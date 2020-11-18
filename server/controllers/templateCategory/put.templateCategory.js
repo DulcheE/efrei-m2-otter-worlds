@@ -1,22 +1,20 @@
-import Template from '../../models/template.model'
+import TemplateCategory from '../../models/templateCategory.model'
 
-export default function putTemplate (req, res) {
-  Template.update(parseInt(req.params.id), new Template(req.body))
+export default function putTemplateCategory (req, res) {
+  TemplateCategory.update(parseInt(req.params.id), new TemplateCategory(req.body))
     .then((bSucceded) => {
       if (bSucceded) {
         res.status(200).json(bSucceded)
       } else {
-        res.status(404).json(`Template ${req.params.id} don't exist !`)
+        res.status(404).json(`TemplateCategory ${req.params.id} don't exist !`)
       }
     })
     .catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err.code)
-      const jsonErr = { code: err.code, message: 'Error while updating the new template.\n' }
+      const jsonErr = { code: err.code, message: 'Error while updating the new templateCategory.\n' }
 
-      if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-        jsonErr.message += 'No existing foreigner for a given id.\n'
-      } else if (err.code === 'ER_PARAMETER_UNDEFINED') {
+      if (err.code === 'ER_PARAMETER_UNDEFINED') {
         jsonErr.message += 'Missing a parameter.\n'
       } else if (err.code === 'ER_DUP_ENTRY') {
         jsonErr.message += 'Duplicate of a unique row.\n'

@@ -1,14 +1,14 @@
-import Template from '../../models/template.model'
+import SubTopic from '../../models/subTopic.model'
 
-export default function postTemplate (req, res) {
-  Template.add(new Template(req.body))
+export default function postSubTopic (req, res) {
+  SubTopic.add(new SubTopic(req.body))
     .then((insertedId) => {
       res.status(201).json(insertedId)
     })
     .catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err.code)
-      const jsonErr = { code: err.code, message: 'Error while creating the new template.\n' }
+      const jsonErr = { code: err.code, message: 'Error while creating the new subTopic.\n' }
 
       if (err.code === 'ER_NO_REFERENCED_ROW_2') {
         jsonErr.message += 'No existing foreigner for a given id.\n'

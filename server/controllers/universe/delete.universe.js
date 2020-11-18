@@ -1,7 +1,7 @@
 import Universe from '../../models/universe.model'
 
 export default function deleteUniverse (req, res) {
-  Universe.remove(parseInt(req.params.id), new Universe(req.body))
+  Universe.remove(parseInt(req.params.id))
     .then((bSucceded) => {
       if (bSucceded) {
         res.status(200).json(bSucceded)
