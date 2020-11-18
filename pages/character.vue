@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <!-- Card containing all data about the character -->
-    <v-card>
+    <v-card shaped>
       <!-- Title for all the essential data about the character -->
       <v-card-title class="text-center justify-center py-6">
         <v-row>
@@ -106,7 +106,11 @@
           </v-col>
         </v-row>
       </v-card-title>
+    </v-card>
 
+    <v-divider class="ma-12" />
+
+    <v-card shaped>
       <!-- Tabs for each data about the character -->
       <v-tabs
         v-model="tab"
@@ -130,31 +134,55 @@
         <!-- Tab n° 1 - Statistics -->
         <v-tab-item>
           <v-container>
-            <v-row align="center" justify="center">
-              <!-- For each stat, we add an input -->
-              <v-col
-                v-for="(category, i) in statsNonEssential"
-                :key="i"
-                cols="6"
-                sm="6"
-                md="4"
-              >
-                <v-card class="pa-4" outlined>
-                  <h1>{{ category.title }}</h1>
-                  <v-text-field
-                    v-for="(stat, j) in category.content"
-                    :key="j"
-                    v-model="stat.value"
-                    :label="stat.name"
-                    :readonly="!isModifying"
-                    :clearable="isModifying"
-                    required
-                    class="ma-4"
-                    :type="stat.isNumber ? 'number' : 'text'"
+            <!-- For each stat category, we add a card -->
+            <v-container
+              v-for="(category, i) in statsNonEssential"
+              :key="i"
+            >
+              <v-hover v-slot="{ hover }">
+                <v-card :class="hover ? 'zoom-xs primary--text ma-8 pa-8' : 'ma-8 pa-8'" :style="hover ? 'border-color: #E9C490' : ''" outlined>
+                  <!-- category's title -->
+                  <h1 :class="hover ? 'primary--text' : ''">
+                    {{ category.title }}
+                  </h1>
+
+                  <!-- category's number input -->
+                  <v-row>
+                    <v-text-field
+                      v-for="(stat, j) in category.content.filter((c) => c.isNumber)"
+                      :key="j"
+                      v-model="stat.value"
+                      :label="stat.name"
+                      :readonly="!isModifying"
+                      :clearable="isModifying"
+                      required
+                      class="ma-4"
+                      type="number"
+                    />
+                  </v-row>
+
+                  <v-divider
+                    v-if="category.content.filter((c) => c.isNumber).length !== 0 && category.content.filter((c) => !c.isNumber).length !== 0"
+                    class="ma-6"
                   />
+
+                  <!-- category's text input -->
+                  <v-row>
+                    <v-text-field
+                      v-for="(stat, j) in category.content.filter((c) => !c.isNumber)"
+                      :key="j"
+                      v-model="stat.value"
+                      :label="stat.name"
+                      :readonly="!isModifying"
+                      :clearable="isModifying"
+                      required
+                      class="ma-2"
+                      type="text"
+                    />
+                  </v-row>
                 </v-card>
-              </v-col>
-            </v-row>
+              </v-hover>
+            </v-container>
           </v-container>
         </v-tab-item>
 
@@ -193,7 +221,7 @@ export default {
 
   data: () => ({
     // Whether the user is able to modify its data or not
-    isModifying: true,
+    isModifying: false,
     hasMagic: true,
     // TEMPORARY - Data about the character to be displayed
     character: {
@@ -247,28 +275,98 @@ export default {
         title: 'General',
         content: [
           {
-            name: 'Reputation',
-            value: 'Well-known',
+            name: 'Intelligence',
+            value: 'Dumb fuck',
             isNumber: false
           },
           {
-            name: 'Strength',
+            name: 'Blablabla',
+            value: 'bla bla ?',
+            isNumber: false
+          },
+          {
+            name: 'Blabla.',
+            value: 'bla !',
+            isNumber: false
+          },
+          {
+            name: 'Deduction',
             value: '8',
             isNumber: true
           },
           {
-            name: 'Agility',
+            name: 'Education',
             value: '5',
             isNumber: true
           },
           {
-            name: 'Spirit',
+            name: 'Language - elder',
             value: '3',
             isNumber: true
           },
           {
-            name: 'Intelligence',
+            name: 'Language - dwarf',
             value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Opposition',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Contradiction',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Premonition',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Compromise',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Agitation',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Violation',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Mutilation',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Planet dies',
+            value: '5',
+            isNumber: true
+          }
+        ]
+      },
+      {
+        title: 'Craft',
+        content: [
+          {
+            name: 'Alchemy',
+            value: 7,
+            isNumber: true
+          },
+          {
+            name: 'Cooking',
+            value: 5,
+            isNumber: true
+          },
+          {
+            name: 'Forgery',
+            value: 2,
             isNumber: true
           }
         ]
@@ -309,7 +407,7 @@ export default {
     },
 
     statsNonEssential () {
-      return this.stats.slice(0, this.stats.length - 1)
+      return this.stats.slice(1, this.stats.length)
     }
   },
 
