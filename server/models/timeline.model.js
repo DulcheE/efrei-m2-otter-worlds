@@ -19,7 +19,7 @@ export default class Timeline {
     this.idTimeline = timeline.idTimeline
     this.name = timeline.name
     this.description = timeline.description
-    this.idUniverse = timeline.idUniverse || timeline.universe_idUniverse
+    this.idUniverse = timeline.universe_idUniverse || timeline.idUniverse
   }
 
   asResource (req) {
@@ -37,7 +37,7 @@ export default class Timeline {
       `${baseAPI(req)}universes/${this.idUniverse}`)
 
     // the links one to many
-    resource.link('event',
+    resource.link('events',
       `${baseAPI(req)}timelines/${this.idTimeline}/events`)
 
     return resource
@@ -48,7 +48,7 @@ export default class Timeline {
    * @param timeline {Timeline[]}
    * @param selfLink {string}
    */
-  static asResourceList (req, timelines, selfLink = 'timeline') {
+  static asResourceList (req, timelines, selfLink = 'timelines') {
     const resourceTimeline = []
     for (const timeline of timelines) {
       const _template = new Timeline(timeline)
