@@ -1,10 +1,12 @@
 import express from 'express'
 import session from 'express-session'
 import logger from 'morgan'
-import apiRouter from './routes/routes.js'
 import config from './server.config.js'
+import mariadbStore from './mariadb-store.js'
+import { apiRoute, apiRouter } from './routes/routes'
 
 const app = express()
+mariadbStore.init(config.MARIADB)
 
 app.use(logger('dev'))
 app.use(session({
@@ -15,6 +17,6 @@ app.use(session({
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.use('/api/', apiRouter)
+app.use(apiRoute, apiRouter)
 
 export default app
