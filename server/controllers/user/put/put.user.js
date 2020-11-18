@@ -1,7 +1,7 @@
 import User from '../../../models/user.model'
 
 export default function updateUsername (req, res) {
-  User.modifyName(req.body)
+  User.modifyName(new User(req.body), parseInt(req.params.id))
     .then((user) => {
       res.status(200).json(user)
     })

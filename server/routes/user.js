@@ -16,7 +16,7 @@ router.get('/:id/characters', getUserCharacter)
 router.get('/:id/universes', getUserUniverse)
 router.post('/', postUser)
 router.post('/login', login)
-router.put('/', putUser)
+router.put('/:id', putUser)
 router.put('/password/:id&:code', putPassword)
 router.delete('/', deleteUser)
 
