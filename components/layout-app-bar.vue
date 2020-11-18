@@ -2,7 +2,7 @@
   <div>
     <!-- App bar (navbar) -->
     <v-app-bar
-      class=""
+      hide-on-scroll
       app
     >
       <v-spacer />
@@ -31,7 +31,22 @@
       <v-spacer />
 
       <!-- Search bar -->
+      <!-- Search bar (on small screen) -->
       <v-text-field
+        class="shrink d-flex d-md-none"
+        placeholder="..."
+        hide-details
+        single-line
+        clearable
+      >
+        <v-icon slot="prepend">
+          mdi-magnify
+        </v-icon>
+      </v-text-field>
+
+      <!-- Search bar (on big screen) -->
+      <v-text-field
+        class="shrink d-none d-md-flex"
         :placeholder="populateSearchBar"
         hide-details
         single-line
@@ -148,7 +163,7 @@
             </template>
 
             <!-- LIST -->
-            <v-list v-if="typeof item.content !== 'undefined'">
+            <v-list v-if="typeof item.content !== 'undefined' && item.content.length !== 0">
               <v-list-item
                 v-for="(content, index) in item.content"
                 :key="index"
@@ -188,6 +203,7 @@
 
 <script>
 import LayoutLoginDialog from '@/components/layout-login-dialog'
+const traverson = require('traverson-promise')
 
 export default {
   name: 'LayoutAppBar',
@@ -200,8 +216,8 @@ export default {
     return {
       name: '',
       // name: 'John DOE',
-      displayDefaultTabs: true,
       isDialogActive: false,
+      universes: [],
       itemsProfile: [
         {
           icon: 'mdi-earth',
@@ -228,35 +244,20 @@ export default {
   },
 
   computed: {
+    // Items to display when a user is NOT browsing an universe
     itemsTabDefault () {
       // We declare some items
       const items = [
         {
           icon: 'mdi-login',
           title: 'Getting Started',
-          to: '/test'
+          to: '/getting-started'
         },
         {
           icon: 'mdi-earth',
           title: 'Most known Universes',
-          to: '/universe',
-          content: [
-            {
-              title: 'Warhammer',
-              srcImg: 'https://aos-tactics.com/wp-content/uploads/2017/02/warhammer-age-of-sigmar-hammer-icon-standard-t-shirt.png',
-              to: '/universe/warhammer'
-            },
-            {
-              title: 'The Witcher',
-              srcImg: 'https://dl1.cbsistatic.com/i/2016/10/20/2b9b17c0-e64a-4d37-955b-2bbff7f9eb10/f7a6e8014e5e20cf9c4da025aec9010d/imgingest-6907707685270604403.png',
-              to: '/universe/witcher'
-            },
-            {
-              title: 'Dungeon & Dragon',
-              srcImg: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
-              to: '/universe/dd'
-            }
-          ]
+          to: '/most-known-universes',
+          content: []
         },
         {
           icon: 'mdi-account-group',
@@ -265,35 +266,21 @@ export default {
         }
       ]
 
+      // We fill the items concerning the universes (if any)
+      this.universes.forEach(u => items[1].content.push({
+        title: u.name,
+        srcImg: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
+        to: '/' + u.name
+      }))
+
       // We return the items
       return items
     },
 
+    // Items to display when a user is browsing an universe
     itemsTabAdvanced () {
       // We declare some items
       const items = [
-        {
-          icon: 'mdi-earth',
-          title: 'Universes',
-          to: '/universe',
-          content: [
-            {
-              title: 'Warhammer',
-              srcImg: 'https://aos-tactics.com/wp-content/uploads/2017/02/warhammer-age-of-sigmar-hammer-icon-standard-t-shirt.png',
-              to: '/universe/warhammer'
-            },
-            {
-              title: 'The Witcher',
-              srcImg: 'https://dl1.cbsistatic.com/i/2016/10/20/2b9b17c0-e64a-4d37-955b-2bbff7f9eb10/f7a6e8014e5e20cf9c4da025aec9010d/imgingest-6907707685270604403.png',
-              to: '/universe/witcher'
-            },
-            {
-              title: 'Dungeon & Dragon',
-              srcImg: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
-              to: '/universe/dd'
-            }
-          ]
-        },
         {
           icon: 'mdi-human-handsup',
           title: 'Characters',
@@ -368,18 +355,26 @@ export default {
       return items
     },
 
+    // Returns the items to display in the App bar Tabs depending on the situation
     itemsTab () {
-      if (this.displayDefaultTabs) {
-        return this.itemsTabDefault
-      } else {
+      if (this.isUniverseSelected) {
         return this.itemsTabAdvanced
+      } else {
+        return this.itemsTabDefault
       }
     },
 
+    // Returns whether a user is logged or not
     isUserLogged () {
       return this.name.length !== 0
     },
 
+    // Returns whether a user is logged or not
+    isUniverseSelected () {
+      return false
+    },
+
+    // Items to put in the search bar
     searchBarItems () {
       return [
         'John Frusciante',
@@ -408,6 +403,7 @@ export default {
       ]
     },
 
+    // Fills the Search bar with a string containing some of the items from a list
     populateSearchBar () {
       // We create a copy of the searchBarItems (since we'll use slice)
       const items = this.searchBarItems
@@ -440,6 +436,25 @@ export default {
       // We return the placeholder
       return placeholder
     }
+  },
+
+  mounted () {
+    traverson.from('http://localhost:3000/api/v1')
+      .follow('$._links.universes')
+      .getResource().result
+      .then((document) => {
+        this.universes = document.universes
+        return Promise.all(this.universes.map((universe) => {
+          traverson.from(universe._links.user.href)
+            .getResource().result
+            .then((document) => {
+              this.$set(universe, 'user', document)
+            })
+        }))
+      })
+      .catch((err) => {
+        throw err.message
+      })
   },
 
   methods: {

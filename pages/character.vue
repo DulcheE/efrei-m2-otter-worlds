@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <!-- Card containing all data about the character -->
-    <v-card>
+    <v-card shaped>
       <!-- Title for all the essential data about the character -->
       <v-card-title class="text-center justify-center py-6">
         <v-row>
@@ -106,9 +106,11 @@
           </v-col>
         </v-row>
       </v-card-title>
+    </v-card>
 
-      <v-divider class="ma-6" />
+    <v-divider class="ma-12" />
 
+    <v-card shaped>
       <!-- Tabs for each data about the character -->
       <v-tabs
         v-model="tab"
@@ -132,72 +134,55 @@
         <!-- Tab n° 1 - Statistics -->
         <v-tab-item>
           <v-container>
-            <v-row>
-              <!-- For each stat, we add an input -->
-              <v-col
-                v-for="(category, i) in statsNonEssential"
-                :key="i"
-                cols="6"
-                sm="6"
-                md="4"
-              >
-                <v-hover v-slot="{ hover }">
-                  <v-card :class="hover ? 'zoom-xs pa-4' : 'pa-4'" outlined>
-                    <!-- category's title -->
-                    <h1 :class="hover ? 'primary--text' : ''">
-                      {{ category.title }}
-                    </h1>
+            <!-- For each stat category, we add a card -->
+            <v-container
+              v-for="(category, i) in statsNonEssential"
+              :key="i"
+            >
+              <v-hover v-slot="{ hover }">
+                <v-card :class="hover ? 'zoom-xs primary--text ma-8 pa-8' : 'ma-8 pa-8'" :style="hover ? 'border-color: #E9C490' : ''" outlined>
+                  <!-- category's title -->
+                  <h1 :class="hover ? 'primary--text' : ''">
+                    {{ category.title }}
+                  </h1>
 
-                    <!-- category's number input -->
-                    <v-row>
-                      <v-col
-                        v-for="(stat, j) in category.content.filter((c) => c.isNumber)"
-                        :key="j"
-                        sm="12"
-                        md="6"
-                        ld="4"
-                      >
-                        <v-text-field
-                          v-model="stat.value"
-                          :label="stat.name"
-                          :readonly="!isModifying"
-                          :clearable="isModifying"
-                          required
-                          class="ma-2"
-                          type="number"
-                        />
-                      </v-col>
-                    </v-row>
-
-                    <v-divider
-                      v-if="category.content.filter((c) => c.isNumber).length !== 0 && category.content.filter((c) => !c.isNumber).length !== 0"
-                      class="ma-6"
+                  <!-- category's number input -->
+                  <v-row>
+                    <v-text-field
+                      v-for="(stat, j) in category.content.filter((c) => c.isNumber)"
+                      :key="j"
+                      v-model="stat.value"
+                      :label="stat.name"
+                      :readonly="!isModifying"
+                      :clearable="isModifying"
+                      required
+                      class="ma-4"
+                      type="number"
                     />
+                  </v-row>
 
-                    <!-- category's text input -->
-                    <v-row>
-                      <v-col
-                        v-for="(stat, j) in category.content.filter((c) => !c.isNumber)"
-                        :key="j"
-                        sm="12"
-                        md="6"
-                        ld="4"
-                      >
-                        <v-text-field
-                          v-model="stat.value"
-                          :label="stat.name"
-                          :readonly="!isModifying"
-                          :clearable="isModifying"
-                          required
-                          class="ma-2"
-                          type="text"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-card>
-                </v-hover>
-              </v-col>
-            </v-row>
+                  <v-divider
+                    v-if="category.content.filter((c) => c.isNumber).length !== 0 && category.content.filter((c) => !c.isNumber).length !== 0"
+                    class="ma-6"
+                  />
+
+                  <!-- category's text input -->
+                  <v-row>
+                    <v-text-field
+                      v-for="(stat, j) in category.content.filter((c) => !c.isNumber)"
+                      :key="j"
+                      v-model="stat.value"
+                      :label="stat.name"
+                      :readonly="!isModifying"
+                      :clearable="isModifying"
+                      required
+                      class="ma-2"
+                      type="text"
+                    />
+                  </v-row>
+                </v-card>
+              </v-hover>
+            </v-container>
           </v-container>
         </v-tab-item>
 
@@ -321,6 +306,46 @@ export default {
           },
           {
             name: 'Language - dwarf',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Opposition',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Contradiction',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Premonition',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Compromise',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Agitation',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Violation',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Mutilation',
+            value: '5',
+            isNumber: true
+          },
+          {
+            name: 'Planet dies',
             value: '5',
             isNumber: true
           }

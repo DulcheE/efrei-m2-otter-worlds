@@ -8,7 +8,9 @@
     </v-row>
 
     <!-- blablabla -->
-    <h1>About us</h1>
+    <h1 class="primary--text">
+      About us
+    </h1>
     <v-container>
       <h4>
         We are a group of 4 <a href="https://www.efrei.fr">Efrei Paris</a> Students in their 5th year of cursus in Software Engineering,
@@ -20,19 +22,33 @@
 
         <br><br><br><br>
 
-        <span class="ma-16">Still reading ? Thanks, here's a gift for you !</span>
+        <span class="font-weight-light primary--text ma-16">Still reading ? Thanks, here's a gift for you !</span>
       </h4>
     </v-container>
 
     <!-- Funny thing -->
     <v-row align="center" justify="center">
       <v-col md="6">
+        <!-- Image -->
         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
           <v-img
-            src="https://tse1.mm.bing.net/th?id=OIP.Qf7AaciNDBLzl6WlbMqG2wHaCe&pid=Api"
+            src="https://i.pinimg.com/originals/68/49/37/684937cb609bc668580f317dbe9f4378.jpg"
             contain
           />
         </a>
+
+        <br>
+
+        <!-- Credit for the OP Original Content -->
+        <center>
+          <a
+            class="font-italic"
+            href="https://www.pinterest.fr/pin/539024649141974565"
+            align="center"
+          >
+            Link to the original artist
+          </a>
+        </center>
       </v-col>
     </v-row>
   </v-container>
