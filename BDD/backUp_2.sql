@@ -71,8 +71,11 @@ INSERT INTO `stat` (`value`, `character_idCharacter`, `templateStat_idTemplateSt
 	('2', 1, 13);
 /*!40000 ALTER TABLE `stat` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.subtopic : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.subtopic : ~2 rows (environ)
 /*!40000 ALTER TABLE `subtopic` DISABLE KEYS */;
+INSERT INTO `subtopic` (`idSubTopic`, `name`, `order`, `topic_idTopic`, `article_idArticle`) VALUES
+	(1, 'The shire', 3, 3, NULL),
+	(3, 'Mordor', 2, 3, NULL);
 /*!40000 ALTER TABLE `subtopic` ENABLE KEYS */;
 
 -- Listage des données de la table otter_worlds.templatecategory : ~3 rows (environ)
@@ -105,8 +108,11 @@ INSERT INTO `templatestat` (`idTemplateStat`, `name`, `bIsNumber`, `bIsRequired`
 /*!40000 ALTER TABLE `timeline` DISABLE KEYS */;
 /*!40000 ALTER TABLE `timeline` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.topic : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.topic : ~2 rows (environ)
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
+INSERT INTO `topic` (`idTopic`, `name`, `order`, `universe_idUniverse`, `article_idArticle`) VALUES
+	(3, 'Royaumes', 1, 1, NULL),
+	(6, 'Religions', 2, 1, NULL);
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 
 -- Listage des données de la table otter_worlds.universe : ~4 rows (environ)
