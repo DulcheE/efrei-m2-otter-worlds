@@ -51,8 +51,8 @@ export default class Timeline {
   static asResourceList (req, timelines, selfLink = 'timelines') {
     const resourceTimeline = []
     for (const timeline of timelines) {
-      const _template = new Timeline(timeline)
-      resourceTimeline.push(_template.asResource(req).toJSON())
+      const _timeline = new Timeline(timeline)
+      resourceTimeline.push(_timeline.asResource(req).toJSON())
     }
 
     const resource = hal.Resource({ timelines: resourceTimeline }, baseAPI(req) + selfLink)
@@ -69,20 +69,20 @@ export default class Timeline {
 
   /**
    * @param {Number} id
-   * @returns {Promise<Template>}
+   * @returns {Promise<Timeline>}
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0]
+    const conn = (await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0]
     if (!conn) {
-      throw new Error(`Template ${id} don't exist !`)
+      throw new Error(`Timeline ${id} don't exist !`)
     }
 
-    return new Template(conn)
+    return new Timeline(conn)
   }
 
   /**
    * @param {Timeline} timeline
-   * @returns {Number} the id of the new inserted template
+   * @returns {Number} the id of the new inserted timeline
    */
   static async add (timeline) {
     const sql = `
@@ -100,14 +100,14 @@ export default class Timeline {
   /**
    * @param {Number} id
    * @param {Timeline} timeline
-   * @returns {Boolean} if the template could have been updated
+   * @returns {Boolean} if the timeline could have been updated
    */
   static async update (id, timeline) {
     const sql = `
       UPDATE timeline
         SET name = ?, description = ?
         WHERE idTimeline = ?`
-    // All the cols you want to update for a template + the id of the template you want to update
+    // All the cols you want to update for a timeline + the id of the timeline you want to update
     // /!\ You may never want to change the links
     const params = [timeline.name, timeline.description, id]
 
@@ -118,7 +118,7 @@ export default class Timeline {
 
   /**
    * @param {Number} id
-   * @returns {Boolean} if the template could have been removed
+   * @returns {Boolean} if the timeline could have been removed
    */
   static async remove (id) {
     const sql = `

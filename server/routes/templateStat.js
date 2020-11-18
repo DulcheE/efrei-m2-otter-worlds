@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import getTemplateStats from '../controllers/templatestat/get.templatestats.js'
-import getTemplateStat from '../controllers/templatestat/get.templatestat.js'
-import postTemplateStat from '../controllers/templatestat/post.templatestat.js'
-import putTemplateStat from '../controllers/templatestat/put.templatestat.js'
-import deleteTemplateStat from '../controllers/templatestat/delete.templatestat.js'
+import getTemplateStats from '../controllers/templateStat/get.templateStats.js'
+import getTemplateStat from '../controllers/templateStat/get.templateStat.js'
+import postTemplateStat from '../controllers/templateStat/post.templateStat.js'
+import putTemplateStat from '../controllers/templateStat/put.templateStat.js'
+import deleteTemplateStat from '../controllers/templateStat/delete.templateStat.js'
 const router = Router()
 
 // Get
