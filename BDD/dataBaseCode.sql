@@ -343,7 +343,9 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `otter_worlds`.`event` (
   `idEvent` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
-  `date` DATE NOT NULL,
+  `year` INT NOT NULL,
+  `month` INT,
+  `day` INT,
   `timeline_idTimeline` INT NOT NULL,
   `article_idArticle` INT NOT NULL,
   PRIMARY KEY (`idEvent`),
