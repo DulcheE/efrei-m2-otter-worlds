@@ -83,6 +83,6 @@ export default {
 
   serverMiddleware: [
     '~/server/server.js'
-  ],
- 
+  ]
+
 }
