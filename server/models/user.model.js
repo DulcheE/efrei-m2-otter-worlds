@@ -132,13 +132,13 @@ export default class User {
    * @param {User} user
    * @return {Promise<User>}
    */
-  static async modifyName (user) {
+  static async modifyName (user, id) {
     const sql = 'SELECT * FROM user WHERE idUser = ?'
-    const param = [user.idUser]
+    const param = [id]
     const row = await mariadbStore.client.query(sql, param)
     const result = new User(row[0])
     if (result.password === user.password) {
-      return await mariadbStore.client.query('UPDATE user SET username = ? WHERE idUSer = ?', [user.username, user.idUser])
+      return await mariadbStore.client.query('UPDATE user SET username = ? WHERE idUSer = ?', [user.username, id])
     } else {
       throw new Error('wrong passeword')
     }
