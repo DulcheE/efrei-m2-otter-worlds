@@ -6,6 +6,7 @@ import inventoryRouter from './inventory.js'
 import subTopicRouter from './subTopic.js'
 import templateCategoryRouter from './templateCategory.js'
 import templateStatRouter from './templateStat.js'
+import timelineRouter from './timeline.js'
 import topicRouter from './topic.js'
 const apiRouter = Router()
 
@@ -21,6 +22,7 @@ apiRouter.use('/inventories', inventoryRouter)
 apiRouter.use('/sub-topics', subTopicRouter)
 apiRouter.use('/template-categories', templateCategoryRouter)
 apiRouter.use('/template-stats', templateStatRouter)
+apiRouter.use('/timelines', timelineRouter)
 apiRouter.use('/topics', topicRouter)
 
 apiRouter.get('/', (req, res) => {
@@ -32,6 +34,7 @@ apiRouter.get('/', (req, res) => {
       subTopics: `${baseAPI(req)}sub-topics`,
       'template-categories': `${baseAPI(req)}template-categories`,
       'template-stats': `${baseAPI(req)}template-stats`,
+      timelines: `${baseAPI(req)}timelines`,
       topics: `${baseAPI(req)}topics`,
       universes: `${baseAPI(req)}universes`,
       users: `${baseAPI(req)}users`
