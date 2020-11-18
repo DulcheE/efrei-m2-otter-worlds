@@ -5,6 +5,7 @@ import characterRouter from './character.js'
 import inventoryRouter from './inventory.js'
 import templateCategoryRouter from './templateCategory.js'
 import templateStatRouter from './templateStat.js'
+import timelineRouter from './timeline.js'
 const apiRouter = Router()
 
 const apiRoute = '/api/v1/'
@@ -18,6 +19,7 @@ apiRouter.use('/characters', characterRouter)
 apiRouter.use('/inventories', inventoryRouter)
 apiRouter.use('/template-categories', templateCategoryRouter)
 apiRouter.use('/template-stats', templateStatRouter)
+apiRouter.use('/timelines', timelineRouter)
 
 apiRouter.get('/', (req, res) => {
   res.json({
