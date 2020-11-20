@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import getTemplateCategories from '../controllers/templatecategory/get.templatecategories.js'
-import getTemplateCategory from '../controllers/templatecategory/get.templatecategory.js'
-import postTemplateCategory from '../controllers/templatecategory/post.templatecategory.js'
-import putTemplateCategory from '../controllers/templatecategory/put.templatecategory.js'
-import deleteTemplateCategory from '../controllers/templatecategory/delete.templatecategory.js'
+import getTemplateCategories from '../controllers/templateCategory/get.templateCategories.js'
+import getTemplateCategory from '../controllers/templateCategory/get.templateCategory.js'
+import postTemplateCategory from '../controllers/templateCategory/post.templateCategory.js'
+import putTemplateCategory from '../controllers/templateCategory/put.templateCategory.js'
+import deleteTemplateCategory from '../controllers/templateCategory/delete.templateCategory.js'
 const router = Router()
 
 // Get

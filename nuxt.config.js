@@ -6,15 +6,15 @@ export default {
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
-    titleTemplate: '%s - otter-worlds',
-    title: 'otter-worlds',
+    titleTemplate: '%s - Otter Worlds',
+    title: 'Otter Worlds',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/logo.ico' }
     ]
   },
 
@@ -53,6 +53,17 @@ export default {
       dark: true,
       themes: {
         dark: {
+          primary: '#E9C490',
+          secondary: '#44221C',
+          accent: '#FF0000',
+          info: '#E9C490',
+          info2: '#9F5143',
+          warning: colors.amber.base,
+          error: colors.deepOrange.accent4,
+          success: colors.green.accent3
+        }
+        /*
+        dark: {
           primary: colors.blue.darken2,
           accent: colors.grey.darken3,
           secondary: colors.amber.darken3,
@@ -61,6 +72,7 @@ export default {
           error: colors.deepOrange.accent4,
           success: colors.green.accent3
         }
+        */
       }
     }
   },
@@ -71,6 +83,6 @@ export default {
 
   serverMiddleware: [
     '~/server/server.js'
-  ],
- 
+  ]
+
 }

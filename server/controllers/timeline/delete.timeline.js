@@ -1,4 +1,4 @@
-import Timeline from '../../models/Timeline.model'
+import Timeline from '../../models/timeline.model'
 
 export default function deleteTimeline (req, res) {
   Timeline.remove(parseInt(req.params.id))

@@ -34,12 +34,6 @@
 .zoom-sm:hover {
   transform: scale(1.1);
 }
-.zoom-xs {
-  transition: transform .2s;
-}
-.zoom-xs:hover {
-  transform: scale(1.05);
-}
 </style>
 
 <script>
