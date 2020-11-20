@@ -15,9 +15,9 @@
 /*!40000 ALTER TABLE `article` DISABLE KEYS */;
 /*!40000 ALTER TABLE `article` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.character : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.character : ~6 rows (environ)
 /*!40000 ALTER TABLE `character` DISABLE KEYS */;
-INSERT INTO `character` (`idCharacter`, `name`, `backstory`, `bIsDead`, `bSheetCompleted`, `user_idUser`, `universe_idUniverse`) VALUES
+INSERT INTO `character` (`idCharacter`, `name`, `backstory`, `bIsDead`, `bIsSheetCompleted`, `user_idUser`, `universe_idUniverse`) VALUES
 	(1, 'Eozen Thelir Daragon', 'A strange warrior who lost his memory', 0, 0, 1, 4),
 	(2, 'Le faurain', 'He come from a demon and patate his enemies', 0, 0, 4, 4),
 	(3, 'ConnArgonien', 'A very friendly reptile', 0, 0, 2, 4),
@@ -42,7 +42,7 @@ INSERT INTO `character` (`idCharacter`, `name`, `backstory`, `bIsDead`, `bSheetC
 /*!40000 ALTER TABLE `interestpoint` DISABLE KEYS */;
 /*!40000 ALTER TABLE `interestpoint` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.inventory : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.inventory : ~3 rows (environ)
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
 INSERT INTO `inventory` (`idInventory`, `name`, `number`, `description`, `weight`, `character_idCharacter`) VALUES
 	(1, 'Torch', 3, 'Torch to light the dark', 0.50, 1),
@@ -62,7 +62,7 @@ INSERT INTO `inventory` (`idInventory`, `name`, `number`, `description`, `weight
 /*!40000 ALTER TABLE `map` DISABLE KEYS */;
 /*!40000 ALTER TABLE `map` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.stat : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.stat : ~12 rows (environ)
 /*!40000 ALTER TABLE `stat` DISABLE KEYS */;
 INSERT INTO `stat` (`value`, `character_idCharacter`, `templateStat_idTemplateStat`) VALUES
 	('5', 1, 1),
@@ -79,14 +79,14 @@ INSERT INTO `stat` (`value`, `character_idCharacter`, `templateStat_idTemplateSt
 	('2', 1, 13);
 /*!40000 ALTER TABLE `stat` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.subtopic : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.subtopic : ~2 rows (environ)
 /*!40000 ALTER TABLE `subtopic` DISABLE KEYS */;
 INSERT INTO `subtopic` (`idSubTopic`, `name`, `order`, `topic_idTopic`, `article_idArticle`) VALUES
 	(1, 'The shire', 3, 3, NULL),
 	(3, 'Mordor', 2, 3, NULL);
 /*!40000 ALTER TABLE `subtopic` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.templatecategory : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.templatecategory : ~3 rows (environ)
 /*!40000 ALTER TABLE `templatecategory` DISABLE KEYS */;
 INSERT INTO `templatecategory` (`idTemplateCategory`, `name`, `order`, `universe_idUniverse`) VALUES
 	(1, 'Characteristics', 2, 4),
@@ -94,7 +94,7 @@ INSERT INTO `templatecategory` (`idTemplateCategory`, `name`, `order`, `universe
 	(3, 'Skills', 3, 4);
 /*!40000 ALTER TABLE `templatecategory` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.templatestat : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.templatestat : ~13 rows (environ)
 /*!40000 ALTER TABLE `templatestat` DISABLE KEYS */;
 INSERT INTO `templatestat` (`idTemplateStat`, `name`, `bIsNumber`, `bIsRequired`, `templateCategory_idTemplateCategory`) VALUES
 	(1, 'Run', 1, 0, 3),
@@ -116,14 +116,14 @@ INSERT INTO `templatestat` (`idTemplateStat`, `name`, `bIsNumber`, `bIsRequired`
 /*!40000 ALTER TABLE `timeline` DISABLE KEYS */;
 /*!40000 ALTER TABLE `timeline` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.topic : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.topic : ~2 rows (environ)
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
 INSERT INTO `topic` (`idTopic`, `name`, `order`, `universe_idUniverse`, `article_idArticle`) VALUES
 	(3, 'Royaumes', 1, 1, NULL),
 	(6, 'Religions', 2, 1, NULL);
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.universe : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.universe : ~4 rows (environ)
 /*!40000 ALTER TABLE `universe` DISABLE KEYS */;
 INSERT INTO `universe` (`idUniverse`, `name`, `description`, `bIsPublic`, `user_idUser`) VALUES
 	(1, 'My little Poney', 'Wonderful world with a lot of magical poney', 1, 4),
@@ -132,7 +132,7 @@ INSERT INTO `universe` (`idUniverse`, `name`, `description`, `bIsPublic`, `user_
 	(4, 'Dungeons and dragons', 'Medieval fantasy world with epic quests', 1, 3);
 /*!40000 ALTER TABLE `universe` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.user : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.user : ~4 rows (environ)
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 INSERT INTO `user` (`idUser`, `username`, `password`) VALUES
 	(1, 'Eddy', 'edypaswor'),
@@ -141,7 +141,7 @@ INSERT INTO `user` (`idUser`, `username`, `password`) VALUES
 	(4, 'Paul', 'paulsword');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.userinuniverse : ~0 rows (environ)
+-- Listage des données de la table otter_worlds.userinuniverse : ~2 rows (environ)
 /*!40000 ALTER TABLE `userinuniverse` DISABLE KEYS */;
 INSERT INTO `userinuniverse` (`user_idUser`, `universe_idUniverse`, `bIsGM`) VALUES
 	(2, 2, 0),
