@@ -8,6 +8,7 @@ import templateCategoryRouter from './templateCategory.js'
 import templateStatRouter from './templateStat.js'
 import timelineRouter from './timeline.js'
 import topicRouter from './topic.js'
+import eventsRouter from './event.js'
 const apiRouter = Router()
 
 const apiRoute = '/api/v1/'
@@ -24,6 +25,7 @@ apiRouter.use('/template-categories', templateCategoryRouter)
 apiRouter.use('/template-stats', templateStatRouter)
 apiRouter.use('/timelines', timelineRouter)
 apiRouter.use('/topics', topicRouter)
+apiRouter.use('/events', eventsRouter)
 
 apiRouter.get('/', (req, res) => {
   res.json({

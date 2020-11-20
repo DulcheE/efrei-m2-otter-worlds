@@ -9,6 +9,8 @@ export default class Timeline {
   name
   /** @type {String} */
   description
+  /** @type  {Event[]} */
+  events
   /** @type {Number} */
   idUniverse
 
@@ -19,6 +21,7 @@ export default class Timeline {
     this.idTimeline = timeline.idTimeline
     this.name = timeline.name
     this.description = timeline.description
+    this.events = []
     this.idUniverse = timeline.universe_idUniverse || timeline.idUniverse
   }
 
@@ -28,7 +31,8 @@ export default class Timeline {
       {
         id: this.idTimeline,
         name: this.name,
-        description: this.description
+        description: this.description,
+        events: this.events
       },
       `${baseAPI(req)}timelines/${this.idTimeline}`)
 
@@ -69,15 +73,15 @@ export default class Timeline {
 
   /**
    * @param {Number} id
-   * @returns {Promise<Template>}
+   * @returns {Promise<Timeline>}
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0]
+    const conn = (await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0]
     if (!conn) {
-      throw new Error(`Template ${id} don't exist !`)
+      throw new Error(`Timeline ${id} don't exist !`)
     }
 
-    return new Template(conn)
+    return new Timeline(conn)
   }
 
   /**
