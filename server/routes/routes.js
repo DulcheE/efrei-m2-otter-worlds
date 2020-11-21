@@ -10,6 +10,9 @@ import templateStatRouter from './templateStat.js'
 import timelineRouter from './timeline.js'
 import topicRouter from './topic.js'
 import eventsRouter from './event.js'
+import mapRouter from './map'
+import interestPointRouter from './interestPoint'
+import articleRouter from './article'
 const apiRouter = Router()
 
 const apiRoute = '/api/v1/'
@@ -28,6 +31,9 @@ apiRouter.use('/template-stats', templateStatRouter)
 apiRouter.use('/timelines', timelineRouter)
 apiRouter.use('/topics', topicRouter)
 apiRouter.use('/events', eventsRouter)
+apiRouter.use('/maps', mapRouter)
+apiRouter.use('/interestPoints', interestPointRouter)
+apiRouter.use('/articles', articleRouter)
 
 apiRouter.get('/', (req, res) => {
   res.json({
@@ -42,7 +48,9 @@ apiRouter.get('/', (req, res) => {
       timelines: `${baseAPI(req)}timelines`,
       topics: `${baseAPI(req)}topics`,
       universes: `${baseAPI(req)}universes`,
-      users: `${baseAPI(req)}users`
+      users: `${baseAPI(req)}users`,
+      events: `${baseAPI(req)}events`,
+      maps: `${baseAPI(req)}maps`
     }
   })
 })
