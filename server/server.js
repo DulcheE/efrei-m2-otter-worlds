@@ -2,11 +2,16 @@ import express from 'express'
 import session from 'express-session'
 import logger from 'morgan'
 import config from './server.config.js'
-// import mariadbStore from './mariadb-store.js'
+import mariadbStore from './mariadb-store.js'
 import { apiRoute, apiRouter } from './routes/routes'
 
 const app = express()
-// mariadbStore.init(config.MARIADB)
+try {
+  mariadbStore.init(config.MARIADB)
+} catch (err) {
+  // eslint-disable-next-line no-console
+  console.log(err.message)
+}
 
 app.use(logger('dev'))
 app.use(session({
