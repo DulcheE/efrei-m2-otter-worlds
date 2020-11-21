@@ -20,34 +20,17 @@
   </v-app>
 </template>
 
-<style>
-/* Zoom effect when overing */
-.zoom {
-  transition: transform .2s;
-}
-.zoom:hover {
-  transform: scale(1.2);
-}
-.zoom-sm {
-  transition: transform .2s;
-}
-.zoom-sm:hover {
-  transform: scale(1.1);
-}
-.zoom-xs {
-  transition: transform .2s;
-}
-.zoom-xs:hover {
-  transform: scale(1.05);
-}
-</style>
-
 <script>
 import LayoutAppBar from '@/components/layout-app-bar'
+import Mixin from '@/mixins/mixin'
 
 export default {
   components: {
     LayoutAppBar
+  },
+
+  mixins: {
+    Mixin
   },
 
   data () {

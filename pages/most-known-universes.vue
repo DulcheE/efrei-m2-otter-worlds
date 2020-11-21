@@ -57,7 +57,7 @@
 
     <router-link to="/characters">
       <v-btn>
-        Normal
+        shortcut to characters
       </v-btn>
     </router-link>
   </v-container>

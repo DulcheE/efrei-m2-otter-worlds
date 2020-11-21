@@ -1,111 +1,122 @@
 <template>
   <v-container>
+    <!-- Status of the character's card -->
+    <v-row align="center" justify="center">
+      <v-col class="pa-4" cols="12" sm="6" md="4">
+        <v-select
+          v-model="status"
+          label="Status of the character's card"
+          :items="statusItems.map(item => item.title)"
+          :readonly="!isModifying"
+          required
+          prepend-icon="mdi-wrench"
+          :color="statusItems.find(item => item.title === status).color"
+          :item-color="statusItems.find(item => item.title === status).color"
+          :class="'ma-4 ' + statusItems.find(item => item.title === status).color + '--text'"
+          solo
+        />
+      </v-col>
+    </v-row>
+
     <!-- Card containing all data about the character -->
     <v-card shaped>
       <!-- Title for all the essential data about the character -->
-      <v-card-title class="text-center justify-center py-6">
+      <v-container class="pa-4">
         <v-row>
           <!-- Image on the left -->
-          <v-col class="pa-4" xs="12" sm="4">
-            <v-img
-              class="shrink d-flex d-md-none"
-              min-height="150"
-              max-height="150"
-              lazy-src="/logo.png"
-              :src="character.src"
-              contain
-            />
-            <v-img
-              class="shrink d-none d-md-flex"
-              min-height="350"
-              max-height="350"
-              lazy-src="/logo.png"
-              :src="character.src"
-            />
+          <v-col class="pa-4" cols="12" lg="4">
+            <!-- Container with fill-height to vertically center the image -->
+            <v-container class="pa-4" fill-height>
+              <v-img
+                class="shrink d-flex d-sm-none"
+                min-height="150"
+                max-height="150"
+                lazy-src="/logo.png"
+                :src="character.src"
+                contain
+              />
+              <v-img
+                class="shrink d-none d-sm-flex"
+                min-height="350"
+                max-height="350"
+                lazy-src="/logo.png"
+                :src="character.src"
+              />
+            </v-container>
           </v-col>
 
           <!-- Text on the right -->
-          <v-col xs="12" sm="8">
-            <v-row align="center" justify="center">
-              <!-- Character's name -->
-              <v-text-field
-                v-model="character.name"
-                label="Name"
-                :readonly="!isModifying"
-                :clearable="isModifying"
-                required
-                class="ma-4"
-                cols="12"
-                sm="6"
-                md="4"
-              />
-
-              <!-- Character's race -->
-              <v-select
-                v-model="character.race"
-                label="Race"
-                :items="arrayRaces"
-                :readonly="!isModifying"
-                required
-                class="ma-4"
-                cols="12"
-                sm="6"
-                md="4"
-              />
-
-              <!-- Character's job -->
-              <v-select
-                v-model="character.job"
-                label="Job"
-                :items="arrayJobs"
-                :readonly="!isModifying"
-                required
-                class="ma-4"
-                cols="12"
-                sm="6"
-                md="4"
-              />
-
-              <!-- Character's age -->
-              <v-text-field
-                v-model="character.age"
-                label="Age"
-                :readonly="!isModifying"
-                :clearable="isModifying"
-                required
-                class="ma-4"
-                type="number"
-                cols="12"
-                sm="6"
-                md="4"
-              />
-            </v-row>
-
-            <v-divider class="ma-6" />
-
-            <v-row align="center" justify="center">
-              <!-- For each stat, we add an input -->
-              <v-col
-                v-for="(item, i) in statsEssential.content"
-                :key="i"
-                cols="12"
-                sm="6"
-                md="4"
-              >
+          <v-col cols="12" lg="8">
+            <v-card elevation="0">
+              <v-row align="center" justify="center">
+                <!-- Character's name -->
                 <v-text-field
-                  v-model="item.value"
-                  :label="item.name"
+                  v-model="character.name"
+                  label="Name"
                   :readonly="!isModifying"
                   :clearable="isModifying"
                   required
                   class="ma-4"
-                  :type="item.isNumber ? 'number' : 'text'"
                 />
-              </v-col>
-            </v-row>
+
+                <!-- Character's race -->
+                <v-select
+                  v-model="character.race"
+                  label="Race"
+                  :items="arrayRaces"
+                  :readonly="!isModifying"
+                  required
+                  class="ma-4"
+                />
+
+                <!-- Character's job -->
+                <v-select
+                  v-model="character.job"
+                  label="Job"
+                  :items="arrayJobs"
+                  :readonly="!isModifying"
+                  required
+                  class="ma-4"
+                />
+
+                <!-- Character's age -->
+                <v-text-field
+                  v-model="character.age"
+                  label="Age"
+                  :readonly="!isModifying"
+                  :clearable="isModifying"
+                  required
+                  class="ma-4"
+                  type="number"
+                />
+              </v-row>
+
+              <v-divider class="ma-6" />
+
+              <v-row align="center" justify="center">
+                <!-- For each stat, we add an input -->
+                <v-col
+                  v-for="(item, i) in statsEssential.content"
+                  :key="i"
+                  cols="12"
+                  sm="6"
+                  md="4"
+                >
+                  <v-text-field
+                    v-model="item.value"
+                    :label="item.name"
+                    :readonly="!isModifying"
+                    :clearable="isModifying"
+                    required
+                    class="ma-4"
+                    :type="item.isNumber ? 'number' : 'text'"
+                  />
+                </v-col>
+              </v-row>
+            </v-card>
           </v-col>
         </v-row>
-      </v-card-title>
+      </v-container>
     </v-card>
 
     <v-divider class="ma-12" />
@@ -221,8 +232,10 @@ export default {
 
   data: () => ({
     // Whether the user is able to modify its data or not
-    isModifying: false,
+    isModifying: true,
     hasMagic: true,
+    isAdmin: false,
+
     // TEMPORARY - Data about the character to be displayed
     character: {
       id: 1234,
@@ -235,6 +248,10 @@ export default {
       age: 22,
       src: 'https://picsum.photos/500/300?image=1'
     },
+
+    // Status of the character's card
+    status: 'Work in progress',
+
     // Tab currently selected on the menu
     tab: null,
     // TEMPORARY - arrays to contain some data
@@ -375,6 +392,35 @@ export default {
   }),
 
   computed: {
+    statusItems () {
+      // We initialize a list
+      const allItems = [
+        {
+          title: 'Work in progress',
+          color: 'primary',
+          isForAdmin: false
+        },
+        {
+          title: 'Waiting validation',
+          color: 'warning',
+          isForAdmin: false
+        },
+        {
+          title: 'Refused by MJ',
+          color: 'error',
+          isForAdmin: true
+        },
+        {
+          title: 'Validated by MJ',
+          color: 'success',
+          isForAdmin: true
+        }
+      ]
+
+      // We return the correct / reduced list
+      return allItems.filter(item => item.isForAdmin === this.isAdmin || item.title === this.status)
+    },
+
     itemsTab () {
       const items = [
         {

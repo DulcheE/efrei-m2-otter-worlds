@@ -48,8 +48,7 @@
 
                   <!-- ...and work -->
                   <router-link class="text-decoration-none white--text" :to="'/universe/wiki/'">
-                    <v-tooltip bottom :open-delay="250">
-                    </v-tooltip>
+                    <v-tooltip bottom :open-delay="250" />
                   </router-link>
                 </h3>
               </v-col>
