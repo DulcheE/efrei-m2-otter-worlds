@@ -41,10 +41,6 @@ export default class InterestPoint {
     resource.link('Article',
       `${baseAPI(req)}Articles/${this.idArticle}`)
 
-    // the links one to many
-    resource.link('otherOthers',
-      `${baseAPI(req)}interestPoints/${this.idInterestPoint}/otherOthers`)
-
     return resource
   }
 
@@ -100,10 +96,10 @@ export default class InterestPoint {
   static async add (interestPoint) {
     const sql = `
       INSERT INTO
-        interestPoint(name, coordinate, map_idMap)
-        VALUES(?, ?, ?)`
+        interestPoint(name, coordinate, map_idMap, article_idArticle)
+        VALUES(?, ?, ?, ?)`
     // All the params we have to put to insert a new row in the table
-    const params = [interestPoint.name, interestPoint.coordinate, interestPoint.idMap]
+    const params = [interestPoint.name, interestPoint.coordinate, interestPoint.idMap, interestPoint.idArticle]
 
     const rows = await mariadbStore.client.query(sql, params)
 

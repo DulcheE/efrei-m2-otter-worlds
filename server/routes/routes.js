@@ -10,6 +10,7 @@ import timelineRouter from './timeline.js'
 import topicRouter from './topic.js'
 import eventsRouter from './event.js'
 import mapRouter from './map'
+import interestPointRouter from './interestPoint'
 const apiRouter = Router()
 
 const apiRoute = '/api/v1/'
@@ -28,6 +29,7 @@ apiRouter.use('/timelines', timelineRouter)
 apiRouter.use('/topics', topicRouter)
 apiRouter.use('/events', eventsRouter)
 apiRouter.use('/maps', mapRouter)
+apiRouter.use('/interestPoints', interestPointRouter)
 
 apiRouter.get('/', (req, res) => {
   res.json({
