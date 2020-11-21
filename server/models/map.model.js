@@ -1,5 +1,6 @@
 import { baseAPI } from '../routes/routes'
 import mariadbStore from '../mariadb-store'
+// import InterestPoint from './interestPoint.model'
 const hal = require('hal')
 
 export default class Map {
@@ -11,6 +12,8 @@ export default class Map {
   idUniverse
   /** @type {Number} */
   idArticle
+  /** @type{ InterestPoint[] } */
+  interestPoints
 
   /**
    * @param {Map} map
@@ -18,6 +21,7 @@ export default class Map {
   constructor (map) {
     this.idMap = map.idMap
     this.name = map.name
+    this.interestPoints = []
     this.idUniverse = map.idUniverse || map.universe_idUniverse
     this.idArticle = map.idArticle || map.article_idArticle
   }
@@ -27,7 +31,8 @@ export default class Map {
     const resource = hal.Resource(
       {
         id: this.idMap,
-        name: this.name
+        name: this.name,
+        interestPoints: this.interestPoints
       },
       `${baseAPI(req)}maps/${this.idMap}`)
 
