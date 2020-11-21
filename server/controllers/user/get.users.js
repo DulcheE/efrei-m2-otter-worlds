@@ -1,4 +1,4 @@
-import User from '../../../models/user.model'
+import User from '../../models/user.model'
 
 export default function getUsers (req, res) {
   // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"

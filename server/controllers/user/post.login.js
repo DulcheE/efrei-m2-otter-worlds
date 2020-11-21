@@ -1,4 +1,4 @@
-import User from '../../../models/user.model'
+import User from '../../models/user.model'
 
 export default function login (req, res) {
   User.Login(new User(req.body))

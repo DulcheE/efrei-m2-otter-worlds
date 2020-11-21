@@ -1,4 +1,4 @@
-import User from '../../../models/user.model'
+import User from '../../models/user.model'
 
 export default function deleteUser (req, res) {
   User.suppr(req.body)

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import userRouter from './user.js' // after the import from express
 import universeRouter from './universe.js'
 import characterRouter from './character.js'
+import groupRouter from './group.js'
 import inventoryRouter from './inventory.js'
 import subTopicRouter from './subTopic.js'
 import templateCategoryRouter from './templateCategory.js'
@@ -19,6 +20,7 @@ const baseAPI = (req) => {
 apiRouter.use('/users', userRouter) // before the export default
 apiRouter.use('/universes', universeRouter)
 apiRouter.use('/characters', characterRouter)
+apiRouter.use('/groups', groupRouter)
 apiRouter.use('/inventories', inventoryRouter)
 apiRouter.use('/sub-topics', subTopicRouter)
 apiRouter.use('/template-categories', templateCategoryRouter)
@@ -32,6 +34,7 @@ apiRouter.get('/', (req, res) => {
     _links: {
       articles: `${baseAPI(req)}articles`,
       characters: `${baseAPI(req)}characters`,
+      groups: `${baseAPI(req)}groups`,
       inventories: `${baseAPI(req)}inventories`,
       subTopics: `${baseAPI(req)}sub-topics`,
       'template-categories': `${baseAPI(req)}template-categories`,

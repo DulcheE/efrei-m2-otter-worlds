@@ -1,4 +1,4 @@
-import User from '../../../models/user.model'
+import User from '../../models/user.model'
 
 export default function updatePassword (req, res) {
   User.ChangePasseword(req.body, req.params.code, parseInt(req.params.id))

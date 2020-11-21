@@ -1,4 +1,4 @@
-import User from '../../../models/user.model'
+import User from '../../models/user.model'
 
 export default function getUser (req, res) {
   User.get(parseInt(req.params.id))

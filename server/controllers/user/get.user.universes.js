@@ -1,5 +1,5 @@
-import Universe from '../../../models/universe.model'
-import User from '../../../models/user.model'
+import Universe from '../../models/universe.model'
+import User from '../../models/user.model'
 
 export default function getUserUniverse (req, res) {
   User.getUniverses(parseInt(req.params.id))

@@ -1,5 +1,5 @@
-import User from '../../../models/user.model'
-import Characters from '../../../models/character.model'
+import User from '../../models/user.model'
+import Characters from '../../models/character.model'
 
 export default function getUserCharacter (req, res) {
   User.getCharacters(parseInt(req.params.id))

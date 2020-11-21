@@ -1,4 +1,4 @@
-import User from '../../../models/user.model'
+import User from '../../models/user.model'
 
 export default function PostUser (req, res) {
   User.add(new User(req.body))
