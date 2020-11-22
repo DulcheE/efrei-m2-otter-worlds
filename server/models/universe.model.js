@@ -48,6 +48,8 @@ export default class Universe {
       `${baseAPI(req)}universes/${this.idUniverse}/timelines`)
     resource.link('topics',
       `${baseAPI(req)}universes/${this.idUniverse}/topics`)
+    resource.link('usersPlaying',
+      `${baseAPI(req)}universes/${this.idUniverse}/users-playing`)
 
     return resource
   }
@@ -95,6 +97,19 @@ export default class Universe {
    */
   static async getCharacters (id) {
     return await mariadbStore.client.query('SELECT * FROM `character` WHERE universe_idUniverse = ?', id)
+  }
+
+  /**
+   * @param {Number} id
+   * @returns {Promise<Characters>}
+   */
+  static async getUsersPlaying (id) {
+    return await mariadbStore.client.query(`
+      SELECT u.*, uin.bIsGM FROM user u
+      INNER JOIN userinuniverse uin
+        ON uin.idUser = u.idUser
+      WHERE idUniverse = ?
+    `, id)
   }
 
   /**

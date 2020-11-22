@@ -29,9 +29,10 @@ export default class User {
 
     resource.link('groups',
       `${baseAPI(req)}users/${this.idUser}/groups`)
-
     resource.link('universes',
       `${baseAPI(req)}users/${this.idUser}/universes`)
+    resource.link('universesPlays',
+        `${baseAPI(req)}users/${this.idUser}/universes-plays`)
 
     return resource
   }
@@ -87,8 +88,6 @@ export default class User {
    * @returns {Promise<Groups>}
    */
   static async getGroups (idUser, idUniverse) {
-    console.log(idUser)
-    console.log(idUniverse)
     return await mariadbStore.client.query(`
       SELECT g.idGroup, g.name, g.universe_idUniverse FROM \`group\` g
       INNER JOIN characterInGroup cg
@@ -105,6 +104,19 @@ export default class User {
    */
   static async getUniverses (id) {
     return await mariadbStore.client.query('SELECT * FROM `universe` WHERE user_idUser = ?', id)
+  }
+
+  /**
+   * @param {Number} id
+   * @returns {Promise<Universe>}
+   */
+  static async getUniversesPlays (id) {
+    return await mariadbStore.client.query(`
+      SELECT u.*, uin.bIsGM FROM universe u
+      INNER JOIN userinuniverse uin
+        ON uin.idUniverse = u.idUniverse
+      WHERE idUser = ?
+    `, id)
   }
 
   /**
