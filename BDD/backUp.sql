@@ -141,12 +141,12 @@ INSERT INTO `user` (`idUser`, `username`, `password`) VALUES
 	(4, 'Paul', 'paulsword');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.userinuniverse : ~2 rows (environ)
-/*!40000 ALTER TABLE `userinuniverse` DISABLE KEYS */;
-INSERT INTO `userinuniverse` (`user_idUser`, `universe_idUniverse`, `bIsGM`) VALUES
+-- Listage des données de la table otter_worlds.userinvitation : ~2 rows (environ)
+/*!40000 ALTER TABLE `userinvitation` DISABLE KEYS */;
+INSERT INTO `userinvitation` (`user_idUser`, `universe_idUniverse`, `bIsGM`) VALUES
 	(2, 2, 0),
 	(3, 2, 0);
-/*!40000 ALTER TABLE `userinuniverse` ENABLE KEYS */;
+/*!40000 ALTER TABLE `userinvitation` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
