@@ -114,7 +114,6 @@ export default class Event {
    * @returns {Number} the id of the new inserted Event
    */
   static async add (event) {
-    console.log('article' + event.idArticle)
     const sql = `
       INSERT INTO
         Event(name, year, month, day, description, timeline_idTimeline, article_idArticle)

@@ -4,6 +4,7 @@ import getArticle from '../controllers/article/get.article.js'
 import getArticleEvent from '../controllers/article/get.article.event'
 import getArticleMaps from '../controllers/article/get.article.maps'
 import getArticleInterestPoints from '../controllers/article/get.article.interestPoint'
+import getArticleKeyword from '../controllers/article/get.article.keywords'
 import postArticle from '../controllers/article/post.article.js'
 import putArticle from '../controllers/article/put.article.js'
 import deleteArticle from '../controllers/article/delete.article.js'
@@ -15,6 +16,7 @@ router.get('/:id', getArticle)
 router.get('/:id/events', getArticleEvent)
 router.get('/:id/maps', getArticleMaps)
 router.get('/:id/interestPoints', getArticleInterestPoints)
+router.get('/:id/keywords', getArticleKeyword)
 
 // Post
 router.post('/', postArticle)

@@ -77,6 +77,14 @@ export default class Article {
 
   /**
    * @param {Number} id
+   * @returns {Promise<Article[]>}
+   */
+  static async getAllArticleForKeyword (id) {
+    return await mariadbStore.client.query('select * from article a left outer join keywordarticle ka on a.idArticle = ka.article_idArticle where ka.keywords_idKeyword = ?', id)
+  }
+
+  /**
+   * @param {Number} id
    * @returns {Promise<Article>}
    */
   static async get (id) {

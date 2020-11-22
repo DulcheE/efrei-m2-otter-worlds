@@ -13,6 +13,7 @@ import eventsRouter from './event.js'
 import mapRouter from './map'
 import interestPointRouter from './interestPoint'
 import articleRouter from './article'
+import keywordRouter from './keyword'
 const apiRouter = Router()
 
 const apiRoute = '/api/v1/'
@@ -34,6 +35,7 @@ apiRouter.use('/events', eventsRouter)
 apiRouter.use('/maps', mapRouter)
 apiRouter.use('/interestPoints', interestPointRouter)
 apiRouter.use('/articles', articleRouter)
+apiRouter.use('/keywords', keywordRouter)
 
 apiRouter.get('/', (req, res) => {
   res.json({
