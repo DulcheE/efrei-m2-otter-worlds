@@ -78,6 +78,14 @@ export default class InterestPoint {
 
   /**
    * @param {Number} id
+   * @returns {Promise<InterestPoint[]>}
+   */
+  static async getAllforArticle (id) {
+    return await mariadbStore.client.query('SELECT * FROM interestPoint WHERE article_idArticle=?', id)
+  }
+
+  /**
+   * @param {Number} id
    * @returns {Promise<InterestPoint>}
    */
   static async get (id) {

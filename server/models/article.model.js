@@ -41,8 +41,12 @@ export default class Article {
       `${baseAPI(req)}SubTopics/${this.idSubTopic}`)
 
     // the links one to many
-    resource.link('otherOthers',
-      `${baseAPI(req)}Articles/${this.idArticle}/otherOthers`)
+    resource.link('Maps',
+      `${baseAPI(req)}Articles/${this.idArticle}/maps`)
+    resource.link('Events',
+       `${baseAPI(req)}Articles/${this.idArticle}/events`)
+    resource.link('interestPoints',
+      `${baseAPI(req)}Articles/${this.idArticle}/interestPoints`)
 
     return resource
   }

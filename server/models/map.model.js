@@ -87,6 +87,14 @@ export default class Map {
   }
 
   /**
+   * @param {Number} id
+   * @returns {Promise<Map>}
+   */
+  static async getForArticle (id) {
+    return await mariadbStore.client.query('SELECT * FROM map WHERE article_idArticle = ?', id)
+  }
+
+  /**
    * @param {Map} map
    * @returns {Number} the id of the new inserted map
    */

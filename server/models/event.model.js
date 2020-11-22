@@ -86,6 +86,14 @@ export default class Event {
 
   /**
    * @param {Number} id
+   * @returns {Promise<Event[]>}
+   */
+  static async getForArticle (id) {
+    return await mariadbStore.client.query('SELECT * FROM Event WHERE article_idArticle = ? ORDER BY year, month, day', id)
+  }
+
+  /**
+   * @param {Number} id
    * @returns {Promise<Event>}
    */
   static async get (id) {
