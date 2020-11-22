@@ -8,6 +8,8 @@ import { apiRoute, apiRouter } from './routes/routes'
 const app = express()
 try {
   mariadbStore.init(config.MARIADB)
+  // eslint-disable-next-line no-console
+  console.log('Connection to the MariaDB database successful !')
 } catch (err) {
   // eslint-disable-next-line no-console
   console.log(err.message)
