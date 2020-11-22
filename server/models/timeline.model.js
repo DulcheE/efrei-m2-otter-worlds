@@ -9,6 +9,8 @@ export default class Timeline {
   name
   /** @type {String} */
   description
+  /** @type {Boolean} */
+  bIsPublic
   /** @type  {Event[]} */
   events
   /** @type {Number} */
@@ -21,6 +23,7 @@ export default class Timeline {
     this.idTimeline = timeline.idTimeline
     this.name = timeline.name
     this.description = timeline.description
+    this.bIsPublic = timeline.bIsPublic
     this.events = []
     this.idUniverse = timeline.universe_idUniverse || timeline.idUniverse
   }
@@ -32,6 +35,7 @@ export default class Timeline {
         id: this.idTimeline,
         name: this.name,
         description: this.description,
+        bIsPublic: this.bIsPublic,
         events: this.events
       },
       `${baseAPI(req)}timelines/${this.idTimeline}`)
@@ -91,10 +95,10 @@ export default class Timeline {
   static async add (timeline) {
     const sql = `
       INSERT INTO
-        timeline(name, description, universe_idUniverse)
-        VALUES(?, ?, ?)`
+        timeline(name, description, bIsPublic, universe_idUniverse)
+        VALUES(?, ?, ?, ?)`
     // All the params we have to put to insert a new row in the table
-    const params = [timeline.name, timeline.description, timeline.idUniverse]
+    const params = [timeline.name, timeline.description, timeline.bIsPublic, timeline.idUniverse]
 
     const rows = await mariadbStore.client.query(sql, params)
 
@@ -109,11 +113,11 @@ export default class Timeline {
   static async update (id, timeline) {
     const sql = `
       UPDATE timeline
-        SET name = ?, description = ?
+        SET name = ?, description = ?, bIsPublic =?
         WHERE idTimeline = ?`
     // All the cols you want to update for a timeline + the id of the timeline you want to update
     // /!\ You may never want to change the links
-    const params = [timeline.name, timeline.description, id]
+    const params = [timeline.name, timeline.description, timeline.bIsPublic, id]
 
     const rows = await mariadbStore.client.query(sql, params)
 

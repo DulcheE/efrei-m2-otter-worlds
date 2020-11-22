@@ -13,6 +13,8 @@ export default class Event {
   month
   /** @type {Number} */
   day
+  /** @type {String} */
+  description
   /** @type {Number} */
   idTimeline
   /** @type {Number} */
@@ -27,8 +29,9 @@ export default class Event {
     this.year = event.year
     this.month = event.month || null
     this.day = event.day || null
+    this.description = event.description
     this.idTimeline = event.idTimeline || event.timeline_idTimeline
-    this.idArticle = event.idArticle || event.article_idArticle
+    this.idArticle = event.idArticle || event.article_idArticle || null
   }
 
   asResource (req) {
@@ -39,7 +42,8 @@ export default class Event {
         name: this.name,
         year: this.year,
         month: this.month,
-        day: this.day
+        day: this.day,
+        description: this.description
       },
       `${baseAPI(req)}events/${this.idEvent}`)
 
@@ -110,12 +114,13 @@ export default class Event {
    * @returns {Number} the id of the new inserted Event
    */
   static async add (event) {
+    console.log('article' + event.idArticle)
     const sql = `
       INSERT INTO
-        Event(name, year, month, day, timeline_idTimeline, article_idArticle)
-        VALUES(?, ?, ?, ?, ?, ?)`
+        Event(name, year, month, day, description, timeline_idTimeline, article_idArticle)
+        VALUES(?, ?, ?, ?, ?, ?, ?)`
     // All the params we have to put to insert a new row in the table
-    const params = [event.name, event.year, event.month, event.day, event.idTimeline, event.idArticle]
+    const params = [event.name, event.year, event.month, event.day, event.description, event.idTimeline, event.idArticle]
 
     const rows = await mariadbStore.client.query(sql, params)
 
@@ -130,11 +135,11 @@ export default class Event {
   static async update (id, event) {
     const sql = `
       UPDATE Event
-        SET name = ?, year = ?, month = ?, day = ?, article_idArticle = ?
+        SET name = ?, year = ?, month = ?, day = ?, description=?, article_idArticle = ?
         WHERE idEvent = ?`
     // All the cols you want to update for a event + the id of the event you want to update
     // /!\ You may never want to change the links
-    const params = [event.name, event.year, event.month, event.day, event.idArticle, id]
+    const params = [event.name, event.year, event.month, event.day, event.description, event.idArticle, id]
 
     const rows = await mariadbStore.client.query(sql, params)
 
