@@ -289,8 +289,8 @@ export default {
     isActive: false,
     itemsRoles: [
       {
-        title: 'Dungeon Master',
-        img: '/getting-started-dm.png',
+        title: 'Game Master',
+        img: '/getting-started-gm.png',
         content: [
           'Create your universes !',
           'Build stories, write your world-building !',
