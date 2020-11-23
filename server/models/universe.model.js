@@ -129,6 +129,24 @@ export default class Universe {
   }
 
   /**
+   * @param {Number} idUniverse
+   * @param {Number} idUser
+   * @param {Number} bIsGM
+   * @returns {Boolean} the id of the new inserted universe
+   */
+  static async inviteUser (idUniverse, idUser, bIsGM) {
+    const sql = `
+      INSERT INTO 
+        userInvitation(user_idUser, universe_idUniverse, bIsGM) 
+        VALUES(?, ?, ?)`
+    const params = [idUser, idUniverse, !!bIsGM]
+
+    const rows = await mariadbStore.client.query(sql, params)
+
+    return rows.affectedRows || false
+  }
+
+  /**
    * @param {Number} id
    * @param {Universe} universe
    * @returns {Boolean} if the universe could have been updated
@@ -139,6 +157,24 @@ export default class Universe {
         SET name = ?, description = ?, bIsPublic = ?
         WHERE idUniverse = ?`
     const params = [universe.name, universe.description, universe.bIsPublic, id]
+
+    const rows = await mariadbStore.client.query(sql, params)
+
+    return rows.affectedRows === 1
+  }
+
+  /**
+   * @param {Number} idUniverse
+   * @param {Number} idUser
+   * @param {Boolean} bIsGM
+   * @returns {Boolean} if the universe could have been updated
+   */
+  static async updateUserRole (idUniverse, idUser, bIsGM) {
+    const sql = `
+      UPDATE userInvitation
+        SET bIsGM = ?
+        WHERE universe_idUniverse = ? AND user_idUser = ?`
+    const params = [bIsGM, idUniverse, idUser]
 
     const rows = await mariadbStore.client.query(sql, params)
 
@@ -158,5 +194,31 @@ export default class Universe {
     const rows = await mariadbStore.client.query(sql, params)
 
     return rows.affectedRows === 1
+  }
+
+  /**
+   * @param {Number} idUniverse
+   * @param {Number} idUser
+   * @returns {Boolean} if the universe could have been removed
+   */
+  static async kickUser (idUniverse, idUser) {
+    const sql = `
+      DELETE FROM userInvitation
+        WHERE universe_idUniverse = ? AND user_idUser = ?`
+    const params = [idUniverse, idUser]
+
+    const rows = await mariadbStore.client.query(sql, params)
+
+    if (rows.affectedRows !== 1) { return false }
+
+    const sql2 = `
+      DELETE FROM \`character\`
+        WHERE universe_idUniverse = ? AND user_idUser = ?
+    `
+    const params2 = [idUniverse, idUser]
+
+    await mariadbStore.client.query(sql2, params2)
+
+    return true
   }
 }
