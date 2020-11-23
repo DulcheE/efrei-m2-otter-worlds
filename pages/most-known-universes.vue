@@ -60,6 +60,18 @@
         shortcut to characters
       </v-btn>
     </router-link>
+
+    <router-link to="/character">
+      <v-btn>
+        shortcut to character
+      </v-btn>
+    </router-link>
+
+    <router-link to="/character-define">
+      <v-btn>
+        shortcut to character-define
+      </v-btn>
+    </router-link>
   </v-container>
 </template>
 
