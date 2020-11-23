@@ -1,5 +1,61 @@
 <template>
   <v-container>
+    <!-- Button to activate the modification -->
+    <center v-if="!isModifying" class="pa-4">
+      <v-btn
+        large
+        outlined
+        color="primary"
+        class="ma-2"
+        @click="isModifying = true"
+      >
+        <v-icon
+          left
+          dark
+        >
+          mdi-wrench
+        </v-icon>
+        Modify the character
+      </v-btn>
+    </center>
+
+    <!-- Buttons when  modifying -->
+    <center v-else class="pa-4">
+      <!-- Button to discard the modifications -->
+      <v-btn
+        large
+        outlined
+        color="error"
+        class="ma-2"
+        @click="discardChanges"
+      >
+        <v-icon
+          left
+          dark
+        >
+          mdi-delete
+        </v-icon>
+        Discard the changes
+      </v-btn>
+
+      <!-- Button to save the modifications -->
+      <v-btn
+        large
+        outlined
+        color="success"
+        class="ma-2"
+        @click="saveChanges"
+      >
+        <v-icon
+          left
+          dark
+        >
+          mdi-check
+        </v-icon>
+        Save the changes
+      </v-btn>
+    </center>
+
     <!-- Status of the character's card -->
     <v-row align="center" justify="center">
       <v-col class="pa-4" cols="12" sm="6" md="4">
@@ -27,6 +83,7 @@
           <v-col class="pa-4" cols="12" lg="4">
             <!-- Container with fill-height to vertically center the image -->
             <v-container class="pa-4" fill-height>
+              <!-- small image for small screens -->
               <v-img
                 class="shrink d-flex d-sm-none"
                 min-height="150"
@@ -35,6 +92,8 @@
                 :src="character.src"
                 contain
               />
+
+              <!-- big image for bigger screens -->
               <v-img
                 class="shrink d-none d-sm-flex"
                 min-height="350"
@@ -45,75 +104,115 @@
             </v-container>
           </v-col>
 
-          <!-- Text on the right -->
+          <!-- Inputs on the right -->
           <v-col cols="12" lg="8">
-            <v-card elevation="0">
+            <!-- Container with fill-height to vertically center the content -->
+            <v-container class="pa-4" fill-height>
               <v-row align="center" justify="center">
                 <!-- Character's name -->
-                <v-text-field
-                  v-model="character.name"
-                  label="Name"
-                  :readonly="!isModifying"
-                  :clearable="isModifying"
-                  required
-                  class="ma-4"
-                />
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="character.name"
+                    label="Name"
+                    :disabled="!isModifying"
+                    :clearable="isModifying"
+                    :rules="isModifying ? [rules.ascii] : []"
+                    required
+                    class="ma-4"
+                    type="text"
+                  />
+                </v-col>
 
                 <!-- Character's race -->
-                <v-select
-                  v-model="character.race"
-                  label="Race"
-                  :items="arrayRaces"
-                  :readonly="!isModifying"
-                  required
-                  class="ma-4"
-                />
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="character.race"
+                    label="Race"
+                    :disabled="!isModifying"
+                    :clearable="isModifying"
+                    :rules="isModifying ? [rules.ascii] : []"
+                    required
+                    class="ma-4"
+                    type="text"
+                  />
+                </v-col>
 
                 <!-- Character's job -->
-                <v-select
-                  v-model="character.job"
-                  label="Job"
-                  :items="arrayJobs"
-                  :readonly="!isModifying"
-                  required
-                  class="ma-4"
-                />
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="character.job"
+                    label="Job"
+                    :disabled="!isModifying"
+                    :clearable="isModifying"
+                    :rules="isModifying ? [rules.ascii] : []"
+                    required
+                    class="ma-4"
+                  />
+                </v-col>
 
                 <!-- Character's age -->
-                <v-text-field
-                  v-model="character.age"
-                  label="Age"
-                  :readonly="!isModifying"
-                  :clearable="isModifying"
-                  required
-                  class="ma-4"
-                  type="number"
-                />
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    v-model="character.age"
+                    label="Age"
+                    :disabled="!isModifying"
+                    :clearable="isModifying"
+                    required
+                    class="ma-4"
+                    type="number"
+                  />
+                </v-col>
               </v-row>
 
-              <v-divider class="ma-6" />
+              <!-- A separator to divide both parts -->
+              <v-container>
+                <v-divider v-if="statsEssential.content.length !== 0" class="ma-6" />
+              </v-container>
 
+              <!-- For each Essential stat, we add an input -->
+              <!-- First, the number inputs -->
               <v-row align="center" justify="center">
-                <!-- For each stat, we add an input -->
                 <v-col
-                  v-for="(item, i) in statsEssential.content"
-                  :key="i"
+                  v-for="item in orderByName(statsEssential.content.filter(s => s.isNumber))"
+                  :key="item.id"
                   cols="12"
                   sm="6"
-                  md="4"
+                  md="3"
                 >
                   <v-text-field
                     v-model="item.value"
                     :label="item.name"
-                    :readonly="!isModifying"
+                    :disabled="!isModifying"
                     :clearable="isModifying"
+                    :rules="isModifying ? [rules.ascii] : []"
                     required
                     class="ma-4"
-                    :type="item.isNumber ? 'number' : 'text'"
+                    type="number"
                   />
                 </v-col>
               </v-row>
-            </v-card>
+
+              <!-- Second, the text inputs -->
+              <v-row align="center" justify="center">
+                <v-col
+                  v-for="item in orderByName(statsEssential.content.filter(s => !s.isNumber))"
+                  :key="item.id"
+                  cols="12"
+                  sm="6"
+                  md="3"
+                >
+                  <v-text-field
+                    v-model="item.value"
+                    :label="item.name"
+                    :disabled="!isModifying"
+                    :clearable="isModifying"
+                    required
+                    class="ma-4"
+                    type="text"
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
           </v-col>
         </v-row>
       </v-container>
@@ -144,78 +243,22 @@
       <v-tabs-items v-model="tab">
         <!-- Tab n° 1 - Statistics -->
         <v-tab-item>
-          <v-container>
-            <!-- For each stat category, we add a card -->
-            <v-container
-              v-for="(category, i) in statsNonEssential"
-              :key="i"
-            >
-              <v-hover v-slot="{ hover }">
-                <v-card :class="hover ? 'zoom-xs primary--text ma-8 pa-8' : 'ma-8 pa-8'" :style="hover ? 'border-color: #E9C490' : ''" outlined>
-                  <!-- category's title -->
-                  <h1 :class="hover ? 'primary--text' : ''">
-                    {{ category.title }}
-                  </h1>
-
-                  <!-- category's number input -->
-                  <v-row>
-                    <v-text-field
-                      v-for="(stat, j) in category.content.filter((c) => c.isNumber)"
-                      :key="j"
-                      v-model="stat.value"
-                      :label="stat.name"
-                      :readonly="!isModifying"
-                      :clearable="isModifying"
-                      required
-                      class="ma-4"
-                      type="number"
-                    />
-                  </v-row>
-
-                  <v-divider
-                    v-if="category.content.filter((c) => c.isNumber).length !== 0 && category.content.filter((c) => !c.isNumber).length !== 0"
-                    class="ma-6"
-                  />
-
-                  <!-- category's text input -->
-                  <v-row>
-                    <v-text-field
-                      v-for="(stat, j) in category.content.filter((c) => !c.isNumber)"
-                      :key="j"
-                      v-model="stat.value"
-                      :label="stat.name"
-                      :readonly="!isModifying"
-                      :clearable="isModifying"
-                      required
-                      class="ma-2"
-                      type="text"
-                    />
-                  </v-row>
-                </v-card>
-              </v-hover>
-            </v-container>
-          </v-container>
+          <CharacterCardStatistics :is-modifying="isModifying" :rules="rules" :stats="stats" :stats-non-essential="statsNonEssential" :order-by-name="orderByName" />
         </v-tab-item>
 
         <!-- Tab n° 2 - Inventory -->
         <v-tab-item>
-          <v-card flat>
-            <v-card-text>Inventory</v-card-text>
-          </v-card>
+          <CharacterCardInventory :is-modifying="isModifying" :rules="rules" :stats="stats" :stats-non-essential="statsNonEssential" :order-by-name="orderByName" />
         </v-tab-item>
 
         <!-- Tab n° 3 - Magic (may be passed) -->
         <v-tab-item v-if="hasMagic">
-          <v-card flat>
-            <v-card-text>Magic</v-card-text>
-          </v-card>
+          <CharacterCardMagic :is-modifying="isModifying" :rules="rules" :stats="stats" :stats-non-essential="statsNonEssential" :order-by-name="orderByName" />
         </v-tab-item>
 
         <!-- Tab n° 4 - BackStory -->
         <v-tab-item>
-          <v-card flat>
-            <v-card-text>BackStory</v-card-text>
-          </v-card>
+          <CharacterCardBackstory :is-modifying="isModifying" :rules="rules" :stats="stats" :stats-non-essential="statsNonEssential" :order-by-name="orderByName" />
         </v-tab-item>
       </v-tabs-items>
     </v-card>
@@ -224,15 +267,24 @@
 
 <script>
 // Imports
+import CharacterCardStatistics from '@/components/character-card-statistics'
+import CharacterCardInventory from '@/components/character-card-inventory'
+import CharacterCardMagic from '@/components/character-card-magic'
+import CharacterCardBackstory from '@/components/character-card-backstory'
+
 export default {
   name: 'PageCharacter',
 
   components: {
+    CharacterCardStatistics,
+    CharacterCardInventory,
+    CharacterCardMagic,
+    CharacterCardBackstory
   },
 
   data: () => ({
     // Whether the user is able to modify its data or not
-    isModifying: true,
+    isModifying: false,
     hasMagic: true,
     isAdmin: false,
 
@@ -242,7 +294,7 @@ export default {
       user: {
         username: 'J3@n C@st3x'
       },
-      name: 'John DOE',
+      name: 'John DOE 𝕗',
       race: 'Human',
       job: 'Soldier',
       age: 22,
@@ -251,15 +303,17 @@ export default {
 
     // Status of the character's card
     status: 'Work in progress',
+    rules: {
+      required: value => !!value || 'Required',
+      counter: value => value.length <= 20 || 'Max 20 characters',
+      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
+    },
 
     // Tab currently selected on the menu
     tab: null,
-    // TEMPORARY - arrays to contain some data
-    arrayRaces: ['Human', 'Ork', 'Argonian', 'Titan', 'Witcher', 'ELf', 'Dwarf'],
-    arrayJobs: ['Soldier', 'Priest', 'Commoner', 'Brigand', 'Thief', 'Merchant'],
     stats: [
       {
-        title: 'Essential',
+        name: 'Essential',
         content: [
           {
             name: 'Reputation',
@@ -272,11 +326,6 @@ export default {
             isNumber: true
           },
           {
-            name: 'Agility',
-            value: '5',
-            isNumber: true
-          },
-          {
             name: 'Spirit',
             value: '3',
             isNumber: true
@@ -285,11 +334,16 @@ export default {
             name: 'Intelligence',
             value: '5',
             isNumber: true
+          },
+          {
+            name: 'Karma',
+            value: 'Non-existent',
+            isNumber: false
           }
         ]
       },
       {
-        title: 'General',
+        name: 'General',
         content: [
           {
             name: 'Intelligence',
@@ -369,7 +423,7 @@ export default {
         ]
       },
       {
-        title: 'Craft',
+        name: 'Craft',
         content: [
           {
             name: 'Alchemy',
@@ -461,6 +515,44 @@ export default {
   },
 
   methods: {
+    /**
+     * Sorts a complex array by it's string field "name"
+     * @param {[]} array Array of complex objects containing a field "name"
+     */
+    orderByName (array) {
+      return array.sort((a, b) => {
+        const na = a.name.toLowerCase()
+        const nb = b.name.toLowerCase()
+
+        if (na < nb) {
+          return -1
+        }
+        if (na > nb) {
+          return 1
+        }
+        return 0
+      })
+    },
+
+    /**
+     * Discard the changes brought the character card
+     */
+    discardChanges () {
+      this.isModifying = false
+    },
+
+    /**
+     * Saves the changes brought the character card, IF VALID
+     */
+    saveChanges () {
+      this.isModifying = false
+      /*
+      this.stats.forEach((category) => {
+        console.log('CAT : ', category.name)
+        category.content.forEach(stat => console.log(stat.name, ' : ', stat.value))
+      })
+      */
+    }
   }
 }
 </script>
