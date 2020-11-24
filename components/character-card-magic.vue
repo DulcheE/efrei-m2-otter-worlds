@@ -21,20 +21,6 @@ export default {
       type: Object,
       required: true,
       default: () => {}
-    },
-    stats: {
-      type: Array,
-      required: true,
-      default: () => []
-    },
-    statsNonEssential: {
-      type: Array,
-      required: true,
-      default: () => []
-    },
-    orderByName: {
-      type: Function,
-      required: true
     }
   },
 

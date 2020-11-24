@@ -259,7 +259,7 @@
 
           <!-- Tab n° 2 - Inventory -->
           <v-tab-item>
-            <CharacterCardInventory :is-modifying="isModifying" :rules="rules" :stats="stats" />
+            <CharacterCardInventory :is-modifying="isModifying" :rules="rules" :inventory="inventory" />
           </v-tab-item>
 
           <!-- Tab n° 3 - Magic (may be passed) -->
@@ -275,7 +275,7 @@
       </v-card>
 
       <!-- Button to activate the modification -->
-      <center v-if="!isModifying" class="pa-4">
+      <center v-if="!isModifying" class="pa-16">
         <v-btn
           large
           outlined
@@ -294,7 +294,7 @@
       </center>
 
       <!-- Buttons when modifying -->
-      <center v-else class="pa-4">
+      <center v-else class="pa-16">
         <!-- Button to discard the modifications -->
         <v-btn
           large
