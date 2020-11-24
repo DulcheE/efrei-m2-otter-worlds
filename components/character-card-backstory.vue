@@ -1,8 +1,17 @@
 <template>
   <v-container>
-    <v-card flat>
-      <v-card-text>Backstory</v-card-text>
-    </v-card>
+    <v-container>
+      <v-textarea
+        v-model="backstory"
+        class="ma-4"
+        :disabled="!isModifying"
+        :rules="isModifying ? [rules.required, rules.ascii] : []"
+        :placeholder="backstory || 'Please write your backstory !'"
+        outlined
+        auto-grow
+        rows="8"
+      />
+    </v-container>
   </v-container>
 </template>
 
@@ -22,19 +31,10 @@ export default {
       required: true,
       default: () => {}
     },
-    stats: {
-      type: Array,
+    backstory: {
+      type: String,
       required: true,
-      default: () => []
-    },
-    statsNonEssential: {
-      type: Array,
-      required: true,
-      default: () => []
-    },
-    orderByName: {
-      type: Function,
-      required: true
+      default: () => ''
     }
   },
 
