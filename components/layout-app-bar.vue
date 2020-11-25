@@ -214,8 +214,8 @@ export default {
 
   data () {
     return {
-      name: '',
-      // name: 'John DOE',
+      // name: '',
+      name: 'John DOE',
       isDialogActive: false,
       universes: [],
       itemsProfile: [
