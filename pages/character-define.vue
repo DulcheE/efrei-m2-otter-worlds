@@ -144,7 +144,7 @@
                   <v-btn
                     class="ma-2 primary--text"
                     outlined
-                    @click="addStat(0, true)"
+                    @click="addStat(statsEssential.id, true)"
                   >
                     Add numbered stat
                   </v-btn>
@@ -166,7 +166,7 @@
                       append-icon="mdi-delete"
                       class="ma-4"
                       type="text"
-                      @click:append="deleteStat(0, item.id)"
+                      @click:append="deleteStat(statsEssential.id, item.id)"
                     />
                   </v-col>
                 </v-row>
@@ -176,7 +176,7 @@
                   <v-btn
                     class="ma-2 primary--text"
                     outlined
-                    @click="addStat(0, false)"
+                    @click="addStat(statsEssential.id, false)"
                   >
                     Add alphabetic stat
                   </v-btn>
@@ -198,7 +198,7 @@
                       append-icon="mdi-delete"
                       class="ma-4"
                       type="text"
-                      @click:append="deleteStat(0, item.id)"
+                      @click:append="deleteStat(statsEssential.id, item.id)"
                     />
                   </v-col>
                 </v-row>
@@ -220,7 +220,7 @@
           centered
         >
           <v-tab
-            v-for="(item, i) in itemsTab"
+            v-for="(item, i) in tabItems"
             :key="i"
             exact
           >
@@ -233,153 +233,41 @@
         <v-tabs-items v-model="tab">
           <!-- Tab n° 1 - Statistics -->
           <v-tab-item>
+            <CharacterDefineNewCategory
+              :categories="statsRegular"
+              :is-magic="false"
+              :rules="rules"
+              :add-category="addCategory"
+              :delete-category="deleteCategory"
+              :add-stat="addStat"
+              :delete-stat="deleteStat"
+            />
+          </v-tab-item>
+
+          <!-- Tab n° 2 - Magic -->
+          <v-tab-item>
             <v-container>
-              <!-- For each stat category, we add a card -->
-              <v-container
-                v-for="(category, i) in statsNonEssential"
-                :key="i"
-              >
-                <v-hover v-slot="{ hover }">
-                  <v-card :class="hover ? 'zoom-xs primary--text ma-8 pa-8' : 'ma-8 pa-8'" :style="hover ? 'border-color: #E9C490' : ''" outlined>
-                    <!-- category's name -->
-                    <v-text-field
-                      v-model="category.name"
-                      :label="category.name.length === 0 ? 'Category\'s name' : ''"
-                      :rules="[rules.required, rules.counter, rules.ascii]"
-                      class="ma-4"
-                      type="text"
-                    />
+              <!-- A switch to (dis)able the magic in this template -->
+              <div class="d-flex justify-center">
+                <v-switch
+                  v-model="hasMagic"
+                  inset
+                  label="Does the character have access to magic stats ?"
+                />
+              </div>
 
-                    <!-- Button to add numbered stat -->
-                    <v-container>
-                      <v-btn
-                        class="ma-2 primary--text"
-                        outlined
-                        @click="addStat(i+1, true)"
-                      >
-                        Add numbered stat
-                      </v-btn>
-                    </v-container>
-
-                    <!-- category's number input -->
-                    <v-row>
-                      <v-col
-                        v-for="(stat, j) in category.content.filter((c) => c.isNumber)"
-                        :key="j"
-                        cols="12"
-                        sm="6"
-                        md="4"
-                        lg="3"
-                      >
-                        <v-text-field
-                          v-model="stat.name"
-                          :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                          :rules="[rules.required, rules.counter, rules.ascii]"
-                          append-icon="mdi-delete"
-                          class="ma-4"
-                          type="text"
-                          @click:append="deleteStat(i+1, stat.id)"
-                        />
-                      </v-col>
-                    </v-row>
-
-                    <!-- A divider between numeric and alphabet values -->
-                    <v-divider class="ma-6" />
-
-                    <!-- Button to add alphabetic stat -->
-                    <v-container>
-                      <v-btn
-                        class="ma-2 primary--text"
-                        outlined
-                        @click="addStat(i+1, false)"
-                      >
-                        Add alphabetic stat
-                      </v-btn>
-                    </v-container>
-
-                    <!-- category's text input -->
-                    <v-row>
-                      <v-col
-                        v-for="(stat, j) in category.content.filter((c) => !c.isNumber)"
-                        :key="j"
-                        cols="12"
-                        sm="6"
-                        md="4"
-                        lg="3"
-                      >
-                        <v-text-field
-                          v-model="stat.name"
-                          :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                          :rules="[rules.required, rules.counter, rules.ascii]"
-                          append-icon="mdi-delete"
-                          class="ma-4"
-                          type="text"
-                          @click:append="deleteStat(i+1, stat.id)"
-                        />
-                      </v-col>
-                    </v-row>
-
-                    <!-- Button to Remove the Category -->
-                    <center class="pa-4">
-                      <v-btn
-                        large
-                        outlined
-                        class="ma-2 error-text"
-                        color="error"
-                        @click="deleteCategory(i+1)"
-                      >
-                        <v-icon
-                          left
-                          dark
-                        >
-                          mdi-delete
-                        </v-icon>
-                        Remove Category
-                      </v-btn>
-                    </center>
-                  </v-card>
-                </v-hover>
-              </v-container>
-
-              <!-- Button to Add a Stat category -->
-              <center class="pa-4">
-                <v-btn
-                  large
-                  outlined
-                  class="ma-2"
-                  @click="addCategory"
-                >
-                  <v-icon
-                    left
-                    dark
-                  >
-                    mdi-plus-circle
-                  </v-icon>
-                  Add new category
-                </v-btn>
-              </center>
+              <!-- The creator of category, if the template has magic -->
+              <CharacterDefineNewCategory
+                v-if="hasMagic"
+                :categories="statsMagic"
+                :is-magic="true"
+                :rules="rules"
+                :add-category="addCategory"
+                :delete-category="deleteCategory"
+                :add-stat="addStat"
+                :delete-stat="deleteStat"
+              />
             </v-container>
-          </v-tab-item>
-
-          <!-- Tab n° 2 - Inventory -->
-          <v-tab-item>
-            <v-card flat>
-              <v-card-text>Inventory</v-card-text>
-            </v-card>
-          </v-tab-item>
-
-          <!-- Tab n° 3 - Magic (may be passed) -->
-          <v-tab-item v-if="hasMagic">
-            <v-card flat>
-              <v-card-text>Magic</v-card-text>
-            </v-card>
-          </v-tab-item>
-
-          <!-- Tab n° 4 - BackStory -->
-          <v-tab-item>
-            <v-card flat>
-              <v-card-text>BackStory</v-card-text>
-            </v-card>
           </v-tab-item>
         </v-tabs-items>
       </v-card>
@@ -389,16 +277,18 @@
 
 <script>
 // Imports
+import CharacterDefineNewCategory from '@/components/character-define-new-category'
+
 export default {
   name: 'PageCharacterDefine',
 
   components: {
+    CharacterDefineNewCategory
   },
 
   data: () => ({
-    // Whether the user is able to modify its data or not
-    isModifying: false,
-    hasMagic: true,
+    // Some booleans
+    hasMagic: false,
     isAdmin: false,
 
     // Whether the form is valid or not
@@ -421,6 +311,16 @@ export default {
 
     // Tab currently selected on the menu
     tab: null,
+    tabItems: [
+      {
+        title: 'Statistics',
+        icon: 'mdi-counter'
+      },
+      {
+        title: 'Magic',
+        icon: 'mdi-wizard-hat'
+      }
+    ],
 
     // TEMPORARY - arrays to contain some data
     // A new Stat array is initiated as follow (only has 1 category, the 'Essential', which is required)
@@ -428,45 +328,26 @@ export default {
       {
         name: 'Essential',
         id: 0,
+        isMagic: false,
         content: []
       }
     ]
   }),
 
   computed: {
-    itemsTab () {
-      const items = [
-        {
-          title: 'Statistics',
-          icon: 'mdi-counter'
-        },
-        {
-          title: 'Inventory',
-          icon: 'mdi-bag-checked'
-        },
-        {
-          title: 'Magic',
-          icon: 'mdi-wizard-hat'
-        },
-        {
-          title: 'Backstory',
-          icon: 'mdi-feather'
-        }
-      ]
-
-      if (!this.hasMagic) {
-        items.splice(2, 1)
-      }
-
-      return items
-    },
-
+    /** Category (the first in order) containing all Essential stats */
     statsEssential () {
       return this.stats[0]
     },
 
-    statsNonEssential () {
-      return this.stats.slice(1, this.stats.length)
+    /** Categories of stats that are neither Magic nor Essential */
+    statsRegular () {
+      return this.stats.filter(category => !category.isMagic && category.id !== 0)
+    },
+
+    /** Categories of stats that are Magic */
+    statsMagic () {
+      return this.stats.filter(category => category.isMagic)
     }
   },
 
@@ -488,57 +369,82 @@ export default {
       // If the form is valid
       if (this.$refs.form.validate()) {
         alert('VALID - changes saved !')
+
+        // Do display all the stats
+        /*
+        this.stats.forEach((category) => {
+          console.log('CAT : ', category.name)
+          category.content.forEach(stat => console.log('STAT : ', stat.name))
+        })
+        */
       }
     },
 
     /**
      * Adds a new Category to the character's card
+     * @param {Boolean} isMagic whether the new Category is a magic one or not
      */
-    addCategory () {
+    addCategory (isMagic) {
       this.stats.push({
         name: '',
-        content: [],
-        id: this.idCpt--
+        id: this.idCpt--,
+        isMagic,
+        content: []
       })
     },
 
     /**
-     * Deletes a Category of given index
-     * @param {Int} index position at which the category is located
+     * Deletes a Category of given id
+     * @param {Int} idCategory position at which the category is located
      */
-    deleteCategory (index) {
-      // We remove the Category IFF it is not the first one, which is required
-      if (index !== 0) {
+    deleteCategory (idCategory) {
+      // We get the position of the category of given id
+      const index = this.stats.findIndex(category => category.id === idCategory)
+
+      // If found, we remove the Category
+      if (index !== -1) {
         this.stats.splice(index, 1)
       }
     },
 
     /**
-     * Adds a stat to the category of given index, and precises if it is a number or an alphabetic value
-     * @param {Int} index position of the category where the stat is located
+     * Adds a stat to the category of given id, and precises if it is a number or an alphabetic value
+     * @param {Int} idCategory id of the category where the stat is located
      * @param {Boolean} isNumber whether the new stat is a number or not
      */
-    addStat (index, isNumber) {
-      this.stats[index].content.push({
-        name: '',
-        value: (isNumber) ? 0 : '',
-        isNumber,
-        id: this.idCpt--
-      })
+    addStat (idCategory, isNumber) {
+      // We get the position of the category of given id
+      const indexCategory = this.stats.findIndex(category => category.id === idCategory)
+
+      // If found, we continue
+      if (indexCategory !== -1) {
+        this.stats[indexCategory].content.push({
+          name: '',
+          value: (isNumber) ? 0 : '',
+          isNumber,
+          id: this.idCpt--
+        })
+      }
     },
 
     /**
      * Deletes a stat of the category of given index
-     * @param {Int} index position of the category where the stat is located
-     * @param {Int} id id of the stat to delete
+     * @param {Int} idCategory position of the category where the stat is located
+     * @param {Int} idStat id of the stat to delete
      */
-    deleteStat (index, id) {
-      // We get the position of the stat to delete
-      const position = this.stats[index].content.findIndex(stat => stat.id === id)
+    deleteStat (idCategory, idStat) {
+      // We get the position of the category of given id
+      const indexCategory = this.stats.findIndex(category => category.id === idCategory)
 
-      // If found, we remove the stat
-      if (position !== -1) {
-        this.stats[index].content.splice(position, 1)
+      // If found, we continue
+      if (indexCategory !== -1) {
+        // We get the position of the stat to delete
+        const indexStat = this.stats[indexCategory].content.findIndex(stat => stat.id === idStat)
+
+        // If found, we remove the stat
+        if (indexStat !== -1) {
+          this.stats[indexCategory].content.splice(indexStat, 1)
+        }
       }
     }
   }

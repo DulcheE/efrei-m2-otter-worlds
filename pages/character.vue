@@ -516,12 +516,12 @@ export default {
 
     // Whether the picture dialog is open or not
     dialogPicture: false,
+    pictureSelected: '',
     pictures: [
       'https://qph.fs.quoracdn.net/main-qimg-4ab11fd74be31e6c46ee07a7de8a050c',
       'http://www.pokepedia.fr/images/thumb/7/70/Simiabraz-DP.png/250px-Simiabraz-DP.png',
       'http://images.wikia.com/es.pokemon/images/b/bb/Empoleon_%28dream_world%29.png'
     ],
-    pictureSelected: '',
 
     // Tab currently selected on the menu
     tab: null

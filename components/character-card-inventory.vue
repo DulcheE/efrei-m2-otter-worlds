@@ -71,6 +71,7 @@
       v-if="isModifying"
       v-model="dialogAdd"
       max-width="500px"
+      persistent
     >
       <!-- Dialog's trigger -->
       <template v-slot:activator="{ on, attrs }">
