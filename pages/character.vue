@@ -254,7 +254,7 @@
         <v-tabs-items v-model="tab">
           <!-- Tab n° 1 - Statistics -->
           <v-tab-item>
-            <CharacterCardStatistics :is-modifying="isModifying" :rules="rules" :stats="character.stats" :stats-non-essential="statsNonEssential" :order-by-name="orderByName" />
+            <CharacterCardStatistics :is-modifying="isModifying" :rules="rules" :stats="statsRegular" :order-by-name="orderByName" />
           </v-tab-item>
 
           <!-- Tab n° 2 - Inventory -->
@@ -264,7 +264,7 @@
 
           <!-- Tab n° 3 - Magic (may be passed) -->
           <v-tab-item v-if="hasMagic">
-            <CharacterCardMagic :is-modifying="isModifying" :rules="rules" />
+            <CharacterCardMagic :is-modifying="isModifying" :rules="rules" :stats="statsMagic" :order-by-name="orderByName" />
           </v-tab-item>
 
           <!-- Tab n° 4 - BackStory -->
@@ -373,6 +373,8 @@ export default {
       stats: [
         {
           name: 'Essential',
+          id: 0,
+          isMagic: false,
           content: [
             {
               name: 'Reputation',
@@ -403,6 +405,8 @@ export default {
         },
         {
           name: 'General',
+          id: 1,
+          isMagic: false,
           content: [
             {
               name: 'Intelligence',
@@ -483,6 +487,8 @@ export default {
         },
         {
           name: 'Craft',
+          id: 2,
+          isMagic: false,
           content: [
             {
               name: 'Alchemy',
@@ -498,6 +504,23 @@ export default {
               name: 'Forgery',
               value: 2,
               isNumber: true
+            }
+          ]
+        },
+        {
+          name: 'Witchery',
+          id: 3,
+          isMagic: true,
+          content: [
+            {
+              name: 'Mana',
+              value: 7,
+              isNumber: true
+            },
+            {
+              name: 'Witchcraft',
+              value: 'novice',
+              isNumber: false
             }
           ]
         }
@@ -584,12 +607,19 @@ export default {
       return items
     },
 
+    /** Category (the first in order) containing all Essential stats */
     statsEssential () {
       return this.character.stats[0]
     },
 
-    statsNonEssential () {
-      return this.character.stats.slice(1, this.character.stats.length)
+    /** Categories of stats that are neither Magic nor Essential */
+    statsRegular () {
+      return this.character.stats.filter(category => !category.isMagic && category.id !== 0)
+    },
+
+    /** Categories of stats that are Magic */
+    statsMagic () {
+      return this.character.stats.filter(category => category.isMagic)
     }
   },
 
