@@ -1,392 +1,389 @@
 <template>
   <v-container>
-    <!-- Button to save the template -->
-    <center class="pa-4">
+    <v-form ref="form" v-model="validForm">
       <!-- Button to save the template -->
-      <v-btn
-        large
-        outlined
-        color="error"
-        class="ma-2"
-      >
-        <v-icon
-          left
-          dark
-        >
-          mdi-delete
-        </v-icon>
-        Discard progress
-      </v-btn>
-
-      <!-- Button to save the template -->
-      <v-btn
-        large
-        outlined
-        color="success"
-        class="ma-2"
-        @click="saveProgress"
-      >
-        <v-icon
-          left
-          dark
-        >
-          mdi-check
-        </v-icon>
-        Save progress
-      </v-btn>
-    </center>
-
-    <!-- If there is an error, display an error alert -->
-    <v-row align="center" justify="center">
-      <v-col class="pa-4" cols="12" sm="6" md="4">
-        <v-alert
-          v-model="errorIsActive"
+      <center class="pa-4">
+        <!-- Button to discard the template -->
+        <v-btn
+          large
           outlined
-          dismissible
-          type="error"
-          text
-          transition="scale-transition"
+          color="error"
+          class="ma-2"
+          @click="discardChanges"
         >
-          {{ errorMessage }}
-        </v-alert>
-      </v-col>
-    </v-row>
+          <v-icon
+            left
+            dark
+          >
+            mdi-delete
+          </v-icon>
+          Discard changes
+        </v-btn>
 
-    <!-- Card containing all data about the character -->
-    <v-card shaped>
-      <!-- Title for all the essential data about the character -->
-      <v-container class="pa-4">
-        <v-row>
-          <!-- Image on the left -->
-          <v-col class="pa-4" cols="12" lg="4">
-            <!-- Container with fill-height to vertically center the image -->
-            <v-container class="pa-4" fill-height>
-              <!-- small image for small screens -->
-              <v-img
-                class="shrink d-flex d-sm-none"
-                min-height="150"
-                max-height="150"
-                lazy-src="/logo.png"
-                src="https://blog.headway-advisory.com/wp-content/uploads/2018/01/fmeunier_paris-1024x1024.jpeg"
-                contain
-              />
-
-              <!-- big image for bigger screens -->
-              <v-img
-                class="shrink d-none d-sm-flex"
-                min-height="350"
-                max-height="350"
-                lazy-src="/logo.png"
-                src="https://blog.headway-advisory.com/wp-content/uploads/2018/01/fmeunier_paris-1024x1024.jpeg"
-              />
-            </v-container>
-          </v-col>
-
-          <!-- Inputs on the right -->
-          <v-col cols="12" lg="8">
-            <!-- Container with fill-height to vertically center the content -->
-            <v-container class="pa-4" fill-height>
-              <v-row align="center" justify="center">
-                <!-- Character's name -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Name"
-                    class="ma-4"
-                    disabled
-                  />
-                </v-col>
-
-                <!-- Character's race -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Race"
-                    class="ma-4"
-                    disabled
-                  />
-                </v-col>
-
-                <!-- Character's job -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Job"
-                    class="ma-4"
-                    disabled
-                  />
-                </v-col>
-
-                <!-- Character's age -->
-                <v-col cols="12" sm="6" md="3">
-                  <v-text-field
-                    label="Age"
-                    class="ma-4"
-                    disabled
-                  />
-                </v-col>
-              </v-row>
-
-              <!-- A separator to divide both parts -->
-              <v-container>
-                <v-divider class="ma-6" />
-              </v-container>
-
-              <!-- A text to present the 1st category of stats -->
-              <v-container>
-                <h3 class="text-center pa-4">
-                  Here is the <span class="font-weight-bold primary--text">'Essential'</span> category of stats : each character's sheet needs it
-                </h3>
-              </v-container>
-
-              <!-- Form to add inputs for essential stats -->
-              <!-- Button to add numbered stat -->
-              <v-container>
-                <v-btn
-                  class="ma-2 primary--text"
-                  outlined
-                  @click="addStat(0, true)"
-                >
-                  Add numbered stat
-                </v-btn>
-              </v-container>
-
-              <!-- The inputs for numbered stats -->
-              <v-row>
-                <v-col
-                  v-for="item in statsEssential.content.filter((c) => c.isNumber)"
-                  :key="item.id"
-                  cols="12"
-                  sm="6"
-                  md="3"
-                >
-                  <v-text-field
-                    v-model="item.name"
-                    :label="item.name.length === 0 ? 'statistic\'s name' : ''"
-                    :rules="[rules.ascii, rules.empty]"
-                    append-icon="mdi-delete"
-                    required
-                    class="ma-4"
-                    type="text"
-                    @click:append="deleteStat(0, item.id)"
-                  />
-                </v-col>
-              </v-row>
-
-              <!-- Button to add alphabetic stat -->
-              <v-container>
-                <v-btn
-                  class="ma-2 primary--text"
-                  outlined
-                  @click="addStat(0, false)"
-                >
-                  Add alphabetic stat
-                </v-btn>
-              </v-container>
-
-              <!-- The inputs for numbered stats -->
-              <v-row>
-                <v-col
-                  v-for="item in statsEssential.content.filter((c) => !c.isNumber)"
-                  :key="item.id"
-                  cols="12"
-                  sm="6"
-                  md="3"
-                >
-                  <v-text-field
-                    v-model="item.name"
-                    :label="item.name.length === 0 ? 'statistic\'s name' : ''"
-                    :rules="[rules.ascii, rules.empty]"
-                    append-icon="mdi-delete"
-                    required
-                    class="ma-4"
-                    type="text"
-                    @click:append="deleteStat(0, item.id)"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
-
-    <v-divider class="ma-12" />
-
-    <v-card shaped>
-      <!-- Tabs for each data about the character -->
-      <v-tabs
-        v-model="tab"
-        grow
-        icons-and-text
-        center-active
-        centered
-      >
-        <v-tab
-          v-for="(item, i) in itemsTab"
-          :key="i"
-          exact
+        <!-- Button to save the template -->
+        <v-btn
+          large
+          outlined
+          color="success"
+          class="ma-2"
+          @click="saveChanges"
         >
-          <span class="shrink d-none d-sm-flex">{{ item.title }}</span>
-          <v-icon>{{ item.icon }}</v-icon>
-        </v-tab>
-      </v-tabs>
+          <v-icon
+            left
+            dark
+          >
+            mdi-check
+          </v-icon>
+          Save changes
+        </v-btn>
+      </center>
 
-      <!-- Tabs -->
-      <v-tabs-items v-model="tab">
-        <!-- Tab n° 1 - Statistics -->
-        <v-tab-item>
-          <v-container>
-            <!-- For each stat category, we add a card -->
-            <v-container
-              v-for="(category, i) in statsNonEssential"
-              :key="i"
-            >
-              <v-hover v-slot="{ hover }">
-                <v-card :class="hover ? 'zoom-xs primary--text ma-8 pa-8' : 'ma-8 pa-8'" :style="hover ? 'border-color: #E9C490' : ''" outlined>
-                  <!-- category's name -->
-                  <v-text-field
-                    v-model="category.name"
-                    :label="category.name.length === 0 ? 'Category\'s name' : ''"
-                    :rules="[rules.ascii, rules.empty]"
-                    required
-                    class="ma-4"
-                    type="text"
-                  />
-                  <!-- @click:append="deleteStat(i+1, item.id)" -->
+      <!-- If there is an error, display an error alert -->
+      <v-row align="center" justify="center">
+        <v-col class="pa-4" cols="12" sm="6" md="4">
+          <v-alert
+            v-model="errorIsActive"
+            outlined
+            dismissible
+            type="error"
+            text
+            transition="scale-transition"
+          >
+            {{ errorMessage }}
+          </v-alert>
+        </v-col>
+      </v-row>
 
-                  <!-- Button to add numbered stat -->
-                  <v-container>
-                    <v-btn
-                      class="ma-2 primary--text"
-                      outlined
-                      @click="addStat(i+1, true)"
-                    >
-                      Add numbered stat
-                    </v-btn>
-                  </v-container>
+      <!-- Card containing all data about the character -->
+      <v-card shaped>
+        <!-- Title for all the essential data about the character -->
+        <v-container class="pa-4">
+          <v-row>
+            <!-- Image on the left -->
+            <v-col class="pa-4" cols="12" lg="4">
+              <!-- Container with fill-height to vertically center the image -->
+              <v-container class="pa-4" fill-height>
+                <!-- small image for small screens -->
+                <v-img
+                  class="shrink d-flex d-sm-none"
+                  min-height="150"
+                  max-height="150"
+                  lazy-src="/logo.png"
+                  src="https://blog.headway-advisory.com/wp-content/uploads/2018/01/fmeunier_paris-1024x1024.jpeg"
+                  contain
+                />
 
-                  <!-- category's number input -->
-                  <v-row>
-                    <v-col
-                      v-for="(stat, j) in category.content.filter((c) => c.isNumber)"
-                      :key="j"
-                      cols="12"
-                      sm="6"
-                      md="4"
-                      lg="3"
-                    >
-                      <v-text-field
-                        v-model="stat.name"
-                        :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                        :rules="[rules.ascii, rules.empty]"
-                        append-icon="mdi-delete"
-                        required
-                        class="ma-4"
-                        type="text"
-                        @click:append="deleteStat(i+1, stat.id)"
-                      />
-                    </v-col>
-                  </v-row>
+                <!-- big image for bigger screens -->
+                <v-img
+                  class="shrink d-none d-sm-flex"
+                  min-height="350"
+                  max-height="350"
+                  lazy-src="/logo.png"
+                  src="https://blog.headway-advisory.com/wp-content/uploads/2018/01/fmeunier_paris-1024x1024.jpeg"
+                />
+              </v-container>
+            </v-col>
 
-                  <!-- A divider between numeric and alphabet values -->
+            <!-- Inputs on the right -->
+            <v-col cols="12" lg="8">
+              <!-- Container with fill-height to vertically center the content -->
+              <v-container class="pa-4" fill-height>
+                <v-row align="center" justify="center">
+                  <!-- Character's name -->
+                  <v-col cols="12" sm="6" md="3">
+                    <v-text-field
+                      label="Name"
+                      class="ma-4"
+                      disabled
+                    />
+                  </v-col>
+
+                  <!-- Character's race -->
+                  <v-col cols="12" sm="6" md="3">
+                    <v-text-field
+                      label="Race"
+                      class="ma-4"
+                      disabled
+                    />
+                  </v-col>
+
+                  <!-- Character's job -->
+                  <v-col cols="12" sm="6" md="3">
+                    <v-text-field
+                      label="Job"
+                      class="ma-4"
+                      disabled
+                    />
+                  </v-col>
+
+                  <!-- Character's age -->
+                  <v-col cols="12" sm="6" md="3">
+                    <v-text-field
+                      label="Age"
+                      class="ma-4"
+                      disabled
+                    />
+                  </v-col>
+                </v-row>
+
+                <!-- A separator to divide both parts -->
+                <v-container>
                   <v-divider class="ma-6" />
+                </v-container>
 
-                  <!-- Button to add alphabetic stat -->
-                  <v-container>
-                    <v-btn
-                      class="ma-2 primary--text"
-                      outlined
-                      @click="addStat(i+1, false)"
-                    >
-                      Add alphabetic stat
-                    </v-btn>
-                  </v-container>
+                <!-- A text to present the 1st category of stats -->
+                <v-container>
+                  <h3 class="text-center pa-4">
+                    Here is the <span class="font-weight-bold primary--text">'Essential'</span> category of stats : each character's sheet needs it
+                  </h3>
+                </v-container>
 
-                  <!-- category's text input -->
-                  <v-row>
-                    <v-col
-                      v-for="(stat, j) in category.content.filter((c) => !c.isNumber)"
-                      :key="j"
-                      cols="12"
-                      sm="6"
-                      md="4"
-                      lg="3"
-                    >
-                      <v-text-field
-                        v-model="stat.name"
-                        :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                        :rules="[rules.ascii, rules.empty]"
-                        append-icon="mdi-delete"
-                        required
-                        class="ma-4"
-                        type="text"
-                        @click:append="deleteStat(i+1, stat.id)"
-                      />
-                    </v-col>
-                  </v-row>
+                <!-- Form to add inputs for essential stats -->
+                <!-- Button to add numbered stat -->
+                <v-container>
+                  <v-btn
+                    class="ma-2 primary--text"
+                    outlined
+                    @click="addStat(0, true)"
+                  >
+                    Add numbered stat
+                  </v-btn>
+                </v-container>
 
-                  <!-- Button to Remove the Category -->
-                  <center class="pa-4">
-                    <v-btn
-                      large
-                      outlined
-                      class="ma-2 error-text"
-                      color="error"
-                      @click="deleteCategory(i+1)"
-                    >
-                      <v-icon
-                        left
-                        dark
-                      >
-                        mdi-delete
-                      </v-icon>
-                      Remove Category
-                    </v-btn>
-                  </center>
-                </v-card>
-              </v-hover>
-            </v-container>
+                <!-- The inputs for numbered stats -->
+                <v-row>
+                  <v-col
+                    v-for="item in statsEssential.content.filter((c) => c.isNumber)"
+                    :key="item.id"
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
+                    <v-text-field
+                      v-model="item.name"
+                      :label="item.name.length === 0 ? 'statistic\'s name' : ''"
+                      :rules="[rules.required, rules.counter, rules.ascii]"
+                      append-icon="mdi-delete"
+                      class="ma-4"
+                      type="text"
+                      @click:append="deleteStat(0, item.id)"
+                    />
+                  </v-col>
+                </v-row>
 
-            <!-- Button to Add a Stat category -->
-            <center class="pa-4">
-              <v-btn
-                large
-                outlined
-                class="ma-2"
-                @click="addCategory"
+                <!-- Button to add alphabetic stat -->
+                <v-container>
+                  <v-btn
+                    class="ma-2 primary--text"
+                    outlined
+                    @click="addStat(0, false)"
+                  >
+                    Add alphabetic stat
+                  </v-btn>
+                </v-container>
+
+                <!-- The inputs for numbered stats -->
+                <v-row>
+                  <v-col
+                    v-for="item in statsEssential.content.filter((c) => !c.isNumber)"
+                    :key="item.id"
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
+                    <v-text-field
+                      v-model="item.name"
+                      :label="item.name.length === 0 ? 'statistic\'s name' : ''"
+                      :rules="[rules.required, rules.counter, rules.ascii]"
+                      append-icon="mdi-delete"
+                      class="ma-4"
+                      type="text"
+                      @click:append="deleteStat(0, item.id)"
+                    />
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+
+      <v-divider class="ma-12" />
+
+      <v-card shaped>
+        <!-- Tabs for each data about the character -->
+        <v-tabs
+          v-model="tab"
+          grow
+          icons-and-text
+          center-active
+          centered
+        >
+          <v-tab
+            v-for="(item, i) in itemsTab"
+            :key="i"
+            exact
+          >
+            <span class="shrink d-none d-sm-flex">{{ item.title }}</span>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-tab>
+        </v-tabs>
+
+        <!-- Tabs -->
+        <v-tabs-items v-model="tab">
+          <!-- Tab n° 1 - Statistics -->
+          <v-tab-item>
+            <v-container>
+              <!-- For each stat category, we add a card -->
+              <v-container
+                v-for="(category, i) in statsNonEssential"
+                :key="i"
               >
-                <v-icon
-                  left
-                  dark
+                <v-hover v-slot="{ hover }">
+                  <v-card :class="hover ? 'zoom-xs primary--text ma-8 pa-8' : 'ma-8 pa-8'" :style="hover ? 'border-color: #E9C490' : ''" outlined>
+                    <!-- category's name -->
+                    <v-text-field
+                      v-model="category.name"
+                      :label="category.name.length === 0 ? 'Category\'s name' : ''"
+                      :rules="[rules.required, rules.counter, rules.ascii]"
+                      class="ma-4"
+                      type="text"
+                    />
+
+                    <!-- Button to add numbered stat -->
+                    <v-container>
+                      <v-btn
+                        class="ma-2 primary--text"
+                        outlined
+                        @click="addStat(i+1, true)"
+                      >
+                        Add numbered stat
+                      </v-btn>
+                    </v-container>
+
+                    <!-- category's number input -->
+                    <v-row>
+                      <v-col
+                        v-for="(stat, j) in category.content.filter((c) => c.isNumber)"
+                        :key="j"
+                        cols="12"
+                        sm="6"
+                        md="4"
+                        lg="3"
+                      >
+                        <v-text-field
+                          v-model="stat.name"
+                          :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
+                          :rules="[rules.required, rules.counter, rules.ascii]"
+                          append-icon="mdi-delete"
+                          class="ma-4"
+                          type="text"
+                          @click:append="deleteStat(i+1, stat.id)"
+                        />
+                      </v-col>
+                    </v-row>
+
+                    <!-- A divider between numeric and alphabet values -->
+                    <v-divider class="ma-6" />
+
+                    <!-- Button to add alphabetic stat -->
+                    <v-container>
+                      <v-btn
+                        class="ma-2 primary--text"
+                        outlined
+                        @click="addStat(i+1, false)"
+                      >
+                        Add alphabetic stat
+                      </v-btn>
+                    </v-container>
+
+                    <!-- category's text input -->
+                    <v-row>
+                      <v-col
+                        v-for="(stat, j) in category.content.filter((c) => !c.isNumber)"
+                        :key="j"
+                        cols="12"
+                        sm="6"
+                        md="4"
+                        lg="3"
+                      >
+                        <v-text-field
+                          v-model="stat.name"
+                          :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
+                          :rules="[rules.required, rules.counter, rules.ascii]"
+                          append-icon="mdi-delete"
+                          class="ma-4"
+                          type="text"
+                          @click:append="deleteStat(i+1, stat.id)"
+                        />
+                      </v-col>
+                    </v-row>
+
+                    <!-- Button to Remove the Category -->
+                    <center class="pa-4">
+                      <v-btn
+                        large
+                        outlined
+                        class="ma-2 error-text"
+                        color="error"
+                        @click="deleteCategory(i+1)"
+                      >
+                        <v-icon
+                          left
+                          dark
+                        >
+                          mdi-delete
+                        </v-icon>
+                        Remove Category
+                      </v-btn>
+                    </center>
+                  </v-card>
+                </v-hover>
+              </v-container>
+
+              <!-- Button to Add a Stat category -->
+              <center class="pa-4">
+                <v-btn
+                  large
+                  outlined
+                  class="ma-2"
+                  @click="addCategory"
                 >
-                  mdi-plus-circle
-                </v-icon>
-                Add new category
-              </v-btn>
-            </center>
-          </v-container>
-        </v-tab-item>
+                  <v-icon
+                    left
+                    dark
+                  >
+                    mdi-plus-circle
+                  </v-icon>
+                  Add new category
+                </v-btn>
+              </center>
+            </v-container>
+          </v-tab-item>
 
-        <!-- Tab n° 2 - Inventory -->
-        <v-tab-item>
-          <v-card flat>
-            <v-card-text>Inventory</v-card-text>
-          </v-card>
-        </v-tab-item>
+          <!-- Tab n° 2 - Inventory -->
+          <v-tab-item>
+            <v-card flat>
+              <v-card-text>Inventory</v-card-text>
+            </v-card>
+          </v-tab-item>
 
-        <!-- Tab n° 3 - Magic (may be passed) -->
-        <v-tab-item v-if="hasMagic">
-          <v-card flat>
-            <v-card-text>Magic</v-card-text>
-          </v-card>
-        </v-tab-item>
+          <!-- Tab n° 3 - Magic (may be passed) -->
+          <v-tab-item v-if="hasMagic">
+            <v-card flat>
+              <v-card-text>Magic</v-card-text>
+            </v-card>
+          </v-tab-item>
 
-        <!-- Tab n° 4 - BackStory -->
-        <v-tab-item>
-          <v-card flat>
-            <v-card-text>BackStory</v-card-text>
-          </v-card>
-        </v-tab-item>
-      </v-tabs-items>
-    </v-card>
+          <!-- Tab n° 4 - BackStory -->
+          <v-tab-item>
+            <v-card flat>
+              <v-card-text>BackStory</v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-card>
+    </v-form>
   </v-container>
 </template>
 
@@ -403,6 +400,9 @@ export default {
     isModifying: false,
     hasMagic: true,
     isAdmin: false,
+
+    // Whether the form is valid or not
+    validForm: false,
 
     // Error message, if the template contains an error
     errorMessage: '',
@@ -475,73 +475,20 @@ export default {
 
   methods: {
     /**
-     * Saves the current template for a character's card
+     * Discard the changes brought to the template
      */
-    saveProgress () {
-      // We check if any Category has an empty name
-      this.stats.forEach((category) => {
-        if (category.name.length === 0) {
-          this.errorIsActive = true
-          this.errorMessage = 'At least one category has no name !'
-        }
-      })
+    discardChanges () {
+      this.isModifying = false
+    },
 
-      // We check if we leave the method early
-      if (this.errorIsActive) {
-        return 0
+    /**
+     * Saves the changes brought to the template, IF VALID
+     */
+    saveChanges () {
+      // If the form is valid
+      if (this.$refs.form.validate()) {
+        alert('VALID - changes saved !')
       }
-
-      // We check if any stat has an empty name
-      this.stats.forEach((category) => {
-        category.content.forEach((stat) => {
-          if (stat.name.length === 0) {
-            this.errorIsActive = true
-            this.errorMessage = 'A stat in category \'' + category.name + '\' has no name !'
-          }
-        })
-      })
-
-      // We check if we leave the method early
-      if (this.errorIsActive) {
-        return 0
-      }
-
-      // We check that every category name is unique
-      this.stats.forEach((category) => {
-        if (this.stats.filter(c => c.name === category.name).length !== 1) {
-          this.errorIsActive = true
-          this.errorMessage = 'The name \'' + category.name + '\' can be applied to only one category !'
-        }
-      })
-
-      // We check if we leave the method early
-      if (this.errorIsActive) {
-        return 0
-      }
-
-      // We check that, in a category, each stat's name is unique
-      this.stats.forEach((category) => {
-        category.content.forEach((stat) => {
-          if (category.content.filter(s => s.name === stat.name).length !== 1) {
-            this.errorIsActive = true
-            this.errorMessage = 'In category \'' + category.name + '\', each stat must have a unique name !'
-          }
-        })
-      })
-
-      // We check if we leave the method early
-      if (this.errorIsActive) {
-        return 0
-      }
-
-      // We display the result
-      alert('Validation successful !')
-      /*
-      this.stats.forEach((category) => {
-        console.log('CAT : ', category.name)
-        category.content.forEach(stat => console.log('STAT : ', stat.name))
-      })
-      */
     },
 
     /**

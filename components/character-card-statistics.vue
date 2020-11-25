@@ -30,7 +30,7 @@
                 :label="stat.name"
                 :disabled="!isModifying"
                 :clearable="isModifying"
-                required
+                :rules="isModifying ? [rules.required] : []"
                 class="ma-4"
                 type="number"
               />
@@ -59,8 +59,7 @@
                 :label="stat.name"
                 :disabled="!isModifying"
                 :clearable="isModifying"
-                :rules="isModifying ? [rules.ascii] : []"
-                required
+                :rules="isModifying ? [rules.required, rules.ascii] : []"
                 class="ma-2"
                 type="text"
               />

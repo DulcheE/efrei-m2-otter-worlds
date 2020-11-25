@@ -1,4 +1,7 @@
 <style>
+/* Changes the mouse's cursor on Pointer */
+.pointer {cursor: pointer;}
+
 /* Zoom effect when overing */
 h1, h2 {
   color: #E9C490;
