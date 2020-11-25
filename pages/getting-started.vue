@@ -284,6 +284,7 @@
 <script>
 export default {
   name: 'PageGettingStarted',
+  title: 'Getting started',
 
   data: () => ({
     isActive: false,
