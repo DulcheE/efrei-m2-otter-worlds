@@ -15,7 +15,7 @@ h1, h2 {
   transform: scale(1.2);
 }
 .zoom-sm {
-  transition: transform .9s;
+  transition: transform .2s;
 }
 .zoom-sm:hover {
   transform: scale(1.1);

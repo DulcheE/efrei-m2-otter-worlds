@@ -33,14 +33,8 @@
 </template>
 
 <script>
-import Mixin from '@/mixins/mixin'
-
 export default {
   layout: 'empty',
-
-  mixins: {
-    Mixin
-  },
 
   props: {
     error: {
