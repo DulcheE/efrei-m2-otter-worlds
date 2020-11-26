@@ -1,5 +1,115 @@
 <template>
   <v-container>
+    <!-- 1 - create -->
+    <h1 class="ma-6">
+      Create your own Universe !
+    </h1>
+
+    <!-- New universe -->
+    <center class="pa-8">
+      <!-- Dialog to create a new universe -->
+      <v-dialog
+        v-model="dialogNewUniverse"
+        width="500"
+      >
+        <!-- Button : trigger of the dialog -->
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            x-large
+            outlined
+            color="primary"
+            class="ma-2"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon
+              left
+              dark
+            >
+              mdi-earth
+            </v-icon>
+            New Universe
+          </v-btn>
+        </template>
+
+        <!-- Dialog -->
+        <v-card>
+          <v-card-title>
+            <span class="headline">New Universe</span>
+          </v-card-title>
+
+          <v-card-text>
+            <v-container>
+              <!-- Form -->
+              <v-form ref="formNewUniverse" v-model="formNewUniverse">
+                <!-- Inputs for the new item -->
+                <v-row>
+                  <!-- New item : name -->
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="newUniverse.name"
+                      label="Name"
+                      :rules="[rules.required]"
+                    />
+                  </v-col>
+
+                  <!-- New item : description -->
+                  <v-col cols="12">
+                    <div class="d-flex justify-center">
+                      <v-textarea
+                        v-model="newUniverse.description"
+                        label="Description"
+                        :rules="[rules.required]"
+                        :placeholder="backstory || 'Please write the description of your universe !'"
+                        outlined
+                        auto-grow
+                        rows="4"
+                      />
+                    </div>
+                  </v-col>
+
+                  <!-- New item : number -->
+                  <v-col cols="12">
+                    <v-switch
+                      v-model="newUniverse.bIsPublic"
+                      inset
+                      label="Is the universe public ?"
+                    />
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-container>
+          </v-card-text>
+
+          <!-- Divider -->
+          <v-divider />
+
+          <!-- Actions -->
+          <v-card-actions>
+            <v-spacer />
+
+            <!-- Button to create the Universe -->
+            <v-btn
+              color="primary"
+              text
+              @click="createUniverse"
+            >
+              Create new Universe !
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </center>
+
+    <v-container>
+      <v-divider class="ma-6" />
+    </v-container>
+
+    <!-- 2 - discover -->
+    <h1 class="ma-6">
+      Or discover the most popular ones !
+    </h1>
+
     <v-row>
       <!-- Iterate through the universes -->
       <v-col
@@ -55,23 +165,26 @@
       </v-col>
     </v-row>
 
-    <router-link to="/characters">
-      <v-btn>
-        shortcut to characters
-      </v-btn>
-    </router-link>
+    <!-- Useful links -->
+    <v-container>
+      <router-link to="/characters">
+        <v-btn>
+          shortcut to characters
+        </v-btn>
+      </router-link>
 
-    <router-link to="/character">
-      <v-btn>
-        shortcut to character
-      </v-btn>
-    </router-link>
+      <router-link to="/character">
+        <v-btn>
+          shortcut to character
+        </v-btn>
+      </router-link>
 
-    <router-link to="/character-define">
-      <v-btn>
-        shortcut to character-define
-      </v-btn>
-    </router-link>
+      <router-link to="/character-define">
+        <v-btn>
+          shortcut to character-define
+        </v-btn>
+      </router-link>
+    </v-container>
   </v-container>
 </template>
 
@@ -84,7 +197,29 @@ export default {
   },
 
   data: () => ({
-    universes: []
+    // Universe to display
+    universes: [],
+
+    // Whether the form to add a dialog is valid or not
+    formNewUniverse: false,
+    dialogNewUniverse: false,
+    newUniverse: {
+      name: '',
+      description: '',
+      bIsPublic: false,
+      user: {}
+    },
+    newUniversePlaceholder: {
+      name: '',
+      description: '',
+      bIsPublic: false,
+      user: {}
+    },
+    rules: {
+      required: value => !!value || 'Required',
+      counter: value => value.length <= 50 || 'Max 50 characters',
+      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
+    }
   }),
 
   computed: {
@@ -110,6 +245,24 @@ export default {
   },
 
   methods: {
+    createUniverse () {
+      // If the form is valid
+      if (this.$refs.formNewUniverse.validate()) {
+        // We set the user in the universe
+        this.newUniverse.user = {
+          username: 'CREATED BY FORM'
+        }
+
+        // We add the universe to the list
+        this.universes.push(this.newUniverse)
+
+        // We reset the universe with its placeholder
+        this.newUniverse = this.newUniversePlaceholder
+
+        // We close the dialog
+        this.dialogNewUniverse = false
+      }
+    }
   }
 }
 </script>

@@ -255,7 +255,7 @@ export default {
         },
         {
           icon: 'mdi-earth',
-          title: 'Most known Universes',
+          title: 'Create / Discover Universes',
           to: '/most-known-universes',
           content: []
         },
@@ -369,7 +369,7 @@ export default {
       return this.name.length !== 0
     },
 
-    // Returns whether a user is logged or not
+    // Returns whether a universe is selected or not
     isUniverseSelected () {
       return false
     },

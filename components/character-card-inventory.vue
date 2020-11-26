@@ -105,7 +105,7 @@
                   <v-text-field
                     v-model="newItem.name"
                     label="Name"
-                    :rules="isModifying ? [rules.required, rules.ascii] : []"
+                    :rules="[rules.required]"
                   />
                 </v-col>
 
@@ -114,7 +114,7 @@
                   <v-text-field
                     v-model="newItem.description"
                     label="Description"
-                    :rules="isModifying ? [rules.required, rules.ascii] : []"
+                    :rules="[rules.required]"
                   />
                 </v-col>
 
@@ -123,7 +123,7 @@
                   <v-text-field
                     v-model="newItem.number"
                     label="Number"
-                    :rules="isModifying ? [rules.required] : []"
+                    :rules="[rules.required]"
                   />
                 </v-col>
 
@@ -132,7 +132,7 @@
                   <v-text-field
                     v-model="newItem.weight"
                     label="Weight"
-                    :rules="isModifying ? [rules.required] : []"
+                    :rules="[rules.required]"
                   />
                 </v-col>
               </v-row>
@@ -140,15 +140,18 @@
           </v-container>
         </v-card-text>
 
+        <!-- Divider -->
+        <v-divider />
+
         <v-card-actions>
           <v-spacer />
           <!-- Button to cancel the new item -->
-          <v-btn class="zoom-sm ma-8" color="warning" outlined @click="dialogAdd = false">
+          <v-btn class="zoom-sm ma-8" color="warning" text @click="dialogAdd = false">
             Cancel
           </v-btn>
 
           <!-- Button to save the new item -->
-          <v-btn class="zoom-sm ma-8" color="success" outlined @click="dialogAddConfirm">
+          <v-btn class="zoom-sm ma-8" color="success" text @click="dialogAddConfirm">
             Save
           </v-btn>
         </v-card-actions>

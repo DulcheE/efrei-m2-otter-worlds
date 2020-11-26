@@ -1,3 +1,7 @@
+<template>
+  <div />
+</template>
+
 <style>
 /* Changes the mouse's cursor on Pointer */
 .pointer {cursor: pointer;}
