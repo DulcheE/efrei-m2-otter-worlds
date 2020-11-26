@@ -40,7 +40,7 @@
               <v-text-field
                 v-model="stat.name"
                 :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                :rules="[rules.required, rules.counter]"
+                :rules="[rules.required]"
                 append-icon="mdi-delete"
                 class="ma-4"
                 type="text"

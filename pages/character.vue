@@ -129,7 +129,7 @@
                       label="Name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required] : []"
+                      :rules="[rules.required, rules.counter]"
                       class="ma-4"
                       type="text"
                     />
@@ -142,7 +142,7 @@
                       label="Race"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required] : []"
+                      :rules="[rules.required, rules.counter]"
                       required
                       class="ma-4"
                       type="text"
@@ -156,7 +156,7 @@
                       label="Job"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required] : []"
+                      :rules="[rules.required, rules.counter]"
                       required
                       class="ma-4"
                     />
@@ -169,7 +169,7 @@
                       label="Age"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required] : []"
+                      :rules="[rules.required]"
                       class="ma-4"
                       type="number"
                     />
@@ -196,7 +196,7 @@
                       :label="item.name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required] : []"
+                      :rules="[rules.required]"
                       class="ma-4"
                       type="number"
                     />
@@ -217,7 +217,7 @@
                       :label="item.name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required] : []"
+                      :rules="[rules.required, rules.counter]"
                       class="ma-4"
                       type="text"
                     />
@@ -370,7 +370,7 @@ export default {
       user: {
         username: 'J3@n C@st3x'
       },
-      name: 'John DOE 𝕗',
+      name: '',
       race: 'Human',
       job: 'Soldier',
       age: 22,
