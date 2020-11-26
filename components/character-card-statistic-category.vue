@@ -28,7 +28,7 @@
               :label="stat.name"
               :disabled="!isModifying"
               :clearable="isModifying"
-              :rules="isModifying ? [rules.required] : []"
+              :rules="[rules.required, rules.counter]"
               class="ma-4"
               type="number"
             />
@@ -57,7 +57,7 @@
               :label="stat.name"
               :disabled="!isModifying"
               :clearable="isModifying"
-              :rules="isModifying ? [rules.required, rules.ascii] : []"
+              :rules="[rules.required, rules.counter]"
               class="ma-2"
               type="text"
             />

@@ -11,7 +11,7 @@
           <v-text-field
             v-model="category.name"
             :label="category.name.length === 0 ? 'Category\'s name' : ''"
-            :rules="[rules.required, rules.counter, rules.ascii]"
+            :rules="[rules.required, rules.counter]"
             class="ma-4"
             type="text"
           />
@@ -40,7 +40,7 @@
               <v-text-field
                 v-model="stat.name"
                 :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                :rules="[rules.required, rules.counter, rules.ascii]"
+                :rules="[rules.required, rules.counter]"
                 append-icon="mdi-delete"
                 class="ma-4"
                 type="text"
@@ -76,7 +76,7 @@
               <v-text-field
                 v-model="stat.name"
                 :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                :rules="[rules.required, rules.counter, rules.ascii]"
+                :rules="[rules.required, rules.counter]"
                 append-icon="mdi-delete"
                 class="ma-4"
                 type="text"

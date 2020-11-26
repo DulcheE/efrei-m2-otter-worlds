@@ -129,7 +129,7 @@
                       label="Name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required, rules.ascii] : []"
+                      :rules="isModifying ? [rules.required] : []"
                       class="ma-4"
                       type="text"
                     />
@@ -142,7 +142,7 @@
                       label="Race"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required, rules.ascii] : []"
+                      :rules="isModifying ? [rules.required] : []"
                       required
                       class="ma-4"
                       type="text"
@@ -156,7 +156,7 @@
                       label="Job"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required, rules.ascii] : []"
+                      :rules="isModifying ? [rules.required] : []"
                       required
                       class="ma-4"
                     />
@@ -196,7 +196,7 @@
                       :label="item.name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required, rules.ascii] : []"
+                      :rules="isModifying ? [rules.required] : []"
                       class="ma-4"
                       type="number"
                     />
@@ -217,7 +217,7 @@
                       :label="item.name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="isModifying ? [rules.required, rules.ascii] : []"
+                      :rules="isModifying ? [rules.required] : []"
                       class="ma-4"
                       type="text"
                     />
@@ -538,7 +538,7 @@ export default {
     status: 'Work in progress',
     rules: {
       required: value => !!value || 'Required',
-      counter: value => value.length <= 20 || 'Max 25 characters',
+      counter: value => value.length <= 50 || 'Max 50 characters',
       ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
     },
 
