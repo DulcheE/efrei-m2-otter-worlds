@@ -231,6 +231,7 @@
 
       <v-divider class="ma-12" />
 
+      <!-- Tabs for each data about the character -->
       <v-card shaped>
         <!-- Tabs for each data about the character -->
         <v-tabs
@@ -274,61 +275,64 @@
         </v-tabs-items>
       </v-card>
 
-      <!-- Button to activate the modification -->
-      <center v-if="!isModifying" class="pa-16">
-        <v-btn
-          large
-          outlined
-          color="primary"
-          class="ma-2"
-          @click="isModifying = true"
-        >
-          <v-icon
-            left
-            dark
+      <!-- Buttons for modification -->
+      <div v-if="isUsersCharacter">
+        <!-- Button to activate the modification -->
+        <center v-if="!isModifying" class="pa-16">
+          <v-btn
+            large
+            outlined
+            color="primary"
+            class="ma-2"
+            @click="isModifying = true"
           >
-            mdi-wrench
-          </v-icon>
-          Modify the character
-        </v-btn>
-      </center>
+            <v-icon
+              left
+              dark
+            >
+              mdi-wrench
+            </v-icon>
+            Modify the character
+          </v-btn>
+        </center>
 
-      <!-- Buttons when modifying -->
-      <center v-else class="pa-16">
-        <!-- Button to discard the modifications -->
-        <v-btn
-          large
-          outlined
-          color="error"
-          class="ma-2"
-          @click="discardChanges"
-        >
-          <v-icon
-            left
-            dark
+        <!-- Buttons when modifying -->
+        <center v-else class="pa-16">
+          <!-- Button to discard the modifications -->
+          <v-btn
+            large
+            outlined
+            color="error"
+            class="ma-2"
+            @click="discardChanges"
           >
-            mdi-delete
-          </v-icon>
-          Discard the changes
-        </v-btn>
+            <v-icon
+              left
+              dark
+            >
+              mdi-delete
+            </v-icon>
+            Discard the changes
+          </v-btn>
 
-        <!-- Button to save the modifications -->
-        <v-btn
-          large
-          outlined
-          color="success"
-          class="ma-2"
-          @click="saveChanges"
-        >
-          <v-icon
-            left
-            dark
+          <!-- Button to save the modifications -->
+          <v-btn
+            large
+            outlined
+            color="success"
+            class="ma-2"
+            @click="saveChanges"
           >
-            mdi-check
-          </v-icon>
-          Save the changes
-        </v-btn>
-      </center>
+            <v-icon
+              left
+              dark
+            >
+              mdi-check
+            </v-icon>
+            Save the changes
+          </v-btn>
+        </center>
+      </div>
     </v-form>
   </v-container>
 </template>
@@ -355,6 +359,7 @@ export default {
     isModifying: false,
     hasMagic: true,
     isAdmin: false,
+    isUsersCharacter: true,
 
     // Whether the form is valid or not
     validForm: false,
