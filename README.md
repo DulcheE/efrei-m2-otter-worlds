@@ -70,7 +70,7 @@ To make the server operationnal, please enter :
 ### Synopsis
 This website is a fictional universe management system for author and rpg Game master. The point of the system is to help worldbuilders to keep track of all different elements of their fictional world (places, character, religion, evenement), and rpg players to manage the different characters they have in said word (their stories and inventory).
 
-![schema n° 1 : use-case graph](https://github.com/DulcheE/efrei-m2-otter-worlds/blob/main/assets/graph-useCase.png)
+![schema n° 1 : use-case graph](https://github.com/DulcheE/efrei-m2-otter-worlds/blob/main/static/graph-useCase.png)
 
 So we can divide the functionalities we want to implement in two big categories:
 
@@ -107,7 +107,7 @@ So we can divide the functionalities we want to implement in two big categories:
   
 The point of our project is to offer an easy to use solution very similar to software like **[worldAnvil](https://www.worldanvil.com)** to help manage worldbuilding and campaign management for tabletop RPG players.
 
-![schema n° 2 : user graph](https://github.com/DulcheE/efrei-m2-otter-worlds/blob/main/assets/graph-user.png)
+![schema n° 2 : user graph](https://github.com/DulcheE/efrei-m2-otter-worlds/blob/main/static/graph-user.png)
 
 
 ### Conception
@@ -115,7 +115,7 @@ To implement all of this, we will of course need a Database, which means we also
 To easily develop the back and the front together, we will use the framework **[Nuxt](https://nuxtjs.org)** to have a Front in **[Vue.js](https://fr.vuejs.org)** and other routes for the back in **[Node.js](https://nodejs.org)**. For the database, we will use **[Mario DB](https://mariadb.org)** which is an open source database engine based on the same core as the MySQL database engine. The advantages of **[Mario DB](https://mariadb.org)** over other database engine are the special type existing in MariaDB (especially the Auto increment) and the possibility to implement PL/SQL triggers and programs.
 
 
-![schema n° 3 : technologies graph](https://github.com/DulcheE/efrei-m2-otter-worlds/blob/main/assets/graph-technologies.png)
+![schema n° 3 : technologies graph](https://github.com/DulcheE/efrei-m2-otter-worlds/blob/main/static/graph-technologies.png)
 
 
 Regarding the front, we will use as UI Framework **[Vuetify](https://vuetifyjs.com)** which is modular, responsive, and performant. For all the API calls to the back, we will use Axios and we will manage the state of the client application with Vuex.
