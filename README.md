@@ -36,9 +36,9 @@ Here is the Github repository :
  ```
 https://github.com/DulcheE/efrei-m2-otter-worlds
  ```
-And here is the Heroku link where the website is deployed *(since the project is not deployed yet, here is another link as a placeholder)* :
+And here is the Heroku link where the website is deployed :
  ```
-https://build-your-fleet.herokuapp.com/
+https://otter-worlds.herokuapp.com
  ```
 
 
@@ -58,7 +58,7 @@ Download the project.
 To fully end the download, open a console tab where the project is located, and enter :
   $npm install
   
-To make the server operationnal, please enter :
+To make the server operational, please enter :
   $npm run dev
 ```
 
