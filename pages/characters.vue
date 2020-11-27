@@ -1,5 +1,30 @@
 <template>
   <v-container>
+    <!-- New Character -->
+    <center class="pa-4">
+      <v-btn
+        x-large
+        outlined
+        color="primary"
+        class="ma-2 zoom-xs"
+        to="/character"
+      >
+        <v-icon
+          left
+          dark
+        >
+          mdi-human-handsup
+        </v-icon>
+        New Character
+      </v-btn>
+    </center>
+
+    <!-- Divider -->
+    <v-container>
+      <v-divider class="ma-4" />
+    </v-container>
+
+    <!-- All Characterq -->
     <v-row align="center" justify="center">
       <!-- Iterate through the characters -->
       <v-col

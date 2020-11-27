@@ -1,12 +1,12 @@
 <template>
   <v-container>
     <!-- 1 - create -->
-    <h1 class="ma-6">
+    <h1 class="ma-4">
       Create your own Universe !
     </h1>
 
     <!-- New universe -->
-    <center class="pa-8">
+    <center class="pa-4">
       <!-- Dialog to create a new universe -->
       <v-dialog
         v-model="dialogNewUniverse"
@@ -18,7 +18,7 @@
             x-large
             outlined
             color="primary"
-            class="ma-2"
+            class="ma-2 zoom-xs"
             v-bind="attrs"
             v-on="on"
           >
@@ -42,9 +42,9 @@
             <v-container>
               <!-- Form -->
               <v-form ref="formNewUniverse" v-model="formNewUniverse">
-                <!-- Inputs for the new item -->
+                <!-- Inputs for the new universe -->
                 <v-row>
-                  <!-- New item : name -->
+                  <!-- New universe : name -->
                   <v-col cols="12">
                     <v-text-field
                       v-model="newUniverse.name"
@@ -53,7 +53,7 @@
                     />
                   </v-col>
 
-                  <!-- New item : description -->
+                  <!-- New universe : description -->
                   <v-col cols="12">
                     <div class="d-flex justify-center">
                       <v-textarea
@@ -68,8 +68,8 @@
                     </div>
                   </v-col>
 
-                  <!-- New item : number -->
-                  <v-col cols="12">
+                  <!-- New universe : isPublic -->
+                  <v-col class="d-flex justify-center" cols="12">
                     <v-switch
                       v-model="newUniverse.bIsPublic"
                       inset
@@ -102,11 +102,11 @@
     </center>
 
     <v-container>
-      <v-divider class="ma-6" />
+      <v-divider class="ma-4" />
     </v-container>
 
     <!-- 2 - discover -->
-    <h1 class="ma-6">
+    <h1 class="ma-4">
       Or discover the most popular ones !
     </h1>
 

@@ -8,7 +8,7 @@
     </v-row>
 
     <!-- Part 1 - title -->
-    <h1>
+    <h1 class="ma-4">
       Welcome to the Otter Worlds !
     </h1>
 
@@ -79,7 +79,7 @@
     <br><br><br><br>
 
     <!-- Part 3 - what to expect -->
-    <h1>
+    <h1 class="ma-4">
       What can I do ?
     </h1>
 

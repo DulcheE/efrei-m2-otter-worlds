@@ -8,7 +8,7 @@
     </v-row>
 
     <!-- blablabla -->
-    <h1>
+    <h1 class="ma-4">
       About us
     </h1>
     <v-container>

@@ -101,7 +101,7 @@
               <!-- Inputs for the new item -->
               <v-row>
                 <!-- New item : name -->
-                <v-col cols="12" sm="6">
+                <v-col cols="12">
                   <v-text-field
                     v-model="newItem.name"
                     label="Name"
@@ -110,11 +110,15 @@
                 </v-col>
 
                 <!-- New item : description -->
-                <v-col cols="12" sm="6">
-                  <v-text-field
+                <v-col cols="12">
+                  <v-textarea
                     v-model="newItem.description"
                     label="Description"
                     :rules="[rules.required]"
+                    :placeholder="newItem.description || 'Please write the description of your item !'"
+                    outlined
+                    auto-grow
+                    rows="2"
                   />
                 </v-col>
 

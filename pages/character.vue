@@ -132,6 +132,7 @@
                       :rules="[rules.required, rules.counter]"
                       class="ma-4"
                       type="text"
+                      required
                     />
                   </v-col>
 

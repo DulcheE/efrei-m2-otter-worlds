@@ -6,6 +6,9 @@
     <!-- App bar (navbar) -->
     <LayoutAppBar />
 
+    <!-- Game Master's dashboard, if the user is in his universe -->
+    <LayoutGmDashboard v-if="isMJ" />
+
     <!-- Container for Nuxt's page -->
     <v-main>
       <v-container>
@@ -26,12 +29,14 @@
 <script>
 import CSS from '@/assets/css'
 import LayoutAppBar from '@/components/layout-app-bar'
+import LayoutGmDashboard from '@/components/layout-gm-dashboard'
 import Mixin from '@/mixins/mixin'
 
 export default {
   components: {
     CSS,
-    LayoutAppBar
+    LayoutAppBar,
+    LayoutGmDashboard
   },
 
   mixins: {
@@ -40,6 +45,7 @@ export default {
 
   data () {
     return {
+      isMJ: true
     }
   },
 

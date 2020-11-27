@@ -246,8 +246,7 @@ export default {
   computed: {
     // Items to display when a user is NOT browsing an universe
     itemsTabDefault () {
-      // We declare some items
-      const items = [
+      return [
         {
           icon: 'mdi-login',
           title: 'Getting Started',
@@ -257,7 +256,13 @@ export default {
           icon: 'mdi-earth',
           title: 'Create / Discover Universes',
           to: '/most-known-universes',
-          content: []
+          content: this.universes.map((u) => {
+            return {
+              title: u.name,
+              srcImg: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
+              to: '/' + u.name
+            }
+          })
         },
         {
           icon: 'mdi-account-group',
@@ -265,16 +270,6 @@ export default {
           to: '/about-us'
         }
       ]
-
-      // We fill the items concerning the universes (if any)
-      this.universes.forEach(u => items[1].content.push({
-        title: u.name,
-        srcImg: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
-        to: '/' + u.name
-      }))
-
-      // We return the items
-      return items
     },
 
     // Items to display when a user is browsing an universe
