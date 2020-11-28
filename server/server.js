@@ -4,7 +4,7 @@ import MariaDBStore from 'express-session-mariadb-store'
 import logger from 'morgan'
 import config from './server.config.js'
 import mariadbStore from './mariadb-store.js'
-import { apiRoute, apiRouter } from './routes/routes'
+import { apiRoute, apiRouter } from './api/routes'
 
 const app = express()
 try {

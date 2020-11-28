@@ -1,4 +1,4 @@
-import { baseAPI } from '../routes/routes'
+import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
 import config from '../server.config.js'
 const hal = require('hal')
