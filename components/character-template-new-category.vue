@@ -130,7 +130,7 @@
 <script>
 // Imports
 export default {
-  name: 'CharacterDefineNewCategory',
+  name: 'CharacterTemplateNewCategory',
 
   props: {
     categories: {

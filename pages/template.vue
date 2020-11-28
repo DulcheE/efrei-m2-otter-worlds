@@ -22,6 +22,10 @@ export default {
   },
 
   methods: {
+  },
+
+  head () {
+    return { title: '' }
   }
 }
 </script>

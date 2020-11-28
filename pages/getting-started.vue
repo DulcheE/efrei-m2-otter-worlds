@@ -284,7 +284,6 @@
 <script>
 export default {
   name: 'PageGettingStarted',
-  title: 'Getting started',
 
   data: () => ({
     isActive: false,
@@ -316,6 +315,10 @@ export default {
         ]
       }
     ]
-  })
+  }),
+
+  head () {
+    return { title: 'Getting started' }
+  }
 }
 </script>

@@ -233,7 +233,7 @@
         <v-tabs-items v-model="tab">
           <!-- Tab n° 1 - Statistics -->
           <v-tab-item>
-            <CharacterDefineNewCategory
+            <CharacterTemplateNewCategory
               :categories="statsRegular"
               :is-magic="false"
               :rules="rules"
@@ -257,7 +257,7 @@
               </div>
 
               <!-- The creator of category, if the template has magic -->
-              <CharacterDefineNewCategory
+              <CharacterTemplateNewCategory
                 v-if="hasMagic"
                 :categories="statsMagic"
                 :is-magic="true"
@@ -277,13 +277,13 @@
 
 <script>
 // Imports
-import CharacterDefineNewCategory from '@/components/character-define-new-category'
+import CharacterTemplateNewCategory from '@/components/character-template-new-category'
 
 export default {
-  name: 'PageCharacterDefine',
+  name: 'PageCharacterTemplate',
 
   components: {
-    CharacterDefineNewCategory
+    CharacterTemplateNewCategory
   },
 
   data: () => ({
@@ -447,6 +447,10 @@ export default {
         }
       }
     }
+  },
+
+  head () {
+    return { title: 'Character template' }
   }
 }
 </script>

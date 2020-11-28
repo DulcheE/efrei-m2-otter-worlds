@@ -162,7 +162,7 @@
               </v-tab>
             </template>
 
-            <!-- LIST -->
+            <!-- LIST (if any) -->
             <v-list v-if="typeof item.content !== 'undefined' && item.content.length !== 0">
               <v-list-item
                 v-for="(content, index) in item.content"

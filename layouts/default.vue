@@ -1,8 +1,5 @@
 <template>
   <v-app dark>
-    <!-- We call our CSS page -->
-    <CSS />
-
     <!-- App bar (navbar) -->
     <LayoutAppBar />
 
@@ -27,14 +24,12 @@
 </template>
 
 <script>
-import CSS from '@/assets/css'
 import LayoutAppBar from '@/components/layout-app-bar'
 import LayoutGmDashboard from '@/components/layout-gm-dashboard'
 import Mixin from '@/mixins/mixin'
 
 export default {
   components: {
-    CSS,
     LayoutAppBar,
     LayoutGmDashboard
   },

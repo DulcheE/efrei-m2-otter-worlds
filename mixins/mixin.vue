@@ -7,6 +7,9 @@ h1, h2 {
   color: #E9C490;
 }
 
+/* No underline effect for NuxtLink (does not work) */
+NuxtLink { text-decoration: none; }
+
 /* Zoom effect when overing */
 .zoom {
   transition: transform .2s;

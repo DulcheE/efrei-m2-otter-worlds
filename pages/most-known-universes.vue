@@ -1,106 +1,109 @@
 <template>
   <v-container>
     <!-- 1 - create -->
-    <h1 class="ma-4">
-      Create your own Universe !
-    </h1>
+    <div>
+      <h1 class="ma-4">
+        Create your own Universe !
+      </h1>
 
-    <!-- New universe -->
-    <center class="pa-4">
-      <!-- Dialog to create a new universe -->
-      <v-dialog
-        v-model="dialogNewUniverse"
-        width="500"
-      >
-        <!-- Button : trigger of the dialog -->
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            x-large
-            outlined
-            color="primary"
-            class="ma-2 zoom-xs"
-            v-bind="attrs"
-            v-on="on"
-          >
-            <v-icon
-              left
-              dark
-            >
-              mdi-earth
-            </v-icon>
-            New Universe
-          </v-btn>
-        </template>
-
-        <!-- Dialog -->
-        <v-card>
-          <v-card-title>
-            <span class="headline">New Universe</span>
-          </v-card-title>
-
-          <v-card-text>
-            <v-container>
-              <!-- Form -->
-              <v-form ref="formNewUniverse" v-model="formNewUniverse">
-                <!-- Inputs for the new universe -->
-                <v-row>
-                  <!-- New universe : name -->
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="newUniverse.name"
-                      label="Name"
-                      :rules="[rules.required]"
-                    />
-                  </v-col>
-
-                  <!-- New universe : description -->
-                  <v-col cols="12">
-                    <div class="d-flex justify-center">
-                      <v-textarea
-                        v-model="newUniverse.description"
-                        label="Description"
-                        :rules="[rules.required]"
-                        :placeholder="backstory || 'Please write the description of your universe !'"
-                        outlined
-                        auto-grow
-                        rows="4"
-                      />
-                    </div>
-                  </v-col>
-
-                  <!-- New universe : isPublic -->
-                  <v-col class="d-flex justify-center" cols="12">
-                    <v-switch
-                      v-model="newUniverse.bIsPublic"
-                      inset
-                      label="Is the universe public ?"
-                    />
-                  </v-col>
-                </v-row>
-              </v-form>
-            </v-container>
-          </v-card-text>
-
-          <!-- Divider -->
-          <v-divider />
-
-          <!-- Actions -->
-          <v-card-actions>
-            <v-spacer />
-
-            <!-- Button to create the Universe -->
+      <!-- New universe -->
+      <center class="pa-4">
+        <!-- Dialog to create a new universe -->
+        <v-dialog
+          v-model="dialogNewUniverse"
+          width="500"
+        >
+          <!-- Button : trigger of the dialog -->
+          <template v-slot:activator="{ on, attrs }">
             <v-btn
+              x-large
+              outlined
               color="primary"
-              text
-              @click="createUniverse"
+              class="ma-2 zoom-xs"
+              v-bind="attrs"
+              v-on="on"
             >
-              Create new Universe !
+              <v-icon
+                left
+                dark
+              >
+                mdi-earth
+              </v-icon>
+              New Universe
             </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </center>
+          </template>
 
+          <!-- Dialog -->
+          <v-card>
+            <v-card-title>
+              <span class="headline">New Universe</span>
+            </v-card-title>
+
+            <v-card-text>
+              <v-container>
+                <!-- Form -->
+                <v-form ref="formNewUniverse" v-model="formNewUniverse">
+                  <!-- Inputs for the new universe -->
+                  <v-row>
+                    <!-- New universe : name -->
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="newUniverse.name"
+                        label="Name"
+                        :rules="[rules.required]"
+                      />
+                    </v-col>
+
+                    <!-- New universe : description -->
+                    <v-col cols="12">
+                      <div class="d-flex justify-center">
+                        <v-textarea
+                          v-model="newUniverse.description"
+                          label="Description"
+                          :rules="[rules.required]"
+                          :placeholder="backstory || 'Please write the description of your universe !'"
+                          outlined
+                          auto-grow
+                          rows="4"
+                        />
+                      </div>
+                    </v-col>
+
+                    <!-- New universe : isPublic -->
+                    <v-col class="d-flex justify-center" cols="12">
+                      <v-switch
+                        v-model="newUniverse.bIsPublic"
+                        inset
+                        label="Is the universe public ?"
+                      />
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </v-container>
+            </v-card-text>
+
+            <!-- Divider -->
+            <v-divider />
+
+            <!-- Actions -->
+            <v-card-actions>
+              <v-spacer />
+
+              <!-- Button to create the Universe -->
+              <v-btn
+                color="primary"
+                text
+                @click="createUniverse"
+              >
+                Create new Universe !
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </center>
+    </div>
+
+    <!-- divider -->
     <v-container>
       <v-divider class="ma-4" />
     </v-container>
@@ -121,69 +124,67 @@
         md="4"
         lg="3"
       >
-        <!-- Card for the current universe -->
-        <v-card
-          class="zoom-xs"
-          elevation="8"
-          :to="'/universe/' + universe.name"
-        >
-          <!-- Title of the universe -->
-          <v-card-title>
-            <v-container class="pa-0">
-              <v-row align="center" justify="center">
-                <!-- Logo (flexible according to the screen size) -->
-                <v-col sm="4" md="4" align="right">
-                  <v-img class="shrink d-flex d-md-none" src="/logo.png" max-height="50" max-width="50" contain />
-                  <v-img class="shrink d-none d-md-flex" src="/logo.png" max-height="75" max-width="75" contain />
-                </v-col>
+        <NuxtLink :to="'/universe/' + universe.name" class="text-decoration-none">
+          <!-- Card for the current universe -->
+          <v-card
+            class="zoom-xs"
+            elevation="8"
+          >
+            <!-- Title of the universe -->
+            <v-card-title>
+              <v-container class="pa-0">
+                <v-row align="center" justify="center">
+                  <!-- Logo (flexible according to the screen size) -->
+                  <v-col sm="4" md="4" align="right">
+                    <v-img class="shrink d-flex d-md-none" src="/logo.png" max-height="50" max-width="50" contain />
+                    <v-img class="shrink d-none d-md-flex" src="/logo.png" max-height="75" max-width="75" contain />
+                  </v-col>
 
-                <!-- Title -->
-                <v-col sm="8" md="8">
-                  <h3 class="primary--text text-truncate">
-                    {{ universe.name }}
-                  </h3>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card-title>
+                  <!-- Title -->
+                  <v-col sm="8" md="8">
+                    <h3 class="primary--text text-truncate">
+                      {{ universe.name }}
+                    </h3>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-title>
 
-          <!-- Some stuff -->
-          <v-card-subtitle>
-            <i>{{ (universe.user || {username: 'unknown' }).username }}</i>
-          </v-card-subtitle>
+            <!-- Some stuff -->
+            <v-card-subtitle>
+              <i>{{ (universe.user || {username: 'unknown' }).username }}</i>
+            </v-card-subtitle>
 
-          <!-- Description of the universe -->
-          <v-card-text>
-            <v-container>
-              <h3>{{ universe.description }}</h3>
-            </v-container>
-          </v-card-text>
-        </v-card>
-
-        <!-- some spaces -->
-        <br><br>
+            <!-- Description of the universe -->
+            <v-card-text>
+              <v-container>
+                <h3>{{ universe.description }}</h3>
+              </v-container>
+            </v-card-text>
+          </v-card>
+        </NuxtLink>
       </v-col>
     </v-row>
 
     <!-- Useful links -->
     <v-container>
-      <router-link to="/characters">
+      <NuxtLink to="/characters" class="text-decoration-none">
         <v-btn>
           shortcut to characters
         </v-btn>
-      </router-link>
+      </NuxtLink>
 
-      <router-link to="/character">
+      <NuxtLink to="/character" class="text-decoration-none">
         <v-btn>
           shortcut to character
         </v-btn>
-      </router-link>
+      </NuxtLink>
 
-      <router-link to="/character-define">
+      <NuxtLink to="/character-template" class="text-decoration-none">
         <v-btn>
-          shortcut to character-define
+          shortcut to character-template
         </v-btn>
-      </router-link>
+      </NuxtLink>
     </v-container>
   </v-container>
 </template>
@@ -263,6 +264,10 @@ export default {
         this.dialogNewUniverse = false
       }
     }
+  },
+
+  head () {
+    return { title: 'Known universes' }
   }
 }
 </script>

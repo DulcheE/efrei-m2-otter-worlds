@@ -2,21 +2,22 @@
   <v-container>
     <!-- New Character -->
     <center class="pa-4">
-      <v-btn
-        x-large
-        outlined
-        color="primary"
-        class="ma-2 zoom-xs"
-        to="/character"
-      >
-        <v-icon
-          left
-          dark
+      <NuxtLink to="/character" class="text-decoration-none">
+        <v-btn
+          x-large
+          outlined
+          color="primary"
+          class="ma-2 zoom-xs"
         >
-          mdi-human-handsup
-        </v-icon>
-        New Character
-      </v-btn>
+          <v-icon
+            left
+            dark
+          >
+            mdi-human-handsup
+          </v-icon>
+          New Character
+        </v-btn>
+      </NuxtLink>
     </center>
 
     <!-- Divider -->
@@ -37,7 +38,7 @@
         xl="3"
       >
         <!-- Card for the current character -->
-        <router-link class="text-decoration-none white--text" :to="'/universe/character/' + character.name">
+        <NuxtLink class="text-decoration-none" :to="'/universe/character/' + character.name">
           <v-card class="zoom-sm">
             <v-row>
               <!-- Image on the left -->
@@ -101,7 +102,7 @@
               </v-col>
             </v-row>
           </v-card>
-        </router-link>
+        </NuxtLink>
       </v-col>
     </v-row>
   </v-container>
@@ -148,6 +149,10 @@ export default {
   },
 
   methods: {
+  },
+
+  head () {
+    return { title: 'Characters' }
   }
 }
 </script>

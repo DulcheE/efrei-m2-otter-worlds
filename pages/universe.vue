@@ -98,6 +98,10 @@ export default {
   },
 
   methods: {
+  },
+
+  head () {
+    return { title: 'Universe' }
   }
 }
 </script>

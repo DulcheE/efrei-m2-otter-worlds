@@ -235,6 +235,10 @@ export default {
         passwordMatch: value => value === this.passw || 'Match password'
       }
     }
+  },
+
+  head () {
+    return { title: 'My profile' }
   }
 }
 </script>

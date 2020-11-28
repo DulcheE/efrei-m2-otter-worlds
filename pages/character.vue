@@ -670,6 +670,10 @@ export default {
         this.isModifying = false
       }
     }
+  },
+
+  head () {
+    return { title: this.character.name }
   }
 }
 </script>
