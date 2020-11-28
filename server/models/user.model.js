@@ -75,6 +75,14 @@ export default class User {
   }
 
   /**
+   * @param {String} username
+   * @returns {Boolean}
+   */
+  static async getByName (username) {
+    return (await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', [username]))[0]
+  }
+
+  /**
    * @param {Number} id
    * @returns {Promise<Characters>}
    */
@@ -117,20 +125,6 @@ export default class User {
         ON uin.idUniverse = u.idUniverse
       WHERE idUser = ?
     `, id)
-  }
-
-  /**
-   * @param {User} user
-   * @returns {Boolean}
-   */
-  static async Login (user) {
-    const row = await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', user.username)
-    const result = row[0]
-    if (result.password === user.password) {
-      return true
-    } else {
-      throw new Error('wrong username or passeword')
-    }
   }
 
   /**

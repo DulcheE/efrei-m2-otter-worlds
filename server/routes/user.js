@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import getUsers from '../controllers/user/get.users.js'
+import getMe from '../controllers/user/get.user.me.js'
 import getUser from '../controllers/user/get.user.js'
 import getUserCharacters from '../controllers/user/get.user.characters'
 import getUserGroups from '../controllers/user/get.user.groups'
@@ -13,6 +14,7 @@ import login from '../controllers/user/post.login'
 const router = Router()
 
 router.get('/', getUsers)
+router.get('/me', getMe)
 router.get('/:id', getUser)
 router.get('/:id/characters', getUserCharacters)
 router.get('/:id/groups', getUserGroups)

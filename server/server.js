@@ -1,5 +1,6 @@
 import express from 'express'
 import session from 'express-session'
+import MariaDBStore from 'express-session-mariadb-store'
 import logger from 'morgan'
 import config from './server.config.js'
 import mariadbStore from './mariadb-store.js'
@@ -18,9 +19,18 @@ try {
 app.use(logger('dev'))
 app.use(session({
   secret: config.SESSION_SECRET,
+  store: new MariaDBStore(config.MARIADB),
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  },
   resave: false,
   saveUninitialized: false
 }))
+// app.use(session({
+//   secret: config.SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: false
+// }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
