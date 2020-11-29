@@ -19,9 +19,8 @@ class UniversePolicy {
     const param = [idUniverse, idUser || 0, idUniverse]
     const result = (await mariadbStore.client.query(sql, param))[0]
 
-    if (result.bIsPublic) {
-      return true
-    }
+    if (!result) { return false }
+    if (result.bIsPublic) { return true }
     return result.idUser === idUser
   }
 
@@ -56,7 +55,7 @@ class UniversePolicy {
       WHERE idUniverse = ? AND user_idUser = ?
     `
     const param = [idUniverse, idUser]
-    const result = await mariadbStore.client.query(sql, param)
+    const result = (await mariadbStore.client.query(sql, param))[0]
 
     return !!result
   }
