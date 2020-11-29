@@ -121,12 +121,12 @@ export default {
     group: null,
     selectedItem: -1,
     items: [
-      { text: 'Character template', icon: 'mdi-human-handsup', to: '/character-define' },
-      { text: 'New map', icon: 'mdi-map', to: '/map' },
-      { text: 'New timeline', icon: 'mdi-chart-timeline-variant', to: '/timeline' }
+      { text: 'Character template', icon: 'mdi-human-handsup', to: '/universe/0/character-template' },
+      { text: 'New map', icon: 'mdi-map', to: '/universe/0/map' },
+      { text: 'New timeline', icon: 'mdi-chart-timeline-variant', to: '/universe/0/timeline' }
     ],
 
-    // Selected
+    // Universe's data
     universe: {
       name: 'Wololo',
       src: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
