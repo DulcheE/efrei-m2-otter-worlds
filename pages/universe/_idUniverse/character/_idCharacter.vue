@@ -632,6 +632,14 @@ export default {
   mounted () {
     // We initialize the value of the picture selected by the user
     this.pictureSelected = this.character.src
+
+    // Display an alert showing if creating or accessing an existing character
+    const idCharacter = this.$route.params.idCharacter
+    if (idCharacter === undefined) {
+      alert('creating a NEW character !')
+    } else {
+      alert('accessing the character of id : ' + idCharacter)
+    }
   },
 
   methods: {

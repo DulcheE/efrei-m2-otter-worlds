@@ -232,7 +232,7 @@ export default {
         {
           icon: 'mdi-cog',
           title: 'Settings',
-          to: '/user/0/settings'
+          to: '/user/settings'
         },
         {
           icon: 'mdi-logout-variant',

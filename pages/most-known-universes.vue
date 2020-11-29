@@ -61,7 +61,7 @@
                           v-model="newUniverse.description"
                           label="Description"
                           :rules="[rules.required]"
-                          :placeholder="backstory || 'Please write the description of your universe !'"
+                          :placeholder="newUniverse.description || 'Please write the description of your universe !'"
                           outlined
                           auto-grow
                           rows="4"

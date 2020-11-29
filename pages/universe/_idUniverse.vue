@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Universe {{ universe.name }}</h1>
+    <h1>Universe {{ $route.params.idUniverse }}</h1>
   </v-container>
 </template>
 
@@ -13,10 +13,7 @@ export default {
   },
 
   data: () => ({
-    universe: {
-      id: 0,
-      name: 'who cares ?'
-    }
+    universe: {}
   }),
 
   computed: {
@@ -29,7 +26,7 @@ export default {
   },
 
   head () {
-    return { title: this.universe.name }
+    return { title: this.$route.params.idUniverse }
   }
 }
 </script>
