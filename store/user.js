@@ -22,8 +22,6 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        // eslint-disable-next-line
-        console.log(document)
         context.commit('setUsers', document.users)
       })
       .catch((err) => {
