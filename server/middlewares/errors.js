@@ -10,10 +10,8 @@ function tryTo (fn, errors) {
   /** @param { import('express').Request } req */
   async function middleware (req, res, next) {
     try {
-      console.log('here')
       await fn(req, res, next)
     } catch (err) {
-      console.log('here2')
       errors(req, res, next, err)
     }
   }

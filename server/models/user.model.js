@@ -140,19 +140,11 @@ export default class User {
   }
 
   /**
-   * @param {User} user
+   * @param {Number} idUser
    * @returns {Promise<User>}
    */
-  static async suppr (user) {
-    const sql = 'SELECT * FROM user WHERE idUser = ?'
-    const param = [user.idUser]
-    const row = await mariadbStore.client.query(sql, param)
-    const result = new User(row[0])
-    if (result.password === user.password) {
-      return await mariadbStore.client.query('DELETE FROM user WHERE idUser = ?', [user.idUser])
-    } else {
-      throw new Error('wrong passeword')
-    }
+  static async remove (idUser) {
+    return await mariadbStore.client.query('DELETE FROM user WHERE idUser = ?', [idUser])
   }
 
   /**

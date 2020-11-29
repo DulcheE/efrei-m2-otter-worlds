@@ -1,9 +1,12 @@
 import User from '../../../models/user.model'
 
-export default function deleteUser (req, res) {
-  User.suppr(req.body)
-    .then((user) => {
-      res.status(200).json(user)
-    })
-    .catch(err => res.status(404).send(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function deleteUser (req, res) {
+  await User.remove(parseInt(req.params.id))
+  await req.session.destroy()
+
+  res.sendStatus(200)
 }
