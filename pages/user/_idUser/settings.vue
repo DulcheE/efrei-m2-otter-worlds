@@ -213,6 +213,8 @@
 
 <script>
 export default {
+  name: 'PageSettings',
+
   data () {
     return {
       username: 'John Doe',
@@ -238,7 +240,7 @@ export default {
   },
 
   head () {
-    return { title: 'My profile' }
+    return { title: 'Settings' }
   }
 }
 </script>

@@ -7,7 +7,7 @@
     <LayoutGmDashboard v-if="isMJ" />
 
     <!-- Container for Nuxt's page -->
-    <v-main>
+    <v-main class="background">
       <v-container>
         <nuxt />
       </v-container>

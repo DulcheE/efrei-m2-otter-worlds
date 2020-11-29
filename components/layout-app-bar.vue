@@ -231,8 +231,8 @@ export default {
         },
         {
           icon: 'mdi-cog',
-          title: 'Edit profile',
-          to: '/myprofile'
+          title: 'Settings',
+          to: '/user/0/settings'
         },
         {
           icon: 'mdi-logout-variant',

@@ -2,7 +2,7 @@
   <v-container>
     <!-- New Character -->
     <center class="pa-4">
-      <NuxtLink to="/character" class="text-decoration-none">
+      <NuxtLink to="/universe/${universe.id}/character" class="text-decoration-none">
         <v-btn
           x-large
           outlined
@@ -117,6 +117,10 @@ export default {
   },
 
   data: () => ({
+    universe: {
+      id: 0,
+      name: 'who cares ?'
+    },
     arrayRaces: ['Human', 'Ork', 'Argonian', 'Titan', 'Witcher', 'ELf', 'Dwarf'],
     arrayJobs: ['Soldier', 'Priest', 'Commoner', 'Brigand', 'Thief', 'Merchant']
   }),

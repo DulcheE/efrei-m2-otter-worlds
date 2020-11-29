@@ -168,19 +168,19 @@
 
     <!-- Useful links -->
     <v-container>
-      <NuxtLink to="/characters" class="text-decoration-none">
+      <NuxtLink to="/universe/0/characters" class="text-decoration-none">
         <v-btn>
           shortcut to characters
         </v-btn>
       </NuxtLink>
 
-      <NuxtLink to="/character" class="text-decoration-none">
+      <NuxtLink to="/universe/0/character" class="text-decoration-none">
         <v-btn>
           shortcut to character
         </v-btn>
       </NuxtLink>
 
-      <NuxtLink to="/character-template" class="text-decoration-none">
+      <NuxtLink to="/universe/0/character-template" class="text-decoration-none">
         <v-btn>
           shortcut to character-template
         </v-btn>

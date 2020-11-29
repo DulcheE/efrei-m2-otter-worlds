@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <h1>All Universes</h1>
     <v-row align="center" justify="center">
       <!-- Iterate through the universes -->
       <v-col
@@ -12,7 +13,7 @@
         xl="3"
       >
         <!-- Card for the current universe -->
-        <router-link class="text-decoration-none white--text" :to="'/universe/' + universe.name">
+        <NuxtLink class="text-decoration-none" :to="'/universe/' + universe.name">
           <v-card class="zoom-sm">
             <v-row>
               <!-- Image on the left -->
@@ -54,7 +55,7 @@
               </v-col>
             </v-row>
           </v-card>
-        </router-link>
+        </NuxtLink>
       </v-col>
     </v-row>
   </v-container>
