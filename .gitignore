@@ -89,3 +89,4 @@ sw.*
 # Vim swap files
 *.swp
 server/local.server.config.js
+BDD/BDD-Model.mwb.bak

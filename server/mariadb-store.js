@@ -5,6 +5,8 @@ class Mariadb {
   pool;
   /** @type { Promise<PoolConnection> } */
   client;
+  /** @type { Promise<PoolConnection> } */
+  connection;
 
   /**
    * @param { import('mariadb').ClientConfig } config

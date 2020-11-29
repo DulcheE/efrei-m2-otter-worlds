@@ -1,4 +1,4 @@
-import { baseAPI } from '../routes/routes'
+import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
 const hal = require('hal')
 
@@ -9,6 +9,10 @@ export default class Timeline {
   name
   /** @type {String} */
   description
+  /** @type {Boolean} */
+  bIsPublic
+  /** @type  {Event[]} */
+  events
   /** @type {Number} */
   idUniverse
 
@@ -19,6 +23,8 @@ export default class Timeline {
     this.idTimeline = timeline.idTimeline
     this.name = timeline.name
     this.description = timeline.description
+    this.bIsPublic = timeline.bIsPublic
+    this.events = []
     this.idUniverse = timeline.universe_idUniverse || timeline.idUniverse
   }
 
@@ -28,7 +34,9 @@ export default class Timeline {
       {
         id: this.idTimeline,
         name: this.name,
-        description: this.description
+        description: this.description,
+        bIsPublic: this.bIsPublic,
+        events: this.events
       },
       `${baseAPI(req)}timelines/${this.idTimeline}`)
 
@@ -51,8 +59,8 @@ export default class Timeline {
   static asResourceList (req, timelines, selfLink = 'timelines') {
     const resourceTimeline = []
     for (const timeline of timelines) {
-      const _template = new Timeline(timeline)
-      resourceTimeline.push(_template.asResource(req).toJSON())
+      const _timeline = new Timeline(timeline)
+      resourceTimeline.push(_timeline.asResource(req).toJSON())
     }
 
     const resource = hal.Resource({ timelines: resourceTimeline }, baseAPI(req) + selfLink)
@@ -69,28 +77,28 @@ export default class Timeline {
 
   /**
    * @param {Number} id
-   * @returns {Promise<Template>}
+   * @returns {Promise<Timeline>}
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0]
+    const conn = (await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0]
     if (!conn) {
-      throw new Error(`Template ${id} don't exist !`)
+      throw new Error(`Timeline ${id} don't exist !`)
     }
 
-    return new Template(conn)
+    return new Timeline(conn)
   }
 
   /**
    * @param {Timeline} timeline
-   * @returns {Number} the id of the new inserted template
+   * @returns {Number} the id of the new inserted timeline
    */
   static async add (timeline) {
     const sql = `
       INSERT INTO
-        timeline(name, description, universe_idUniverse)
-        VALUES(?, ?, ?)`
+        timeline(name, description, bIsPublic, universe_idUniverse)
+        VALUES(?, ?, ?, ?)`
     // All the params we have to put to insert a new row in the table
-    const params = [timeline.name, timeline.description, timeline.idUniverse]
+    const params = [timeline.name, timeline.description, timeline.bIsPublic, timeline.idUniverse]
 
     const rows = await mariadbStore.client.query(sql, params)
 
@@ -100,16 +108,16 @@ export default class Timeline {
   /**
    * @param {Number} id
    * @param {Timeline} timeline
-   * @returns {Boolean} if the template could have been updated
+   * @returns {Boolean} if the timeline could have been updated
    */
   static async update (id, timeline) {
     const sql = `
       UPDATE timeline
-        SET name = ?, description = ?
+        SET name = ?, description = ?, bIsPublic =?
         WHERE idTimeline = ?`
-    // All the cols you want to update for a template + the id of the template you want to update
+    // All the cols you want to update for a timeline + the id of the timeline you want to update
     // /!\ You may never want to change the links
-    const params = [timeline.name, timeline.description, id]
+    const params = [timeline.name, timeline.description, timeline.bIsPublic, id]
 
     const rows = await mariadbStore.client.query(sql, params)
 
@@ -118,7 +126,7 @@ export default class Timeline {
 
   /**
    * @param {Number} id
-   * @returns {Boolean} if the template could have been removed
+   * @returns {Boolean} if the timeline could have been removed
    */
   static async remove (id) {
     const sql = `

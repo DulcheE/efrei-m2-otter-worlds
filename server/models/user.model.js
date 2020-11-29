@@ -1,4 +1,4 @@
-import { baseAPI } from '../routes/routes'
+import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
 const hal = require('hal')
 
@@ -27,8 +27,12 @@ export default class User {
       },
       `${baseAPI(req)}users/${this.idUser}`)
 
+    resource.link('groups',
+      `${baseAPI(req)}users/${this.idUser}/groups`)
     resource.link('universes',
       `${baseAPI(req)}users/${this.idUser}/universes`)
+    resource.link('universesPlays',
+        `${baseAPI(req)}users/${this.idUser}/universes-plays`)
 
     return resource
   }
@@ -71,11 +75,35 @@ export default class User {
   }
 
   /**
+   * @param {String} username
+   * @returns {Boolean}
+   */
+  static async getByName (username) {
+    return (await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', [username]))[0]
+  }
+
+  /**
    * @param {Number} id
    * @returns {Promise<Characters>}
    */
   static async getCharacters (id) {
     return await mariadbStore.client.query('SELECT * FROM `character` WHERE user_idUser = ?', id)
+  }
+
+  /**
+   * @param {Number} idUser id of the user that we want the groups
+   * @param {Number} idUniverse id of the universe that we want the groups for the user
+   * @returns {Promise<Groups>}
+   */
+  static async getGroups (idUser, idUniverse) {
+    return await mariadbStore.client.query(`
+      SELECT g.idGroup, g.name, g.universe_idUniverse FROM \`group\` g
+      INNER JOIN characterInGroup cg
+        ON cg.group_idGroup = g.idGroup
+      INNER JOIN \`character\` c
+        ON c.idCharacter = cg.character_idCharacter
+      WHERE c.user_idUser = ? AND g.universe_idUniverse = ?
+    `, [idUser, idUniverse])
   }
 
   /**
@@ -87,17 +115,16 @@ export default class User {
   }
 
   /**
-   * @param {User} user
-   * @returns {Boolean}
+   * @param {Number} id
+   * @returns {Promise<Universe>}
    */
-  static async Login (user) {
-    const row = await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', user.username)
-    const result = row[0]
-    if (result.password === user.password) {
-      return true
-    } else {
-      throw new Error('wrong username or passeword')
-    }
+  static async getUniversesPlays (id) {
+    return await mariadbStore.client.query(`
+      SELECT u.*, uin.bIsGM FROM universe u
+      INNER JOIN userinuniverse uin
+        ON uin.idUniverse = u.idUniverse
+      WHERE idUser = ?
+    `, id)
   }
 
   /**
