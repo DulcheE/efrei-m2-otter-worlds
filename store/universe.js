@@ -50,6 +50,18 @@ const actions = {
         console.log(err)
       })
   },
+  async fetchByUrl (context, url) {
+    await traverson.from(url)
+      .json()
+      .getResource().result
+      .then((document) => {
+        context.commit('putUniverse', document)
+      })
+      .catch((err) => {
+        // eslint-disable-next-line
+        console.log(err)
+      })
+  },
   addUniverse (context, universe) {
     return traverson.from('http://localhost:3000/api/v1/universes/')
       .json()
