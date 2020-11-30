@@ -25,6 +25,9 @@ export default class Universe {
     this.idUser = universe.user_idUser || universe.idUser
   }
 
+  /**
+   * @param {import('express').Request} req
+   */
   asResource (req) {
     const resource = hal.Resource(
       {
@@ -42,8 +45,8 @@ export default class Universe {
       `${baseAPI(req)}universes/${this.idUniverse}/characters`)
     resource.link('maps',
       `${baseAPI(req)}universes/${this.idUniverse}/maps`)
-    resource.link('templateCategories',
-      `${baseAPI(req)}universes/${this.idUniverse}/templateCategories`)
+    resource.link('template-categories',
+      `${baseAPI(req)}universes/${this.idUniverse}/template-categories`)
     resource.link('timelines',
       `${baseAPI(req)}universes/${this.idUniverse}/timelines`)
     resource.link('topics',
@@ -55,9 +58,9 @@ export default class Universe {
   }
 
   /**
-   * @param req
-   * @param universes {Universe[]}
-   * @param selfLink {string}
+   * @param {import('express').Request} req
+   * @param {Universe[]} universes
+   * @param {string} selfLink
    */
   static asResourceList (req, universes, selfLink = 'universes') {
     const resourceUniverses = []
@@ -93,7 +96,7 @@ export default class Universe {
 
   /**
    * @param {Number} id
-   * @returns {Promise<Characters>}
+   * @returns {Promise<import('./character.model.js').default[]>}
    */
   static async getCharacters (id) {
     return await mariadbStore.client.query('SELECT * FROM `character` WHERE universe_idUniverse = ?', id)
@@ -101,7 +104,15 @@ export default class Universe {
 
   /**
    * @param {Number} id
-   * @returns {Promise<Characters>}
+   * @returns {Promise<import('./templateCategory.model.js').default[]>}
+   */
+  static async getTemplateCategories (id) {
+    return await mariadbStore.client.query('SELECT * FROM templateCategory WHERE universe_idUniverse = ?', id)
+  }
+
+  /**
+   * @param {Number} id
+   * @returns {Promise<import('./character.model.js').default[]>}
    */
   static async getUsersPlaying (id) {
     return await mariadbStore.client.query(`
