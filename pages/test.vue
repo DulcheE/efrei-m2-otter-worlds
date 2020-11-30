@@ -7,7 +7,10 @@
     <!-- <v-list v-for="universe in universes" :key="universe.id">
       <h1>{{ universe }}</h1>
     </v-list> -->
-    <v-list v-for="template in templateCategories" :key="template.id">
+    <!-- <v-list v-for="template in templateCategories" :key="template.id">
+      <h5>{{ template }}</h5>
+    </v-list> -->
+    <v-list v-for="template in templateStats" :key="template.id">
       <h5>{{ template }}</h5>
     </v-list>
   </div>
@@ -21,6 +24,7 @@ export default {
     ...mapGetters('user', ['getUsers']),
     ...mapGetters('universe', ['getUniverses']),
     ...mapGetters('templateCategories', ['getTemplateCategories']),
+    ...mapGetters('templateStat', ['getTemplateStats']),
     logged () {
       return this.getLogged()
     },
@@ -32,6 +36,9 @@ export default {
     },
     templateCategories () {
       return this.getTemplateCategories()
+    },
+    templateStats () {
+      return this.getTemplateStats()
     }
   },
   async mounted () {
@@ -41,8 +48,9 @@ export default {
     await this.fetchUniversePlay() */
     // await this.fetchUniverse(1)
     // await this.fetchForUniverse(4)
-    await this.fetchAllTemplateCategories()
-    await this.deleteTemplateCategory(4)
+    // await this.fetchAllTemplateCategories()
+    await this.fetchAllTemplateStats()
+    await this.putTemplateStat({ id: 14, template: { name: 'prout qui pue', bIsNumber: true, bIsRequired: false, idTemplateCategory: 1 } })
       .then(() => {
         // eslint-disable-next-line no-console
         console.log('yay')
@@ -56,8 +64,8 @@ export default {
     ...mapActions('login', ['login', 'fetchUniverseOwn', 'fetchUniversePlay']),
     ...mapActions('user', ['fetchAllUsers', 'addUser', 'putUser', 'deleteUser']),
     ...mapActions('universe', ['fetchAllUniverses', 'fetchUniverse', 'addUniverse', 'putUniverse', 'deleteUniverse']),
-    ...mapActions('templateCategories', ['fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory'])
-
+    ...mapActions('templateCategories', ['fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory']),
+    ...mapActions('templateStat', ['fetchAllTemplateStats', 'fetchTemplateStat', 'fetchForCategory', 'addTemplateStat', 'putTemplateStat', 'deleteTemplateStat'])
   }
 
 }

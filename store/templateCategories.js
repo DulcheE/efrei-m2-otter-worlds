@@ -40,7 +40,7 @@ const actions = {
   async fetchTemplateCategory (context, id) {
     // eslint-disable-next-line
     console.log(context.state)
-    await traverson.from('http://localhost:3000/api/v1/templateCategories/{idTemplate}')
+    await traverson.from('http://localhost:3000/api/v1/template-categories/{idTemplate}')
       .withTemplateParameters({ idTemplate: id })
       .json()
       .getResource().result
