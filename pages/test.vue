@@ -10,8 +10,11 @@
     <!-- <v-list v-for="template in templateCategories" :key="template.id">
       <h5>{{ template }}</h5>
     </v-list> -->
-    <v-list v-for="template in templateStats" :key="template.id">
+    <!-- <v-list v-for="template in templateStats" :key="template.id">
       <h5>{{ template }}</h5>
+    </v-list> -->
+    <v-list v-for="character in characters" :key="character.id">
+      <h5>{{ character }}</h5>
     </v-list>
   </div>
 </template>
@@ -25,6 +28,7 @@ export default {
     ...mapGetters('universe', ['getUniverses']),
     ...mapGetters('templateCategories', ['getTemplateCategories']),
     ...mapGetters('templateStat', ['getTemplateStats']),
+    ...mapGetters('character', ['getCharacters', 'getCharacterByid', 'getCharacter']),
     logged () {
       return this.getLogged()
     },
@@ -39,6 +43,9 @@ export default {
     },
     templateStats () {
       return this.getTemplateStats()
+    },
+    characters () {
+      return this.getCharacters()
     }
   },
   async mounted () {
@@ -49,8 +56,18 @@ export default {
     // await this.fetchUniverse(1)
     // await this.fetchForUniverse(4)
     // await this.fetchAllTemplateCategories()
-    await this.fetchAllTemplateStats()
-    await this.putTemplateStat({ id: 14, template: { name: 'prout qui pue', bIsNumber: true, bIsRequired: false, idTemplateCategory: 1 } })
+    // await this.fetchAllTemplateStats()
+    /* await this.putTemplateStat({ id: 14, template: { name: 'prout qui pue', bIsNumber: true, bIsRequired: false, idTemplateCategory: 1 } })
+      .then(() => {
+        // eslint-disable-next-line no-console
+        console.log('yay')
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.log(err)
+      }) */
+    await this.fetchCharactersForUser(2)
+    await this.putCharacter({ character: { name: 'le juif', backstory: 'il est juif et ca craint mais genre vraiment beaucoup', bIsDeead: false, bIsSheetCompleted: false, idUser: 2, idUniverse: 2 }, id: 7 })
       .then(() => {
         // eslint-disable-next-line no-console
         console.log('yay')
@@ -65,7 +82,8 @@ export default {
     ...mapActions('user', ['fetchAllUsers', 'addUser', 'putUser', 'deleteUser']),
     ...mapActions('universe', ['fetchAllUniverses', 'fetchUniverse', 'addUniverse', 'putUniverse', 'deleteUniverse']),
     ...mapActions('templateCategories', ['fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory']),
-    ...mapActions('templateStat', ['fetchAllTemplateStats', 'fetchTemplateStat', 'fetchForCategory', 'addTemplateStat', 'putTemplateStat', 'deleteTemplateStat'])
+    ...mapActions('templateStat', ['fetchAllTemplateStats', 'fetchTemplateStat', 'fetchForCategory', 'addTemplateStat', 'putTemplateStat', 'deleteTemplateStat']),
+    ...mapActions('character', ['fetchAllCharacters', 'fetchCharacter', 'fetchCharactersForUniverse', 'fetchCharactersForUser', 'addCharacter', 'putCharacter', 'deleteCharacter'])
   }
 
 }
