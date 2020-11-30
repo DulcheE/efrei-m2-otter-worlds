@@ -134,7 +134,7 @@
                   counter="15"
                   clearable
                   prepend-icon="mdi-lock"
-                  label="Password"
+                  label="Password verification"
                   type="password"
                   :rules="[rules.required]"
                 />

@@ -162,7 +162,7 @@
               </v-tab>
             </template>
 
-            <!-- LIST -->
+            <!-- LIST (if any) -->
             <v-list v-if="typeof item.content !== 'undefined' && item.content.length !== 0">
               <v-list-item
                 v-for="(content, index) in item.content"
@@ -171,9 +171,9 @@
               >
                 <!-- image (if exists !) -->
                 <v-img
-                  v-if="typeof content.srcImg !== 'undefined'"
+                  v-if="typeof content.src !== 'undefined'"
                   class="ma-2"
-                  :src="content.srcImg"
+                  :src="content.src"
                   max-height="25"
                   max-width="25"
                   contain
@@ -214,8 +214,8 @@ export default {
 
   data () {
     return {
-      name: '',
-      // name: 'John DOE',
+      // name: '',
+      name: 'John DOE',
       isDialogActive: false,
       universes: [],
       itemsProfile: [
@@ -231,8 +231,8 @@ export default {
         },
         {
           icon: 'mdi-cog',
-          title: 'Edit profile',
-          to: '/myprofile'
+          title: 'Settings',
+          to: '/user/settings'
         },
         {
           icon: 'mdi-logout-variant',
@@ -246,8 +246,7 @@ export default {
   computed: {
     // Items to display when a user is NOT browsing an universe
     itemsTabDefault () {
-      // We declare some items
-      const items = [
+      return [
         {
           icon: 'mdi-login',
           title: 'Getting Started',
@@ -255,9 +254,15 @@ export default {
         },
         {
           icon: 'mdi-earth',
-          title: 'Most known Universes',
+          title: 'Create / Discover Universes',
           to: '/most-known-universes',
-          content: []
+          content: this.universes.map((u) => {
+            return {
+              title: u.name,
+              src: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
+              to: '/universe/' + u.id
+            }
+          })
         },
         {
           icon: 'mdi-account-group',
@@ -265,16 +270,6 @@ export default {
           to: '/about-us'
         }
       ]
-
-      // We fill the items concerning the universes (if any)
-      this.universes.forEach(u => items[1].content.push({
-        title: u.name,
-        srcImg: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
-        to: '/' + u.name
-      }))
-
-      // We return the items
-      return items
     },
 
     // Items to display when a user is browsing an universe
@@ -288,22 +283,22 @@ export default {
           content: [
             {
               title: 'Eddy',
-              srcImg: 'http://pngimg.com/uploads/witcher/witcher_PNG56.png',
+              src: 'http://pngimg.com/uploads/witcher/witcher_PNG56.png',
               to: '/characters/eddy'
             },
             {
               title: 'François',
-              srcImg: 'https://risibank.fr/cache/stickers/d910/91038-full.png',
+              src: 'https://risibank.fr/cache/stickers/d910/91038-full.png',
               to: '/characters/francois'
             },
             {
               title: 'Hugues',
-              srcImg: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/c225ee22-742c-4b8c-bf24-046ecca04e42/d7gluxa-95a2d14f-619b-42c4-8591-5b7cf38eb672.png/v1/fill/w_800,h_800,q_75,strp/more_argonian_by_pa1nful-d7gluxa.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi9jMjI1ZWUyMi03NDJjLTRiOGMtYmYyNC0wNDZlY2NhMDRlNDIvZDdnbHV4YS05NWEyZDE0Zi02MTliLTQyYzQtODU5MS01YjdjZjM4ZWI2NzIucG5nIiwid2lkdGgiOiI8PTgwMCIsImhlaWdodCI6Ijw9ODAwIn1dXX0.ZyMft0maq8-AKhPfI6dHblFmznry3Suvvh-8JelRyGA',
+              src: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/c225ee22-742c-4b8c-bf24-046ecca04e42/d7gluxa-95a2d14f-619b-42c4-8591-5b7cf38eb672.png/v1/fill/w_800,h_800,q_75,strp/more_argonian_by_pa1nful-d7gluxa.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi9jMjI1ZWUyMi03NDJjLTRiOGMtYmYyNC0wNDZlY2NhMDRlNDIvZDdnbHV4YS05NWEyZDE0Zi02MTliLTQyYzQtODU5MS01YjdjZjM4ZWI2NzIucG5nIiwid2lkdGgiOiI8PTgwMCIsImhlaWdodCI6Ijw9ODAwIn1dXX0.ZyMft0maq8-AKhPfI6dHblFmznry3Suvvh-8JelRyGA',
               to: '/characters/hugues'
             },
             {
               title: 'Paul',
-              srcImg: 'https://image.noelshack.com/fichiers/2017/37/6/1505512943-jdg-11.png',
+              src: 'https://image.noelshack.com/fichiers/2017/37/6/1505512943-jdg-11.png',
               to: '/characters/paul'
             }
           ]
@@ -369,7 +364,7 @@ export default {
       return this.name.length !== 0
     },
 
-    // Returns whether a user is logged or not
+    // Returns whether a universe is selected or not
     isUniverseSelected () {
       return false
     },

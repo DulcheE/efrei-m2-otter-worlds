@@ -1,18 +1,19 @@
 <template>
   <v-container>
-    <v-row>
+    <h1>All Universes</h1>
+    <v-row align="center" justify="center">
       <!-- Iterate through the universes -->
       <v-col
         v-for="universe in universes"
         :key="universe.id"
-        class="d-flex pa-6"
+        class="pa-6"
         cols="12"
         sm="6"
-        md="6"
         lg="4"
+        xl="3"
       >
         <!-- Card for the current universe -->
-        <router-link class="text-decoration-none white--text" :to="'/universe/' + universe.name">
+        <NuxtLink class="text-decoration-none" :to="'/universe/' + universe.name">
           <v-card class="zoom-sm">
             <v-row>
               <!-- Image on the left -->
@@ -46,19 +47,15 @@
 
                   <br>
 
-                  <!-- ...and work -->
+                  <!-- ??? -->
                   <router-link class="text-decoration-none white--text" :to="'/universe/wiki/'">
-                    <v-tooltip bottom :open-delay="250">
-                    </v-tooltip>
+                    <v-tooltip bottom :open-delay="250" />
                   </router-link>
                 </h3>
               </v-col>
             </v-row>
           </v-card>
-        </router-link>
-
-        <!-- some spaces -->
-        <br><br>
+        </NuxtLink>
       </v-col>
     </v-row>
   </v-container>
@@ -102,6 +99,10 @@ export default {
   },
 
   methods: {
+  },
+
+  head () {
+    return { title: 'Universe' }
   }
 }
 </script>

@@ -8,7 +8,7 @@
     </v-row>
 
     <!-- Part 1 - title -->
-    <h1 class="primary--text">
+    <h1 class="ma-4">
       Welcome to the Otter Worlds !
     </h1>
 
@@ -79,7 +79,7 @@
     <br><br><br><br>
 
     <!-- Part 3 - what to expect -->
-    <h1 class="primary--text">
+    <h1 class="ma-4">
       What can I do ?
     </h1>
 
@@ -101,7 +101,7 @@
       transition="fade-transition"
     >
       <v-container>
-        <h2 class="primary--text">
+        <h2>
           Build your own fantasy worlds !
         </h2>
         <v-row>
@@ -144,7 +144,7 @@
       transition="fade-transition"
     >
       <v-container>
-        <h2 class="primary--text">
+        <h2>
           Create and customize your characters !
         </h2>
         <v-row>
@@ -187,7 +187,7 @@
       transition="fade-transition"
     >
       <v-container>
-        <h2 class="primary--text">
+        <h2>
           Build your own fantasy worlds !
         </h2>
         <v-row>
@@ -230,7 +230,7 @@
       transition="fade-transition"
     >
       <v-container>
-        <h2 class="primary--text">
+        <h2>
           Construct and consult a dedicated wiki !
         </h2>
         <v-row>
@@ -289,8 +289,8 @@ export default {
     isActive: false,
     itemsRoles: [
       {
-        title: 'Dungeon Master',
-        img: '/getting-started-dm.png',
+        title: 'Game Master',
+        img: '/getting-started-gm.png',
         content: [
           'Create your universes !',
           'Build stories, write your world-building !',
@@ -315,6 +315,10 @@ export default {
         ]
       }
     ]
-  })
+  }),
+
+  head () {
+    return { title: 'Getting started' }
+  }
 }
 </script>

@@ -8,7 +8,7 @@
     </v-row>
 
     <!-- blablabla -->
-    <h1 class="primary--text">
+    <h1 class="ma-4">
       About us
     </h1>
     <v-container>
@@ -30,7 +30,7 @@
     <v-row align="center" justify="center">
       <v-col md="6">
         <!-- Image -->
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+        <a href="https://otter-quiz.herokuapp.com">
           <v-img
             src="https://i.pinimg.com/originals/68/49/37/684937cb609bc668580f317dbe9f4378.jpg"
             contain

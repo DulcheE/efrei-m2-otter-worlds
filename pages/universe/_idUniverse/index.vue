@@ -1,18 +1,19 @@
 <template>
   <v-container>
-    Template
+    <h1>Universe {{ $route.params.idUniverse }}</h1>
   </v-container>
 </template>
 
 <script>
 // Imports
 export default {
-  name: 'PageTemplate',
+  name: 'PageUniverse',
 
   components: {
   },
 
   data: () => ({
+    universe: {}
   }),
 
   computed: {
@@ -25,7 +26,7 @@ export default {
   },
 
   head () {
-    return { title: '' }
+    return { title: this.$route.params.idUniverse }
   }
 }
 </script>

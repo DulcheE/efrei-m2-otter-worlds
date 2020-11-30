@@ -1,18 +1,44 @@
 <template>
   <v-container>
-    <v-row>
+    <!-- New Character -->
+    <center class="pa-4">
+      <NuxtLink to="/universe/${universe.id}/character" class="text-decoration-none">
+        <v-btn
+          x-large
+          outlined
+          color="primary"
+          class="ma-2 zoom-xs"
+        >
+          <v-icon
+            left
+            dark
+          >
+            mdi-human-handsup
+          </v-icon>
+          New Character
+        </v-btn>
+      </NuxtLink>
+    </center>
+
+    <!-- Divider -->
+    <v-container>
+      <v-divider class="ma-4" />
+    </v-container>
+
+    <!-- All Characterq -->
+    <v-row align="center" justify="center">
       <!-- Iterate through the characters -->
       <v-col
         v-for="character in characters"
         :key="character.id"
-        class="d-flex pa-6"
+        class="pa-6"
         cols="12"
         sm="6"
-        md="6"
         lg="4"
+        xl="3"
       >
         <!-- Card for the current character -->
-        <router-link class="text-decoration-none white--text" :to="'/universe/character/' + character.name">
+        <NuxtLink class="text-decoration-none" :to="'/universe/character/' + character.name">
           <v-card class="zoom-sm">
             <v-row>
               <!-- Image on the left -->
@@ -23,7 +49,7 @@
               <!-- Text on the right -->
               <v-col cols="8">
                 <!-- Character's name -->
-                <h2 class="font-weight-bold primary--text pl-4">
+                <h2 class="font-weight-bold pl-4">
                   {{ character.name }}
                 </h2>
 
@@ -41,7 +67,7 @@
                           v-on="on"
                         >{{ character.user.username }}</span>
                       </template>
-                      <span>{{ character.work }}'s user page</span>
+                      <span>{{ character.user.username }}'s user page</span>
                     </v-tooltip>
                   </router-link>
 
@@ -76,10 +102,7 @@
               </v-col>
             </v-row>
           </v-card>
-        </router-link>
-
-        <!-- some spaces -->
-        <br><br>
+        </NuxtLink>
       </v-col>
     </v-row>
   </v-container>
@@ -94,6 +117,10 @@ export default {
   },
 
   data: () => ({
+    universe: {
+      id: 0,
+      name: 'who cares ?'
+    },
     arrayRaces: ['Human', 'Ork', 'Argonian', 'Titan', 'Witcher', 'ELf', 'Dwarf'],
     arrayJobs: ['Soldier', 'Priest', 'Commoner', 'Brigand', 'Thief', 'Merchant']
   }),
@@ -101,7 +128,7 @@ export default {
   computed: {
     characters () {
       const array = []
-      const max = 18
+      const max = 17
 
       for (let i = 0; i < max; i++) {
         const char = {
@@ -126,6 +153,10 @@ export default {
   },
 
   methods: {
+  },
+
+  head () {
+    return { title: 'Characters' }
   }
 }
 </script>
