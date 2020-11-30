@@ -1,4 +1,4 @@
-import User from '../../../models/character.model'
+import User from '../../../models/user.model'
 
 export default function updateUsername (req, res) {
   User.modifyName(new User(req.body), parseInt(req.params.id))

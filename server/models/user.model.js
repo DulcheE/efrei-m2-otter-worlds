@@ -144,6 +144,8 @@ export default class User {
    * @returns {Promise<User>}
    */
   static async suppr (user) {
+    // eslint-disable-next-line no-console
+    console.log(user)
     const sql = 'SELECT * FROM user WHERE idUser = ?'
     const param = [user.idUser]
     const row = await mariadbStore.client.query(sql, param)
