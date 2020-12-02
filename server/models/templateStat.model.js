@@ -1,79 +1,74 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class TemplateStat {
-  /** @type {Number} */
-  idTemplateStat
-  /** @type {String} */
+class HalResourceDataTemplateStat extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {Boolean} */
+  /** @type { Boolean } */
   bIsNumber
-  /** @type {Boolean} */
+  /** @type { Boolean } */
   bIsRequired
-  /** @type {Number} */
-  idTemplateCategory
+}
+
+class HalToOneLinksTemplateStat extends HalToOneLinks {
+  /** @type { Number } */
+  templateCategory
+}
+
+export default class TemplateStat extends HalResource {
+  /** @type { HalResourceDataTemplateStat } */
+  data
+  /** @type { HalToOneLinksTemplateStat } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = []
 
   /**
-   * @param {TemplateStat} templateStat
+   * @param { TemplateStat } templateStat
    */
   constructor (templateStat) {
-    this.idTemplateStat = templateStat.idTemplateStat
-    this.name = templateStat.name
-    this.bIsNumber = templateStat.bIsNumber
-    this.bIsRequired = templateStat.bIsRequired
-    this.idTemplateCategory = templateStat.templateCategory_idTemplateCategory || templateStat.idTemplateCategory
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idTemplateStat,
-        name: this.name,
-        bIsNumber: !!this.bIsNumber,
-        bIsRequired: !!this.bIsRequired
-      },
-      `${baseAPI(req)}template-stats/${this.idTemplateStat}`)
+    this.id = templateStat.idTemplateStat || templateStat.id
 
-    // the links one to one and many to one
-    resource.link('template-categorie',
-      `${baseAPI(req)}template-categories/${this.idTemplateCategory}`)
+    this.data = new HalResourceDataTemplateStat()
+    this.data.name = templateStat.name || templateStat.name
+    this.data.bIsNumber = (templateStat.bIsNumber !== undefined) ? !!templateStat.bIsNumber : templateStat.bIsNumber
+    this.data.bIsRequired = (templateStat.bIsRequired !== undefined) ? !!templateStat.bIsRequired : templateStat.bIsRequired
 
-    // the links one to many
-    resource.link('stats',
-      `${baseAPI(req)}template-stats/${this.idTemplateStat}/stats`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksTemplateStat()
+    this.toOneLinks.templateCategory = templateStat.templateCategory_idTemplateCategory || templateStat.toOneLinks.templateCategory
   }
 
   /**
-   * @param req
-   * @param templateStats {TemplateStat[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, templateStats, selfLink = 'templateStats') {
-    const resourceTemplateStats = []
-    for (const templateStat of templateStats) {
-      const _templateStat = new TemplateStat(templateStat)
-      resourceTemplateStats.push(_templateStat.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ templateStats: resourceTemplateStats }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'template-stats') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<TemplateStat[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'template-stats', resourcePath = 'template-stats') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, TemplateStat)
+  }
+
+  /**
+   * @returns { Promise<TemplateStat[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM templateStat')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<TemplateStat>}
+   * @param { Number } id
+   * @returns { Promise<TemplateStat> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM templateStat WHERE idTemplateStat = ?', id))[0]
@@ -85,8 +80,8 @@ export default class TemplateStat {
   }
 
   /**
-   * @param {TemplateStat} templateStat
-   * @returns {Number} the id of the new inserted templateStat
+   * @param { TemplateStat } templateStat
+   * @returns { Number } the id of the new inserted templateStat
    */
   static async add (templateStat) {
     const sql = `
@@ -102,9 +97,9 @@ export default class TemplateStat {
   }
 
   /**
-   * @param {Number} id
-   * @param {TemplateStat} templateStat
-   * @returns {Boolean} if the templateStat could have been updated
+   * @param { Number } id
+   * @param { TemplateStat } templateStat
+   * @returns { Boolean } if the templateStat could have been updated
    */
   static async update (id, templateStat) {
     const sql = `
@@ -121,8 +116,8 @@ export default class TemplateStat {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the templateStat could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the templateStat could have been removed
    */
   static async remove (id) {
     const sql = `

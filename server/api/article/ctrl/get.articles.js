@@ -1,11 +1,11 @@
 import Article from '../../../models/article.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getArticles (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  Article.getAll()
-    .then((articles) => {
-      res.status(200).json(Article.asResourceList(req, articles))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getArticles (req, res) {
+  const articles = await Article.getAll()
+  res.status(200).json(Article.asResourceList(baseAPI(req), articles))
 }

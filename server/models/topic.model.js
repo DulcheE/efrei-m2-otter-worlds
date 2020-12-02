@@ -1,83 +1,74 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Topic {
-  /** @type {Number} */
-  idTopic
-  /** @type {String} */
+class HalResourceDataTopic extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {Number} */
+  /** @type { Number } */
   order
-  /** @type {Number} */
-  idUniverse
-  /** @type {Number} */
-  idArticle
+}
+
+class HalToOneLinksTopic extends HalToOneLinks {
+  /** @type { Number } */
+  universe
+  /** @type { Number } */
+  article
+}
+
+export default class Topic extends HalResource {
+  /** @type { HalResourceDataTopic } */
+  data
+  /** @type { HalToOneLinksTopic } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['sub-topics']
 
   /**
-   * @param {Topic} topic
+   * @param { Topic } topic
    */
   constructor (topic) {
-    this.idTopic = topic.idTopic
-    this.name = topic.name
-    this.order = topic.order
-    this.idUniverse = topic.universe_idUniverse || topic.idUniverse
-    this.idArticle = topic.article_idArticle || topic.idArticle
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idTopic,
-        name: this.name,
-        order: this.order
-      },
-      `${baseAPI(req)}topics/${this.idTopic}`)
+    this.id = topic.idTopic || topic.id
 
-    // the links one to one and many to one
-    resource.link('universe',
-    `${baseAPI(req)}universes/${this.idUniverse}`)
+    this.data = new HalResourceDataTopic()
+    this.data.name = topic.name || topic.data.name
+    this.data.order = topic.order || topic.data.order
 
-    if (this.idArticle) {
-      resource.link('article',
-      `${baseAPI(req)}articles/${this.idArticle}`)
-    }
-
-    // the links one to many
-    resource.link('sub-topics',
-    `${baseAPI(req)}topics/${this.idTopic}/sub-topics`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksTopic()
+    this.toOneLinks.universe = topic.universe_idUniverse || topic.toOneLinks.universe
+    this.toOneLinks.article = topic.article_idArticle || (topic.toOneLinks !== undefined) ? topic.toOneLinks.article : undefined
   }
 
   /**
-   * @param req
-   * @param topics {Topic[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, topics, selfLink = 'topics') {
-    const resourceTopics = []
-    for (const topic of topics) {
-      const _topic = new Topic(topic)
-      resourceTopics.push(_topic.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ topics: resourceTopics }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'topics') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Topic[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'topics', resourcePath = 'topics') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Topic)
+  }
+
+  /**
+   * @returns { Promise<Topic[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM topic')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Topic>}
+   * @param { Number } id
+   * @returns { Promise<Topic> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM topic WHERE idTopic = ?', id))[0]
@@ -89,16 +80,16 @@ export default class Topic {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<SubTopics>}
+   * @param { Number } id
+   * @returns { Promise<SubTopics> }
    */
   static async getSubTopics (id) {
     return await mariadbStore.client.query('SELECT * FROM subTopic WHERE topic_idTopic = ?', id)
   }
 
   /**
-   * @param {Topic} topic
-   * @returns {Number} the id of the new inserted topic
+   * @param { Topic } topic
+   * @returns { Number } the id of the new inserted topic
    */
   static async add (topic) {
     let sql = ''
@@ -124,9 +115,9 @@ export default class Topic {
   }
 
   /**
-   * @param {Number} id
-   * @param {Topic} topic
-   * @returns {Boolean} if the topic could have been updated
+   * @param {Number } id
+   * @param { Topic } topic
+   * @returns { Boolean } if the topic could have been updated
    */
   static async update (id, topic) {
     let sql = ''
@@ -152,8 +143,8 @@ export default class Topic {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the topic could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the topic could have been removed
    */
   static async remove (id) {
     const sql = `

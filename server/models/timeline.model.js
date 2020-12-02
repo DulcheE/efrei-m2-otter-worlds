@@ -1,83 +1,74 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Timeline {
-  /** @type {Number} */
-  idTimeline
-  /** @type {String} */
+class HalResourceDataTimeline extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {String} */
+  /** @type { String } */
   description
-  /** @type {Boolean} */
+  /** @type { Boolean } */
   bIsPublic
-  /** @type  {Event[]} */
-  events
-  /** @type {Number} */
-  idUniverse
+}
+
+class HalToOneLinksTimeline extends HalToOneLinks {
+  /** @type { Number } */
+  universe
+}
+
+export default class Timeline extends HalResource {
+  /** @type { HalResourceDataTimeline } */
+  data
+  /** @type { HalToOneLinksTimeline } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['events']
 
   /**
-   * @param {Timeline} timeline
+   * @param { Timeline } timeline
    */
   constructor (timeline) {
-    this.idTimeline = timeline.idTimeline
-    this.name = timeline.name
-    this.description = timeline.description
-    this.bIsPublic = timeline.bIsPublic
-    this.events = []
-    this.idUniverse = timeline.universe_idUniverse || timeline.idUniverse
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idTimeline,
-        name: this.name,
-        description: this.description,
-        bIsPublic: this.bIsPublic,
-        events: this.events
-      },
-      `${baseAPI(req)}timelines/${this.idTimeline}`)
+    this.id = timeline.idTimeline || timeline.id
 
-    // the links one to one and many to one
-    resource.link('universe',
-      `${baseAPI(req)}universes/${this.idUniverse}`)
+    this.data = new HalResourceDataTimeline()
+    this.data.name = timeline.name || timeline.data.name
+    this.data.description = timeline.description || timeline.data.description
+    this.data.bIsPublic = (timeline.bIsPublic !== undefined) ? !!timeline.bIsPublic : timeline.data.bIsPublic
 
-    // the links one to many
-    resource.link('events',
-      `${baseAPI(req)}timelines/${this.idTimeline}/events`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksTimeline()
+    this.toOneLinks.universe = timeline.universe_idUniverse || timeline.toOneLinks.universe
   }
 
   /**
-   * @param req
-   * @param timeline {Timeline[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, timelines, selfLink = 'timelines') {
-    const resourceTimeline = []
-    for (const timeline of timelines) {
-      const _timeline = new Timeline(timeline)
-      resourceTimeline.push(_timeline.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ timelines: resourceTimeline }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'timelines') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Timeline[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'timelines', resourcePath = 'timelines') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Timeline)
+  }
+
+  /**
+   * @returns { Promise<Timeline[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM timeline')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Timeline>}
+   * @param { Number } id
+   * @returns { Promise<Timeline> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0]
@@ -89,8 +80,8 @@ export default class Timeline {
   }
 
   /**
-   * @param {Timeline} timeline
-   * @returns {Number} the id of the new inserted timeline
+   * @param { Timeline } timeline
+   * @returns { Number } the id of the new inserted timeline
    */
   static async add (timeline) {
     const sql = `
@@ -106,9 +97,9 @@ export default class Timeline {
   }
 
   /**
-   * @param {Number} id
-   * @param {Timeline} timeline
-   * @returns {Boolean} if the timeline could have been updated
+   * @param { Number } id
+   * @param { Timeline } timeline
+   * @returns { Boolean } if the timeline could have been updated
    */
   static async update (id, timeline) {
     const sql = `
@@ -125,8 +116,8 @@ export default class Timeline {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the timeline could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the timeline could have been removed
    */
   static async remove (id) {
     const sql = `

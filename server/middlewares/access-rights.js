@@ -20,11 +20,15 @@ const unauthorized = (req, res) => { res.sendStatus(401) }
  */
 function gate (validate, behaviour) {
   return async function middleware (req, res, next) {
-    if (!await validate(req)) {
-      behaviour(req, res, next)
-      return
+    try {
+      if (!await validate(req)) {
+        behaviour(req, res, next)
+        return
+      }
+      next()
+    } catch (err) {
+      res.status(400).json({ message: err.message })
     }
-    next()
   }
 }
 

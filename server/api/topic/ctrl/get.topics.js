@@ -1,11 +1,11 @@
 import Topic from '../../../models/topic.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getTopics (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  Topic.getAll()
-    .then((topics) => {
-      res.status(200).json(Topic.asResourceList(req, topics))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getTopics (req, res) {
+  const topics = await Topic.getAll()
+  res.status(200).json(Topic.asResourceList(baseAPI(req), topics))
 }

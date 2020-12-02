@@ -1,5 +1,9 @@
 import Template from '../../../models/template.model'
 
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
 export default function putTemplate (req, res) {
   Template.update(parseInt(req.params.id), new Template(req.body))
     .then((bSucceded) => {

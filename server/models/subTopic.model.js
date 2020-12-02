@@ -1,83 +1,74 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class SubTopic {
-  /** @type {Number} */
-  idSubTopic
-  /** @type {String} */
+class HalResourceDataSubTopic extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {Number} */
+  /** @type { Number } */
   order
-  /** @type {Number} */
-  idTopic
-  /** @type {Number} */
-  idArticle
+}
+
+class HalToOneLinksSubTopic extends HalToOneLinks {
+  /** @type { Number } */
+  topic
+  /** @type { Number } */
+  article
+}
+
+export default class SubTopic extends HalResource {
+  /** @type { HalResourceDataSubTopic } */
+  data
+  /** @type { HalToOneLinksSubTopic } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['articles']
 
   /**
-   * @param {SubTopic} subTopic
+   * @param { SubTopic } subTopic
    */
   constructor (subTopic) {
-    this.idSubTopic = subTopic.idSubTopic
-    this.name = subTopic.name
-    this.order = subTopic.order
-    this.idTopic = subTopic.topic_idTopic || subTopic.idTopic
-    this.idArticle = subTopic.article_idArticle || subTopic.idArticle
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idSubTopic,
-        name: this.name,
-        order: this.order
-      },
-      `${baseAPI(req)}sub-topics/${this.idSubTopic}`)
+    this.id = subTopic.idSubTopic || subTopic.id
 
-    // the links one to one and many to one
-    resource.link('topic',
-    `${baseAPI(req)}topics/${this.idTopic}`)
+    this.data = new HalResourceDataSubTopic()
+    this.data.name = subTopic.name || subTopic.data.name
+    this.data.order = subTopic.order || subTopic.data.ordre
 
-    if (this.idArticle) {
-      resource.link('article',
-      `${baseAPI(req)}articles/${this.idArticle}`)
-    }
-
-    // the links one to many
-    resource.link('articles',
-    `${baseAPI(req)}sub-topics/${this.idSubTopic}/articles`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksSubTopic()
+    this.toOneLinks.topic = subTopic.topic_idTopic || subTopic.toOneLinks.topic
+    this.toOneLinks.article = subTopic.article_idArticle || (subTopic.toOneLinks !== undefined) ? subTopic.toOneLinks.article : undefined
   }
 
   /**
-   * @param req
-   * @param subTopics {SubTopic[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, subTopics, selfLink = 'sub-topics') {
-    const resourceSubTopics = []
-    for (const subTopic of subTopics) {
-      const _subTopic = new SubTopic(subTopic)
-      resourceSubTopics.push(_subTopic.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ subTopics: resourceSubTopics }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'sub-topics') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<SubTopic[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'sub-topics', resourcePath = 'sub-topics') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, SubTopic)
+  }
+
+  /**
+   * @returns { Promise<SubTopic[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM subTopic')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<SubTopic>}
+   * @param { Number } id
+   * @returns { Promise<SubTopic> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM subTopic WHERE idSubTopic = ?', id))[0]
@@ -89,8 +80,8 @@ export default class SubTopic {
   }
 
   /**
-   * @param {SubTopic} subTopic
-   * @returns {Number} the id of the new inserted subTopic
+   * @param { SubTopic } subTopic
+   * @returns { Number } the id of the new inserted subTopic
    */
   static async add (subTopic) {
     let sql = ''
@@ -116,9 +107,9 @@ export default class SubTopic {
   }
 
   /**
-   * @param {Number} id
-   * @param {SubTopic} subTopic
-   * @returns {Boolean} if the subTopic could have been updated
+   * @param { Number } id
+   * @param { SubTopic } subTopic
+   * @returns { Boolean } if the subTopic could have been updated
    */
   static async update (id, subTopic) {
     let sql = ''
@@ -144,8 +135,8 @@ export default class SubTopic {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the subTopic could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the subTopic could have been removed
    */
   static async remove (id) {
     const sql = `

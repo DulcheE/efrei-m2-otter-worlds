@@ -8,15 +8,14 @@ export default async function login (req, res) {
   let user
   try {
     user = await User.getByName(req.body.username)
-  } catch (_) { }
+  } catch { }
 
   if (!user || req.body.password !== user.password) {
     res.status(400).json({ message: 'Wrong username or password !' })
     return
   }
 
-  delete user.password
   req.session.idUser = user.idUser
 
-  res.status(200).json(user)
+  res.status(200).json({ id: user.idUser, username: user.username })
 }

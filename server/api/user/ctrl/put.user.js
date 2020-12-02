@@ -1,9 +1,14 @@
 import User from '../../../models/character.model'
 
-export default function updateUsername (req, res) {
-  User.modifyName(new User(req.body), parseInt(req.params.id))
-    .then((user) => {
-      res.status(200).json(user)
-    })
-    .catch(err => res.status(404).send(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function updateUsername (req, res) {
+  try {
+    const user = await User.modifyName(new User(req.body), parseInt(req.params.id))
+    res.status(200).json(user)
+  } catch (err) {
+    res.status(404).send(err.message)
+  }
 }

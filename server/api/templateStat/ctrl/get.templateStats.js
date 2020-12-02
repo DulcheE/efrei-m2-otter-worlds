@@ -1,11 +1,11 @@
 import TemplateStat from '../../../models/templateStat.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getTemplateStats (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  TemplateStat.getAll()
-    .then((templateStats) => {
-      res.status(200).json(TemplateStat.asResourceList(req, templateStats))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getTemplateStats (req, res) {
+  const templateStats = await TemplateStat.getAll()
+  res.status(200).json(TemplateStat.asResourceList(baseAPI(req), templateStats))
 }

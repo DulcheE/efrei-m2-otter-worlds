@@ -1,11 +1,11 @@
 import Timeline from '../../../models/timeline.model.js'
+import { baseAPI } from '../../routes.js'
 
-export default function getTimelines (req, res) {
-  Timeline.getAll()
-    .then((timelines) => {
-      res.status(200).json(Timeline.asResourceList(req, timelines))
-    })
-    .catch((err) => {
-      res.status(400).json(err)
-    })
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getTimelines (req, res) {
+  const timelines = await Timeline.getAll()
+  res.status(200).json(Timeline.asResourceList(baseAPI(req), timelines))
 }
