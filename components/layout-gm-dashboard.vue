@@ -51,11 +51,76 @@
             </v-list-item-icon>
 
             <v-list-item-content>
-              <v-list-item-title v-text="item.text" />
+              <v-list-item-title v-text="item.title" />
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
       </v-list>
+
+      <!-- Divider -->
+      <v-divider class="mt-4" />
+
+      <!-- Dialog to invite new user -->
+      <v-dialog
+        v-model="dialogInviteUser"
+        max-width="600px"
+      >
+        <!-- Dialog's trigger -->
+        <template v-slot:activator="{ on, attrs }">
+          <center>
+            <v-btn
+              class="ma-4"
+              color="primary"
+              dark
+              text
+              v-bind="attrs"
+              v-on="on"
+              v-text="'Invite user'"
+            />
+          </center>
+        </template>
+
+        <!-- Dialog -->
+        <!-- Form -->
+        <v-form ref="formInviteUser" v-model="formInviteUser">
+          <v-card>
+            <!-- Dialog's title -->
+            <v-card-title>
+              <span class="headline">Invite User</span>
+            </v-card-title>
+
+            <!-- Dialog's input(s) -->
+            <v-card-text>
+              <v-container>
+                <v-text-field
+                  v-model="username"
+                  label="username"
+                  :rules="[rules.required, rules.counter]"
+                />
+              </v-container>
+            </v-card-text>
+
+            <!-- Dialog's actions -->
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                color="warning"
+                text
+                @click="dialogInviteUser = false"
+              >
+                Close
+              </v-btn>
+              <v-btn
+                color="success"
+                text
+                @click="inviteUser"
+              >
+                Invite
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-form>
+      </v-dialog>
 
       <!-- Divider -->
       <v-divider class="mt-4" />
@@ -108,7 +173,6 @@
 </template>
 
 <script>
-// Imports
 export default {
   name: 'LayoutGmDashboard',
 
@@ -121,9 +185,10 @@ export default {
     group: null,
     selectedItem: -1,
     items: [
-      { text: 'Character template', icon: 'mdi-human-handsup', to: '/universe/0/character-template' },
-      { text: 'New map', icon: 'mdi-map', to: '/universe/0/map' },
-      { text: 'New timeline', icon: 'mdi-chart-timeline-variant', to: '/universe/0/timeline' }
+      { title: 'Character template', icon: 'mdi-human-handsup', to: '/universe/0/character-template' },
+      { title: 'New map', icon: 'mdi-map', to: '/universe/0/map' },
+      { title: 'New timeline', icon: 'mdi-chart-timeline-variant', to: '/universe/0/timeline' },
+      { title: 'Settings', icon: 'mdi-cog', to: '/universe/0/settings' }
     ],
 
     // Universe's data
@@ -143,12 +208,38 @@ export default {
       timelines: [
         { }
       ]
+    },
+
+    // All about the form to invite a user
+    dialogInviteUser: false,
+    formInviteUser: false,
+    username: '',
+    rules: {
+      required: value => !!value || 'Required',
+      counter: value => value.length <= 50 || 'Max 50 characters',
+      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
     }
   }),
 
   watch: {
     group () {
       this.drawer = false
+    }
+  },
+
+  methods: {
+    inviteUser () {
+      // If the form is valid
+      if (this.$refs.formInviteUser.validate()) {
+        // We display the name of the invited user
+        alert('inviting ' + this.username)
+
+        // We reset the username
+        this.username = ''
+
+        // We close the dialog
+        this.dialogInviteUser = false
+      }
     }
   }
 }

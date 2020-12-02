@@ -1,3 +1,15 @@
+<script>
+export default {
+  name: 'Mixin',
+
+  components: {
+  },
+
+  data: () => ({
+  })
+}
+</script>
+
 <style>
 /* Changes the mouse's cursor on Pointer */
 .pointer {cursor: pointer;}
