@@ -6,7 +6,7 @@ const state = () => ({
 
 const getters = {
   getTemplateCategories: state => function () {
-    return state
+    return state.TemplateCategories
   },
   getTemplateCategory: state => function (id) {
     return state.templateCategories.find(element => element.id === id)
@@ -64,7 +64,7 @@ const actions = {
         console.log(err)
       })
   },
-  async fetchForUniverse (context, id) {
+  async fetchTemplateCategoryForUniverse (context, id) {
     await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/template-categories')
       .withTemplateParameters({ iduniver: id })
       .json()

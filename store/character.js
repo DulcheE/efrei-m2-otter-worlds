@@ -8,13 +8,16 @@ const state = () => ({
 
 const getters = {
   getCharacters: state => function () {
-    return state
+    return state.characters
   },
   getCharacterByid: state => function (id) {
     return state.characters.find(element => element.id === id)
   },
   getCharacter: state => function () {
     return state.character
+  },
+  getStat: state => function () {
+    return state.stats
   }
 }
 
@@ -23,7 +26,13 @@ const mutations = {
     state.characters = Characters
   },
   putCharacter (state, Character) {
+    state.characters.push(Character)
+  },
+  setCharacter (state, Character) {
     state.character = Character
+  },
+  setStat (state, stats) {
+    state.stats = stats
   }
 }
 
@@ -98,6 +107,36 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
+  },
+  async fetchCharactersForGroup (context, id) {
+    const document = await traverson.from('http://localhost:3000/api/v1/groups/{idgroup}/characters')
+      .withTemplateParameters({ idgroup: id })
+      .json()
+      .getResource().result
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.log(err)
+      })
+    context.commit('setCharacters', document.characters)
+  },
+  async fetchCharacterWithStat (context, id) {
+    const values = await Promise.all([
+      traverson.from('http://localhost:3000/api/v1/characters/{idCharacter}/')
+        .withTemplateParameters({ idCharacter: id })
+        .json()
+        .getResource().result,
+      traverson.from('http://localhost:3000/api/v1/characters/{idCharacter}/')
+        .follow('$._links.stats.href')
+        .withTemplateParameters({ idCharacter: id })
+        .json()
+        .getResource().result
+    ])
+      .catch((err) => {
+        // eslint-disable-next-line
+        console.log(err)
+      })
+    context.commit('setCharacter', values[0])
+    context.commit('setStat', values[1])
   },
   addCharacter (context, character) {
     return traverson.from('http://localhost:3000/api/v1/characters/')

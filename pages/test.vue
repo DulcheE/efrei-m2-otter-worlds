@@ -13,9 +13,22 @@
     <!-- <v-list v-for="template in templateStats" :key="template.id">
       <h5>{{ template }}</h5>
     </v-list> -->
-    <v-list v-for="character in characters" :key="character.id">
+    <!-- <v-list v-for="character in characters" :key="character.id">
       <h5>{{ character }}</h5>
+    </v-list> -->
+    <!-- <h2>{{ character }}</h2>
+    <h2>{{ stat }}</h2> -->
+    <!-- <v-list v-for="item in inventories" :key="item.id">
+      <h5>{{ item }}</h5>
+    </v-list> -->
+    <!-- <v-list v-for="group in groups" :key="group.id">
+      <h5>{{ group }}</h5>
+    </v-list> -->
+    <v-list v-for="top in topics" :key="top.id">
+      <h5>{{ top }}</h5>
     </v-list>
+    <h5>{{ topic }}</h5>
+    <h5>{{ article }}</h5>
   </div>
 </template>
 
@@ -28,7 +41,10 @@ export default {
     ...mapGetters('universe', ['getUniverses']),
     ...mapGetters('templateCategories', ['getTemplateCategories']),
     ...mapGetters('templateStat', ['getTemplateStats']),
-    ...mapGetters('character', ['getCharacters', 'getCharacterByid', 'getCharacter']),
+    ...mapGetters('character', ['getCharacters', 'getCharacterByid', 'getCharacter', 'getStat']),
+    ...mapGetters('inventory', ['getInventories', 'getInventory']),
+    ...mapGetters('group', ['getGroups', 'getGroup']),
+    ...mapGetters('topic', ['getTopics', 'getTopic', 'getTopicByid', 'getArticle']),
     logged () {
       return this.getLogged()
     },
@@ -46,6 +62,27 @@ export default {
     },
     characters () {
       return this.getCharacters()
+    },
+    character () {
+      return this.getCharacter()
+    },
+    stat () {
+      return this.getStat()
+    },
+    inventories () {
+      return this.getInventories()
+    },
+    groups () {
+      return this.getGroups()
+    },
+    topics () {
+      return this.getTopics()
+    },
+    topic () {
+      return this.getTopic()
+    },
+    article () {
+      return this.getArticle()
     }
   },
   async mounted () {
@@ -66,8 +103,8 @@ export default {
         // eslint-disable-next-line no-console
         console.log(err)
       }) */
-    await this.fetchCharactersForUser(2)
-    await this.putCharacter({ character: { name: 'le juif', backstory: 'il est juif et ca craint mais genre vraiment beaucoup', bIsDeead: false, bIsSheetCompleted: false, idUser: 2, idUniverse: 2 }, id: 7 })
+    // await this.fetchCharactersForUser(2)
+    /* await this.putCharacter({ character: { name: 'le juif', backstory: 'il est juif et ca craint mais genre vraiment beaucoup', bIsDeead: false, bIsSheetCompleted: false, idUser: 2, idUniverse: 2 }, id: 7 })
       .then(() => {
         // eslint-disable-next-line no-console
         console.log('yay')
@@ -75,15 +112,24 @@ export default {
       .catch((err) => {
         // eslint-disable-next-line no-console
         console.log(err)
-      })
+      }) */
+    // await this.fetchCharacterWithStat(1)
+    // await this.fetchForCharacter(1)
+    // await this.fetchGroupForCharacter(1)
+    // await this.fetchTopic(3)
+    await this.fetchTopicWithArticle(3)
   },
   methods: {
     ...mapActions('login', ['login', 'fetchUniverseOwn', 'fetchUniversePlay']),
     ...mapActions('user', ['fetchAllUsers', 'addUser', 'putUser', 'deleteUser']),
     ...mapActions('universe', ['fetchAllUniverses', 'fetchUniverse', 'addUniverse', 'putUniverse', 'deleteUniverse']),
-    ...mapActions('templateCategories', ['fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory']),
-    ...mapActions('templateStat', ['fetchAllTemplateStats', 'fetchTemplateStat', 'fetchForCategory', 'addTemplateStat', 'putTemplateStat', 'deleteTemplateStat']),
-    ...mapActions('character', ['fetchAllCharacters', 'fetchCharacter', 'fetchCharactersForUniverse', 'fetchCharactersForUser', 'addCharacter', 'putCharacter', 'deleteCharacter'])
+    ...mapActions('templateCategories', ['fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchTemplateCategoryForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory']),
+    ...mapActions('templateStat', ['fetchAllTemplateStats', 'fetchTemplateStat', 'fetchTemplateStatForCategory', 'addTemplateStat', 'putTemplateStat', 'deleteTemplateStat']),
+    ...mapActions('character', ['fetchAllCharacters', 'fetchCharacter', 'fetchCharactersForGroup', 'fetchCharactersForUniverse', 'fetchCharactersForUser', 'fetchCharacterWithStat', 'addCharacter', 'putCharacter', 'deleteCharacter']),
+    ...mapActions('inventory', ['fetchAllInventories', 'fetchInventory', 'fetchInventoryForCharacter', 'deleteInventory']),
+    ...mapActions('group', ['fetchAllGroups', 'fetchGroup', 'fetchGroupForCharacter', 'deleteGroup']),
+    ...mapActions('topic', ['fetchAllTopics', 'fetchTopic', 'fetchTopicWithArticle', 'fetchTopicForUniverse'])
+
   }
 
 }
