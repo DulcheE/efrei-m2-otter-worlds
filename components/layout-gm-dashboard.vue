@@ -106,7 +106,7 @@
                   v-model="newUser.role"
                   :items="getRolesNames()"
                   label="role"
-                  :rules="[rules.required, rules.maxSmall]"
+                  :rules="[rules.required]"
                 />
               </v-container>
             </v-card-text>

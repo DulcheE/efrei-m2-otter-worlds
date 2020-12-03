@@ -6,7 +6,6 @@
       :key="category.id"
       :is-modifying="isModifying"
       :category="category"
-      :order-by-name="orderByName"
     />
   </v-container>
 </template>
@@ -29,10 +28,6 @@ export default {
     },
     stats: {
       type: Array,
-      required: true
-    },
-    orderByName: {
-      type: Function,
       required: true
     }
   },

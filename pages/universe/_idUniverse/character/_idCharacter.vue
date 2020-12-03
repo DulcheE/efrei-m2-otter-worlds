@@ -256,7 +256,7 @@
         <v-tabs-items v-model="tab">
           <!-- Tab n° 1 - Statistics -->
           <v-tab-item>
-            <CharacterCardStatistics :is-modifying="isModifying" :stats="statsRegular" :order-by-name="orderByName" />
+            <CharacterCardStatistics :is-modifying="isModifying" :stats="statsRegular" />
           </v-tab-item>
 
           <!-- Tab n° 2 - Inventory -->
@@ -266,7 +266,7 @@
 
           <!-- Tab n° 3 - Magic (may be passed) -->
           <v-tab-item v-if="hasMagic">
-            <CharacterCardMagic :is-modifying="isModifying" :stats="statsMagic" :order-by-name="orderByName" />
+            <CharacterCardMagic :is-modifying="isModifying" :stats="statsMagic" />
           </v-tab-item>
 
           <!-- Tab n° 4 - BackStory -->
@@ -341,6 +341,7 @@
 <script>
 // Imports
 import MixinRules from '@/mixins/mixin-rules'
+import MixinOrderByName from '@/mixins/mixin-order-by-name'
 import CharacterCardStatistics from '@/components/character-card-statistics'
 import CharacterCardInventory from '@/components/character-card-inventory'
 import CharacterCardMagic from '@/components/character-card-magic'
@@ -356,7 +357,7 @@ export default {
     CharacterCardBackstory
   },
 
-  mixins: [MixinRules],
+  mixins: [MixinRules, MixinOrderByName],
 
   data: () => ({
     // Whether the user is able to modify its data or not
@@ -631,41 +632,14 @@ export default {
     // We initialize the value of the picture selected by the user
     this.pictureSelected = this.character.src
 
-    // Display an alert showing if creating or accessing an existing character
-    const idCharacter = this.$route.params.idCharacter
-    if (idCharacter === undefined) {
-      alert('creating a NEW character !')
-    } else {
-      alert('accessing the character of id : ' + idCharacter)
-    }
-
-    // ANOTHER IF ?!! I know.
     // If accessing the page to CREATE a character's sheet for the 1st time, the user can directly modify his data
+    const idCharacter = this.$route.params.idCharacter
     if (idCharacter === undefined) {
       this.isModifying = true
     }
   },
 
   methods: {
-    /**
-     * Sorts a complex array by it's string field "name"
-     * @param {[]} array Array of complex objects containing a field "name"
-     */
-    orderByName (array) {
-      return array.sort((a, b) => {
-        const na = a.name.toLowerCase()
-        const nb = b.name.toLowerCase()
-
-        if (na < nb) {
-          return -1
-        }
-        if (na > nb) {
-          return 1
-        }
-        return 0
-      })
-    },
-
     /**
      * Discard the changes brought to the character card
      */

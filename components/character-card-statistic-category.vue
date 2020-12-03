@@ -71,11 +71,12 @@
 <script>
 // Imports
 import MixinRules from '@/mixins/mixin-rules'
+import MixinOrderByName from '@/mixins/mixin-order-by-name'
 
 export default {
   name: 'CharacterCardStatisticCategory',
 
-  mixins: [MixinRules],
+  mixins: [MixinRules, MixinOrderByName],
 
   props: {
     isModifying: {
@@ -85,20 +86,7 @@ export default {
     category: {
       type: Object,
       required: true
-    },
-    orderByName: {
-      type: Function,
-      required: true
     }
-  },
-
-  data: () => ({}),
-
-  computed: {},
-
-  mounted () {},
-
-  methods: {
   }
 }
 </script>

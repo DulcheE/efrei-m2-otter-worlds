@@ -135,6 +135,7 @@
       <!-- Tabs -->
       <template v-slot:extension>
         <v-tabs
+          v-model="tab"
           grow
           icons-and-text
           center-active
@@ -217,6 +218,7 @@ export default {
       name: '',
       // name: 'John DOE',
       isDialogActive: false,
+      tab: null,
       universes: [],
       itemsProfile: [
         {
