@@ -8,6 +8,8 @@ class UniversePolicy {
    * @returns {Promise<Boolean>}
    */
   static async canGet (idUser, idUniverse) {
+    if (!parseInt(idUniverse)) { throw new Error('Invalid idUniverse !') }
+
     const sql = `
       SELECT u.bIsPublic, uiu.idUser FROM universe u
       LEFT JOIN (

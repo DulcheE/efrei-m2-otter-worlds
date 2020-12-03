@@ -1,75 +1,71 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class TemplateCategory {
-  /** @type {Number} */
-  idTemplateCategory
-  /** @type {String} */
+class HalResourceDataTemplateCategory extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {Number} */
+  /** @type { Number } */
   order
-  /** @type {Number} */
-  idUniverse
+}
+
+class HalToOneLinksTemplateCategory extends HalToOneLinks {
+  /** @type { Number } */
+  universe
+}
+
+export default class TemplateCategory extends HalResource {
+  /** @type { HalResourceDataTemplateCategory } */
+  data
+  /** @type { HalToOneLinksTemplateCategory } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['template-stats']
 
   /**
-   * @param {TemplateCategory} templateCategory
+   * @param { TemplateCategory } templateCategory
    */
   constructor (templateCategory) {
-    this.idTemplateCategory = templateCategory.idTemplateCategory
-    this.name = templateCategory.name
-    this.order = templateCategory.order
-    this.idUniverse = templateCategory.universe_idUniverse || templateCategory.idUniverse
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idTemplateCategory,
-        name: this.name,
-        order: this.order
-      },
-      `${baseAPI(req)}template-categories/${this.idTemplateCategory}`)
+    this.id = templateCategory.idTemplateCategory || templateCategory.id
 
-    // the links one to one and many to one
-    resource.link('universe',
-      `${baseAPI(req)}universes/${this.idUniverse}`)
+    this.data = new HalResourceDataTemplateCategory()
+    this.data.name = templateCategory.name || templateCategory.data.name
+    this.data.order = templateCategory.order || templateCategory.data.order
 
-    // the links one to many
-    resource.link('template-stats',
-      `${baseAPI(req)}template-categories/${this.idTemplateCategory}/template-stats`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksTemplateCategory()
+    this.toOneLinks.universe = templateCategory.universe_idUniverse || templateCategory.toOneLinks.universe
   }
 
   /**
-   * @param req
-   * @param templateCategories {TemplateCategory[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, templateCategories, selfLink = 'template-categories') {
-    const resourceTemplateCategories = []
-    for (const templateCategory of templateCategories) {
-      const _templateCategory = new TemplateCategory(templateCategory)
-      resourceTemplateCategories.push(_templateCategory.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ templateCategories: resourceTemplateCategories }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'template-categories') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<TemplateCategory[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'template-categories', resourcePath = 'template-categories') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, TemplateCategory)
+  }
+
+  /**
+   * @returns { Promise<TemplateCategory[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM templateCategory')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<TemplateCategory>}
+   * @param { Number } id
+   * @returns { Promise<TemplateCategory> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM templateCategory WHERE idTemplateCategory = ?', id))[0]
@@ -81,16 +77,16 @@ export default class TemplateCategory {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<TemplateStat>}
+   * @param { Number } id
+   * @returns { Promise<TemplateStat> }
    */
-  static async getTemplateStat (id) {
+  static async getTemplateStats (id) {
     return await mariadbStore.client.query('SELECT * FROM templateStat WHERE templateCategory_idTemplateCategory = ?', id)
   }
 
   /**
-   * @param {TemplateCategory} templateCategory
-   * @returns {Number} the id of the new inserted templateCategory
+   * @param { TemplateCategory } templateCategory
+   * @returns { Number } the id of the new inserted templateCategory
    */
   static async add (templateCategory) {
     const sql = `
@@ -106,9 +102,9 @@ export default class TemplateCategory {
   }
 
   /**
-   * @param {Number} id
-   * @param {TemplateCategory} templateCategory
-   * @returns {Boolean} if the templateCategory could have been updated
+   * @param { Number } id
+   * @param { TemplateCategory } templateCategory
+   * @returns { Boolean } if the templateCategory could have been updated
    */
   static async update (id, templateCategory) {
     const sql = `
@@ -125,8 +121,8 @@ export default class TemplateCategory {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the templateCategory could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the templateCategory could have been removed
    */
   static async remove (id) {
     const sql = `

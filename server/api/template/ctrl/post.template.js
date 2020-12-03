@@ -1,5 +1,9 @@
 import Template from '../../../models/template.model'
 
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
 export default function postTemplate (req, res) {
   Template.add(new Template(req.body))
     .then((insertedId) => {

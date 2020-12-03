@@ -5,7 +5,6 @@
       v-for="category in stats"
       :key="category.id"
       :is-modifying="isModifying"
-      :rules="rules"
       :category="category"
       :order-by-name="orderByName"
     />
@@ -26,10 +25,6 @@ export default {
   props: {
     isModifying: {
       type: Boolean,
-      required: true
-    },
-    rules: {
-      type: Object,
       required: true
     },
     stats: {

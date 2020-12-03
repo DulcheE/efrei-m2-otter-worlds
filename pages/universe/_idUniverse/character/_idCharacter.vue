@@ -129,7 +129,7 @@
                       label="Name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       class="ma-4"
                       type="text"
                       required
@@ -143,7 +143,7 @@
                       label="Race"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       required
                       class="ma-4"
                       type="text"
@@ -157,7 +157,7 @@
                       label="Job"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       required
                       class="ma-4"
                     />
@@ -218,7 +218,7 @@
                       :label="item.name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       class="ma-4"
                       type="text"
                     />
@@ -256,22 +256,22 @@
         <v-tabs-items v-model="tab">
           <!-- Tab n° 1 - Statistics -->
           <v-tab-item>
-            <CharacterCardStatistics :is-modifying="isModifying" :rules="rules" :stats="statsRegular" :order-by-name="orderByName" />
+            <CharacterCardStatistics :is-modifying="isModifying" :stats="statsRegular" :order-by-name="orderByName" />
           </v-tab-item>
 
           <!-- Tab n° 2 - Inventory -->
           <v-tab-item>
-            <CharacterCardInventory :is-modifying="isModifying" :rules="rules" :inventory="inventory" />
+            <CharacterCardInventory :is-modifying="isModifying" :inventory="inventory" />
           </v-tab-item>
 
           <!-- Tab n° 3 - Magic (may be passed) -->
           <v-tab-item v-if="hasMagic">
-            <CharacterCardMagic :is-modifying="isModifying" :rules="rules" :stats="statsMagic" :order-by-name="orderByName" />
+            <CharacterCardMagic :is-modifying="isModifying" :stats="statsMagic" :order-by-name="orderByName" />
           </v-tab-item>
 
           <!-- Tab n° 4 - BackStory -->
           <v-tab-item>
-            <CharacterCardBackstory :is-modifying="isModifying" :rules="rules" :backstory="backstory" />
+            <CharacterCardBackstory :is-modifying="isModifying" :backstory="backstory" />
           </v-tab-item>
         </v-tabs-items>
       </v-card>
@@ -340,6 +340,7 @@
 
 <script>
 // Imports
+import MixinRules from '@/mixins/mixin-rules'
 import CharacterCardStatistics from '@/components/character-card-statistics'
 import CharacterCardInventory from '@/components/character-card-inventory'
 import CharacterCardMagic from '@/components/character-card-magic'
@@ -354,6 +355,8 @@ export default {
     CharacterCardMagic,
     CharacterCardBackstory
   },
+
+  mixins: [MixinRules],
 
   data: () => ({
     // Whether the user is able to modify its data or not
@@ -537,11 +540,6 @@ export default {
 
     // Status of the character's card
     status: 'Work in progress',
-    rules: {
-      required: value => !!value || 'Required',
-      counter: value => value.length <= 50 || 'Max 50 characters',
-      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
-    },
 
     // Whether the picture dialog is open or not
     dialogPicture: false,
@@ -640,6 +638,12 @@ export default {
     } else {
       alert('accessing the character of id : ' + idCharacter)
     }
+
+    // ANOTHER IF ?!! I know.
+    // If accessing the page to CREATE a character's sheet for the 1st time, the user can directly modify his data
+    if (idCharacter === undefined) {
+      this.isModifying = true
+    }
   },
 
   methods: {
@@ -681,7 +685,7 @@ export default {
   },
 
   head () {
-    return { title: this.character.name }
+    return { title: (this.$route.params.idCharacter === undefined) ? 'new character' : this.character.name }
   }
 }
 </script>

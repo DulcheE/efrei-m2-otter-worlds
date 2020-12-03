@@ -6,7 +6,7 @@ const state = () => ({
 
 const getters = {
   getTemplateStats: state => function () {
-    return state
+    return state.templateStats
   },
   getTemplateStat: state => function (id) {
     return state.templateStats.find(element => element.id === id)
@@ -64,7 +64,7 @@ const actions = {
         console.log(err)
       })
   },
-  async fetchForCategory (context, id) {
+  async fetchTemplateStatForCategory (context, id) {
     await traverson.from('http://localhost:3000/api/v1/template-categories/{idcategory}/template-stats')
       .withTemplateParameters({ idcategory: id })
       .json()

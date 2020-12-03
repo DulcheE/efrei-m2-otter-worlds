@@ -1,9 +1,15 @@
 import Keyword from '../../../models/keyword.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getKeyword (req, res) {
-  Keyword.get(parseInt(req.params.id))
-    .then((keyword) => {
-      res.status(200).json(keyword.asResource(req))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getKeyword (req, res) {
+  try {
+    const keyword = await Keyword.get(parseInt(req.params.id))
+    res.status(200).json(keyword.asResource(baseAPI(req)))
+  } catch (err) {
+    res.status(404).json(err.message)
+  }
 }

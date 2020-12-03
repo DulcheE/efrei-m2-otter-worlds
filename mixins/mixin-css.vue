@@ -1,3 +1,9 @@
+<script>
+export default {
+  name: 'MixinCss'
+}
+</script>
+
 <style>
 /* Changes the mouse's cursor on Pointer */
 .pointer {cursor: pointer;}

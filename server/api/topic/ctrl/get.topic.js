@@ -1,9 +1,15 @@
 import Topic from '../../../models/topic.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getTopic (req, res) {
-  Topic.get(parseInt(req.params.id))
-    .then((topic) => {
-      res.status(200).json(topic.asResource(req))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getTopic (req, res) {
+  try {
+    const topic = await Topic.get(parseInt(req.params.id))
+    res.status(200).json(topic.asResource(baseAPI(req)))
+  } catch (err) {
+    res.status(404).json(err.message)
+  }
 }

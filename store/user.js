@@ -13,6 +13,9 @@ const getters = {
 const mutations = {
   setUsers (state, users) {
     state.users = users
+  },
+  putUser (state, user) {
+    state.users.push(user)
   }
 }
 

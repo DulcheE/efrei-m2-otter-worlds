@@ -1,71 +1,68 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Group {
-  /** @type {Number} */
-  idGroup
-  /** @type {String} */
+class HalResourceDataGroup extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {Number} */
-  idUniverse
+}
+
+class HalToOneLinksGroup extends HalToOneLinks {
+  /** @type { Number } */
+  universe
+}
+
+export default class Group extends HalResource {
+  /** @type { HalResourceDataGroup } */
+  data
+  /** @type { HalToOneLinksGroup } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['characters']
 
   /**
-   * @param {Group} group
+   * @param { Group } group
    */
   constructor (group) {
-    this.idGroup = group.idGroup
-    this.name = group.name
-    this.idUniverse = group.universe_idUniverse || group.idUniverse
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idGroup,
-        name: this.name
-      },
-      `${baseAPI(req)}groups/${this.idGroup}`)
+    this.id = group.idGroup || group.id
 
-    // the links one to one and many to one
-    resource.link('universe',
-      `${baseAPI(req)}universes/${this.idUniverse}`)
+    this.data = new HalResourceDataGroup()
+    this.data.name = group.name || group.data.name
 
-    // the links one to many
-    resource.link('characters',
-      `${baseAPI(req)}groups/${this.idGroup}/characters`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksGroup()
+    this.toOneLinks.universe = group.universe_idUniverse || group.toOneLinks.universe
   }
 
   /**
-   * @param req
-   * @param groups {Group[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, groups, selfLink = 'groups') {
-    const resourceGroups = []
-    for (const group of groups) {
-      const _group = new Group(group)
-      resourceGroups.push(_group.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ groups: resourceGroups }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'groups') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Group[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'groups', resourcePath = 'groups') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Group)
+  }
+
+  /**
+   * @returns { Promise<Group[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM `group`')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Group>}
+   * @param { Number } id
+   * @returns { Promise<Group> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM `group` WHERE idGroup = ?', id))[0]
@@ -77,8 +74,8 @@ export default class Group {
   }
 
   /**
-   * @param {Number} id id of the character that we want the inventory
-   * @returns {Promise<Characters>}
+   * @param { Number } id id of the character that we want the inventory
+   * @returns { Promise<Characters> }
    */
   static async getCharacters (id) {
     return await mariadbStore.client.query(`
@@ -90,8 +87,8 @@ export default class Group {
   }
 
   /**
-   * @param {Group} group
-   * @returns {Number} the id of the new inserted group
+   * @param { Group } group
+   * @returns { Number } the id of the new inserted group
    */
   static async add (group) {
     const sql = `
@@ -107,9 +104,9 @@ export default class Group {
   }
 
   /**
-   * @param {Number} id
-   * @param {Group} group
-   * @returns {Boolean} if the group could have been updated
+   * @param { Number } id
+   * @param { Group } group
+   * @returns { Boolean } if the group could have been updated
    */
   static async update (id, group) {
     const sql = `
@@ -126,8 +123,8 @@ export default class Group {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the group could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the group could have been removed
    */
   static async remove (id) {
     const sql = `

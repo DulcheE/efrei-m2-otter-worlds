@@ -57,7 +57,7 @@
               :label="stat.name"
               :disabled="!isModifying"
               :clearable="isModifying"
-              :rules="[rules.required, rules.counter]"
+              :rules="[rules.required, rules.maxSmall]"
               class="ma-2"
               type="text"
             />
@@ -69,16 +69,17 @@
 </template>
 
 <script>
+// Imports
+import MixinRules from '@/mixins/mixin-rules'
+
 export default {
   name: 'CharacterCardStatisticCategory',
+
+  mixins: [MixinRules],
 
   props: {
     isModifying: {
       type: Boolean,
-      required: true
-    },
-    rules: {
-      type: Object,
       required: true
     },
     category: {

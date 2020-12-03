@@ -1,94 +1,82 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
 import config from '../server.config.js'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 const mariadb = require('mariadb')
 
-export default class Character {
-  /** @type {Number} */
-  idCharacter
-  /** @type {String} */
+class HalResourceDataCharacter extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {String} */
+  /** @type { String } */
   backstory
-  /** @type {Boolean} */
+  /** @type { Boolean } */
   bIsDead
-  /** @type {Boolean} */
+  /** @type { Boolean } */
   bIsSheetCompleted
-  /** @type {Number} */
-  idUser
-  /** @type {Number} */
-  idUniverse
+}
+
+class HalToOneLinksCharacter extends HalToOneLinks {
+  /** @type { Number } */
+  user
+  /** @type { Number } */
+  universe
+}
+
+export default class Character extends HalResource {
+  /** @type { HalResourceDataCharacter } */
+  data
+  /** @type { HalToOneLinksCharacter } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['groups', 'inventories', 'stats']
 
   /**
-   * @param {Character} character
+   * @param { Character } character
    */
   constructor (character) {
-    this.idCharacter = character.idCharacter
-    this.name = character.name
-    this.backstory = character.backstory
-    this.bIsDead = character.bIsDead
-    this.bIsSheetCompleted = character.bIsSheetCompleted
-    this.idUser = character.user_idUser || character.idUser
-    this.idUniverse = character.universe_idUniverse || character.idUniverse
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idCharacter,
-        name: this.name,
-        bIsDead: !!this.bIsDead,
-        bIsSheetCompleted: !!this.bIsSheetCompleted,
-        backstory: this.backstory
-      },
-      `${baseAPI(req)}characters/${this.idCharacter}`)
+    this.id = character.idCharacter || character.id
 
-    // the links one to one and many to one
-    resource.link('user',
-    `${baseAPI(req)}users/${this.idUser}`)
-    resource.link('universe',
-      `${baseAPI(req)}universes/${this.idUniverse}`)
+    this.data = new HalResourceDataCharacter()
+    this.data.name = character.name || character.data.name
+    this.data.backstory = character.backstory || character.data.backstory
+    this.data.bIsDead = (character.bIsDead !== undefined) ? !!character.bIsDead : character.data.bIsDead
+    this.data.bIsSheetCompleted = (character.bIsSheetCompleted !== undefined) ? !!character.bIsSheetCompleted : character.data.bIsSheetCompleted
 
-    // the links one to many
-    resource.link('groups',
-    `${baseAPI(req)}characters/${this.idCharacter}/groups`)
-    resource.link('inventories',
-    `${baseAPI(req)}characters/${this.idCharacter}/inventories`)
-    resource.link('stats',
-      `${baseAPI(req)}characters/${this.idCharacter}/stats`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksCharacter()
+    this.toOneLinks.universe = character.universe_idUniverse || character.toOneLinks.universe
+    this.toOneLinks.user = character.user_idUser || character.toOneLinks.user
   }
 
   /**
-   * @param req
-   * @param characters {Character[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, characters, selfLink = 'characters') {
-    const resourceCharacters = []
-    for (const character of characters) {
-      const _character = new Character(character)
-      resourceCharacters.push(_character.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ characters: resourceCharacters }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'characters') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Character[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'characters', resourcePath = 'characters') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Character)
+  }
+
+  /**
+   * @returns { Promise<Character[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM `character`')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Character>}
+   * @param { Number } id
+   * @returns { Promise<Character> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM `character` WHERE idCharacter = ?', id))[0]
@@ -100,8 +88,8 @@ export default class Character {
   }
 
   /**
-   * @param {Number} id id of the character that we want the group
-   * @returns {Promise<Groups>}
+   * @param { Number } id id of the character that we want the group
+   * @returns { Promise<Groups> }
    */
   static async getGroups (id) {
     return await mariadbStore.client.query(`
@@ -113,16 +101,16 @@ export default class Character {
   }
 
   /**
-   * @param {Number} id id of the character that we want the inventory
-   * @returns {Promise<Inventories>}
+   * @param { Number } id id of the character that we want the inventory
+   * @returns { Promise<Inventories> }
    */
   static async getInventories (id) {
     return await mariadbStore.client.query('SELECT * FROM inventory WHERE character_idCharacter = ?', id)
   }
 
   /**
-   * @param {Number} id id of the character that we want all the stats
-   * @returns {Promise<Character[]>}
+   * @param { Number } id id of the character that we want all the stats
+   * @returns { Promise<Character[]> }
    */
   static async getStats (id) {
     const rows = await mariadbStore.client.query('SELECT * FROM characterStats WHERE `character` = ?', id)
@@ -160,8 +148,8 @@ export default class Character {
   }
 
   /**
-   * @param {Character} character
-   * @returns {Number} the id of the new inserted character
+   * @param { Character } character
+   * @returns { Number } the id of the new inserted character
    */
   static async add (character) {
     const sql = `
@@ -177,9 +165,9 @@ export default class Character {
   }
 
   /**
-   * @param {Number} idCharacter the id of the character we want to add in the group
-   * @param {Number} idGroup the id of the group we want to add to the character
-   * @returns {Boolean} if the group was succesfully add to the character
+   * @param { Number } idCharacter the id of the character we want to add in the group
+   * @param { Number } idGroup the id of the group we want to add to the character
+   * @returns { Boolean } if the group was succesfully add to the character
    */
   static async addGroup (idCharacter, idGroup) {
     const sql = `
@@ -190,15 +178,14 @@ export default class Character {
     const params = [idGroup, idCharacter]
 
     const rows = await mariadbStore.client.query(sql, params)
-    console.log(rows)
 
     return rows.affectedRows === 1
   }
 
   /**
-   * @param {Number} id
-   * @param {Character} character
-   * @returns {Boolean} if the character could have been updated
+   * @param { Number } id
+   * @param { Character } character
+   * @returns { Boolean } if the character could have been updated
    */
   static async update (id, character) {
     const sql = `
@@ -215,9 +202,9 @@ export default class Character {
   }
 
   /**
-   * @param {Number} id
-   * @param {Object} stats
-   * @returns {Boolean} if the character could have been updated
+   * @param { Number } id
+   * @param { Object } stats
+   * @returns { Boolean } if the character could have been updated
    */
   static async updateStats (id, stats) {
     const conn = await mariadb.createConnection(config.MARIADB)
@@ -252,8 +239,8 @@ export default class Character {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the character could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the character could have been removed
    */
   static async remove (id) {
     const sql = `
@@ -267,9 +254,9 @@ export default class Character {
   }
 
   /**
-   * @param {Number} idCharacter the id of the character we want to remove from the group
-   * @param {Number} idGroup the id of the group we want to remove to the character
-   * @returns {Boolean} if the character could have been removed
+   * @param { Number } idCharacter the id of the character we want to remove from the group
+   * @param { Number } idGroup the id of the group we want to remove to the character
+   * @returns { Boolean } if the character could have been removed
    */
   static async removeGroup (idCharacter, idGroup) {
     const sql = `
@@ -278,7 +265,6 @@ export default class Character {
     const params = [idCharacter, idGroup]
 
     const rows = await mariadbStore.client.query(sql, params)
-    console.log(rows)
 
     return rows.affectedRows === 1
   }

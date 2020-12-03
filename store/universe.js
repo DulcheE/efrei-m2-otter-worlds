@@ -6,7 +6,7 @@ const state = () => ({
 
 const getters = {
   getUniverses: state => function () {
-    return state
+    return state.universes
   },
   getUniverse: state => function (id) {
     return state.universes.find(element => element.id === id)
