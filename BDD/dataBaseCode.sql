@@ -301,7 +301,7 @@ ENGINE = InnoDB;
 -- Table `otter_worlds`.`keywordArticle`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `otter_worlds`.`keywordArticle` (
-  `keywords_idKeyword` INT NOT NULL,
+  `keyword_idKeyword` INT NOT NULL,
   `article_idArticle` INT NOT NULL,
   INDEX `fk_keyWords_has_article_article1_idx` (`article_idArticle` ASC) VISIBLE,
   INDEX `fk_keyWords_has_article_keyWords1_idx` (`keywords_idKeyword` ASC) VISIBLE,
