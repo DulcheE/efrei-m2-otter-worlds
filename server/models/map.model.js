@@ -40,7 +40,6 @@ export default class Map extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'maps') {
     return super.asResource(baseAPI, resourcePath)
@@ -56,6 +55,8 @@ export default class Map extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Map)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Map[]> }
    */
@@ -64,21 +65,18 @@ export default class Map extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the map
    * @returns { Promise<Map> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM map WHERE idMap = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Map ${id} don't exist !`)
-    }
-
-    return new Map(conn)
+    return new Map((await mariadbStore.client.query('SELECT * FROM map WHERE idMap = ?', id))[0])
   }
 
+  /// POST
+
   /**
-   * @param { Map } map
-   * @returns { Number } the id of the new inserted map
+   * @param { { name: String, idUniverse: Number, idArticle: Number? } } map
+   * @returns { Promise<Number> } the id of the new inserted map
    */
   static async add (map) {
     const sql = `
@@ -93,28 +91,32 @@ export default class Map extends HalResource {
     return rows.insertId || -1
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Map } map
-   * @returns { Number } if the map could have been updated
+   * @param { Number } id id of the map
+   * @param { { name: String, idArticle: Number } } map
+   * @returns { Promise<Number> } if the map could have been updated
    */
   static async update (id, map) {
     const sql = `
       UPDATE map
-        SET name = ?
+        SET name = ?, article_idArticle = ?
         WHERE idMap = ?`
     // All the cols you want to update for a map + the id of the map you want to update
     // /!\ You may never want to change the links
-    const params = [map.name, id]
+    const params = [map.name, map.idArticle, id]
 
     const rows = await mariadbStore.client.query(sql, params)
 
     return rows.affectedRows === 1
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Number } if the map could have been removed
+   * @param { Number } id id of the map
+   * @returns { Promise<Number> } if the map could have been removed
    */
   static async remove (id) {
     const sql = `

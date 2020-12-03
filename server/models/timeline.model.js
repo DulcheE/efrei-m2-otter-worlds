@@ -43,7 +43,6 @@ export default class Timeline extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'timelines') {
     return super.asResource(baseAPI, resourcePath)
@@ -59,6 +58,8 @@ export default class Timeline extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Timeline)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Timeline[]> }
    */
@@ -67,21 +68,18 @@ export default class Timeline extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the timeline
    * @returns { Promise<Timeline> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Timeline ${id} don't exist !`)
-    }
-
-    return new Timeline(conn)
+    return new Timeline((await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0])
   }
 
+  /// POST
+
   /**
-   * @param { Timeline } timeline
-   * @returns { Number } the id of the new inserted timeline
+   * @param { { name: String, description: String, bIsPublic: Boolean, idUniverse: Number } } timeline
+   * @returns { Promise<Number> } the id of the new inserted timeline
    */
   static async add (timeline) {
     const sql = `
@@ -96,10 +94,12 @@ export default class Timeline extends HalResource {
     return rows.insertId || -1
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Timeline } timeline
-   * @returns { Boolean } if the timeline could have been updated
+   * @param { Number } id id of the timeline
+   * @param { { name: String, description: String, bIsPublic: Boolean } } timeline
+   * @returns { Promise<Boolean> } if the timeline could have been updated
    */
   static async update (id, timeline) {
     const sql = `
@@ -115,9 +115,11 @@ export default class Timeline extends HalResource {
     return rows.affectedRows === 1
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the timeline could have been removed
+   * @param { Number } id id of the timeline
+   * @returns { Promise<Boolean> } if the timeline could have been removed
    */
   static async remove (id) {
     const sql = `

@@ -43,7 +43,6 @@ export default class Article extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'articles') {
     return super.asResource(baseAPI, resourcePath)
@@ -60,6 +59,8 @@ export default class Article extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Article)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Article[]> }
    */
@@ -68,29 +69,32 @@ export default class Article extends HalResource {
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<Article[]> }
-   */
-  static async getAllArticleForKeyword (id) {
-    return await mariadbStore.client.query('select * from article a left outer join keywordarticle ka on a.idArticle = ka.article_idArticle where ka.keywords_idKeyword = ?', id)
-  }
-
-  /**
-   * @param { Number } id
+   * @param { Number } id id of the article
    * @returns { Promise<Article> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM article WHERE idArticle = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Article ${id} don't exist !`)
-    }
-
-    return new Article(conn)
+    return new Article((await mariadbStore.client.query('SELECT * FROM article WHERE idArticle = ?', id))[0])
   }
 
   /**
-   * @param { Article } article
-   * @returns { Number } the id of the new inserted article
+   * @param { Number } idKeyword id of the keyword
+   * @returns { Promise<Article[]> }
+   */
+  static async getByKeyword (idKeyword) {
+    // TODO use custom view
+    return await mariadbStore.client.query(`
+      SELECT * FROM article a
+      LEFT OUTER JOIN keywordarticle ka
+        ON a.idArticle = ka.article_idArticle
+      WHERE ka.keyword_idKeyword = ?
+    `, idKeyword)
+  }
+
+  /// POST
+
+  /**
+   * @param { { title: String, content: String, thumbnail: String, idSubTopic: Number } } article
+   * @returns { Promise<Number> } the id of the new inserted article
    */
   static async add (article) {
     const sql = `
@@ -105,10 +109,12 @@ export default class Article extends HalResource {
     return rows.insertId || -1
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Article } article
-   * @returns { Boolean } if the article could have been updated
+   * @param { Number } id id of the article
+   * @param { { title: String, content: String, thumbnail: String } } article
+   * @returns { Promise<Boolean> } if the article could have been updated
    */
   static async update (id, article) {
     const sql = `
@@ -124,9 +130,11 @@ export default class Article extends HalResource {
     return rows.affectedRows === 1
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the article could have been removed
+   * @param { Number } id id of the article
+   * @returns { Promise<Boolean> } if the article could have been removed
    */
   static async remove (id) {
     const sql = `

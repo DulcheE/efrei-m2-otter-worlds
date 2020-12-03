@@ -24,7 +24,7 @@ const router = Router()
 router.get('/', tryTo(getUsers, emptyError)) // no policy
 router.get('/:id', tryTo(getUser, emptyError)) // no policy
 router.get('/:id/characters', tryTo(getUserCharacters, emptyError)) // can see private universes
-router.get('/:id/groups', canGetUniverse('idUniverse', 'body'), tryTo(getUserGroups, emptyError)) // can see universe
+router.get('/:id/groups', canGetUniverse('universe', 'query'), tryTo(getUserGroups, emptyError)) // can see universe
 router.get('/:id/universes', tryTo(getUserUniverses, emptyError)) // can see private universes
 router.get('/:id/universes-plays', tryTo(getUserUniversesPlays, emptyError)) // can see private universes
 

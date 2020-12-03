@@ -21,7 +21,7 @@ export default class Universe extends HalResource {
   /** @type { HalToOneLinksUniverse } */
   toOneLinks
   /** @type { String[] } */
-  static toManyLinks = ['groups', 'characters', 'maps', 'template-categories', 'timelines', 'topics', 'users-playing']
+  static toManyLinks = ['groups', 'characters', 'maps', 'template-categories', 'timelines', 'topics', 'users-playing', 'keywords']
 
   /**
    * @param { Universe } universe
@@ -58,6 +58,8 @@ export default class Universe extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Universe)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Universe[]> }
    */
@@ -66,57 +68,46 @@ export default class Universe extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the universe
    * @returns { Promise<Universe> }
    */
   static async get (id) {
-    const rows = (await mariadbStore.client.query('SELECT * FROM universe WHERE idUniverse = ?', id))[0]
-    if (!rows) {
-      throw new Error(`Universe ${id} don't exist !`)
-    }
-
-    return new Universe(rows)
+    return new Universe((await mariadbStore.client.query('SELECT * FROM universe WHERE idUniverse = ?', id))[0])
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<import('./character.model.js').default[]> }
+   * @param { Number } id id of the user
+   * @returns { Promise<Universe[]> }
    */
-  static async getCharacters (id) {
-    return await mariadbStore.client.query('SELECT * FROM `character` WHERE universe_idUniverse = ?', id)
+  static async getByUser (id) {
+    return await mariadbStore.client.query('SELECT * FROM `universe` WHERE user_idUser = ?', id)
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<import('./templateCategory.model.js').default[]> }
+   * @param { Number } id id of the user
+   * @returns { Promise<Universe[]> }
    */
-  static async getTemplateCategories (id) {
-    return await mariadbStore.client.query('SELECT * FROM templateCategory WHERE universe_idUniverse = ?', id)
-  }
-
-  /**
-   * @param { Number } id
-   * @returns { Promise<import('./character.model.js').default[]> }
-   */
-  static async getUsersPlaying (id) {
+  static async getByUserIsPlayingIn (id) {
     return await mariadbStore.client.query(`
-      SELECT u.*, uin.bIsGM FROM user u
+      SELECT u.*, uin.bIsGM FROM universe u
       INNER JOIN userinuniverse uin
-        ON uin.idUser = u.idUser
-      WHERE idUniverse = ?
+        ON uin.idUniverse = u.idUniverse
+      WHERE idUser = ?
     `, id)
   }
 
+  /// POST
+
   /**
-   * @param { Universe } universe
-   * @returns { Number } the id of the new inserted universe
+   * @param { { name: String, description: String, bIsPublic: Boolean?, idUser: Number } } universe
+   * @returns { Promise<Number> } the id of the new inserted universe
    */
   static async add (universe) {
     const sql = `
       INSERT INTO 
         universe(name, description, bIsPublic, user_idUser) 
         VALUES(?, ?, ?, ?)`
-    const params = [universe.name, universe.description, !!universe.bIsPublic, universe.idUser]
+    const params = [universe.name, universe.description, universe.bIsPublic, universe.idUser]
 
     const rows = await mariadbStore.client.query(sql, params)
 
@@ -127,7 +118,7 @@ export default class Universe extends HalResource {
    * @param { Number } idUniverse
    * @param { Number } idUser
    * @param { Number } bIsGM
-   * @returns { Boolean } the id of the new inserted universe
+   * @returns { Promise<Boolean> } the id of the new inserted universe
    */
   static async inviteUser (idUniverse, idUser, bIsGM) {
     const sql = `
@@ -141,10 +132,12 @@ export default class Universe extends HalResource {
     return rows.affectedRows || false
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Universe } universe
-   * @returns { Boolean } if the universe could have been updated
+   * @param { Number } id id of the universe
+   * @param { { name: String, description: String, bIsPublic: Boolean } } universe
+   * @returns { Promise<Boolean> } if the universe could have been updated
    */
   static async update (id, universe) {
     const sql = `
@@ -162,7 +155,7 @@ export default class Universe extends HalResource {
    * @param { Number } idUniverse
    * @param { Number } idUser
    * @param { Boolean } bIsGM
-   * @returns { Boolean } if the universe could have been updated
+   * @returns { Promise<Boolean> } if the universe could have been updated
    */
   static async updateUserRole (idUniverse, idUser, bIsGM) {
     const sql = `
@@ -176,9 +169,11 @@ export default class Universe extends HalResource {
     return rows.affectedRows === 1
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the universe could have been removed
+   * @param { Number } id id of the universe
+   * @returns { Promise<Boolean> } if the universe could have been removed
    */
   static async remove (id) {
     const sql = `
@@ -194,7 +189,7 @@ export default class Universe extends HalResource {
   /**
    * @param { Number } idUniverse
    * @param { Number } idUser
-   * @returns { Boolean } if the universe could have been removed
+   * @returns { Promise<Boolean> } if the universe could have been removed
    */
   static async kickUser (idUniverse, idUser) {
     const sql = `

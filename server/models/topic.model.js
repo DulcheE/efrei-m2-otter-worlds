@@ -59,6 +59,8 @@ export default class Topic extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Topic)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Topic[]> }
    */
@@ -87,6 +89,8 @@ export default class Topic extends HalResource {
     return await mariadbStore.client.query('SELECT * FROM subTopic WHERE topic_idTopic = ?', id)
   }
 
+  /// POST
+
   /**
    * @param { Topic } topic
    * @returns { Number } the id of the new inserted topic
@@ -113,6 +117,8 @@ export default class Topic extends HalResource {
 
     return rows.insertId || -1
   }
+
+  /// PUT
 
   /**
    * @param {Number } id
@@ -141,6 +147,8 @@ export default class Topic extends HalResource {
 
     return rows.affectedRows === 1
   }
+
+  /// DELETE
 
   /**
    * @param { Number } id

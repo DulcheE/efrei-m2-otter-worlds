@@ -46,7 +46,6 @@ export default class Inventory extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'inventories') {
     return super.asResource(baseAPI, resourcePath)
@@ -62,6 +61,8 @@ export default class Inventory extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Inventory)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Inventory[]> }
    */
@@ -70,21 +71,26 @@ export default class Inventory extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the inventory
    * @returns { Promise<Inventory> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM inventory WHERE idInventory = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Inventory ${id} don't exist !`)
-    }
-
-    return new Inventory(conn)
+    return new Inventory((await mariadbStore.client.query('SELECT * FROM inventory WHERE idInventory = ?', id))[0])
   }
 
   /**
-   * @param { Inventory } inventory
-   * @returns { Number } the id of the new inserted inventory
+   * @param { Number } id id of the character that we want the inventories
+   * @returns { Promise<Inventory[]> }
+   */
+  static async getByCharacter (id) {
+    return await mariadbStore.client.query('SELECT * FROM inventory WHERE character_idCharacter = ?', id)
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, number: Number, description: String, weight: Number, idCharacter: Number } } inventory
+   * @returns { Promise<Number> } the id of the new inserted inventory
    */
   static async add (inventory) {
     const sql = `
@@ -99,10 +105,12 @@ export default class Inventory extends HalResource {
     return rows.insertId || -1
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Inventory } inventory
-   * @returns { Boolean } if the inventory could have been updated
+   * @param { Number } id id of the inventory
+   * @param { { name: String, number: Number, description: String, weight: Number } } inventory
+   * @returns { Promise<Boolean> } if the inventory could have been updated
    */
   static async update (id, inventory) {
     const sql = `
@@ -118,9 +126,11 @@ export default class Inventory extends HalResource {
     return rows.affectedRows === 1
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the inventory could have been removed
+   * @param { Number } id id of the inventory
+   * @returns { Promise<Boolean> } if the inventory could have been removed
    */
   static async remove (id) {
     const sql = `

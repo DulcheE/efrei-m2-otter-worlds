@@ -6,7 +6,7 @@ import Character from '../../../models/character.model'
  */
 export default async function postCharacterGroup (req, res) {
   try {
-    const bSucceded = await Character.addGroup(parseInt(req.params.id), parseInt(req.body.idGroup))
+    const bSucceded = await Character.insertInGroup(parseInt(req.params.id), parseInt(req.body.idGroup))
     res.status(201).json(bSucceded)
   } catch (err) {
     // eslint-disable-next-line no-console

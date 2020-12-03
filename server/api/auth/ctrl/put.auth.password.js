@@ -6,7 +6,7 @@ import User from '../../../models/user.model'
  */
 export default async function changePassword (req, res) {
   try {
-    const user = await User.ChangePasseword(req.body, req.params.code, parseInt(req.params.id))
+    const user = await User.changePasseword(req.body.newPassword, parseInt(req.params.id))
     res.status(200).json(user)
   } catch (err) {
     res.status(404).send(err.message)

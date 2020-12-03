@@ -40,7 +40,6 @@ export default class Template extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'templates') {
     return super.asResource(baseAPI, resourcePath)
@@ -56,6 +55,8 @@ export default class Template extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Template)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Template[]> }
    */
@@ -64,21 +65,18 @@ export default class Template extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the template
    * @returns { Promise<Template> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Template ${id} don't exist !`)
-    }
-
-    return new Template(conn)
+    return new Template((await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0])
   }
 
+  /// POST
+
   /**
-   * @param { Template } template
-   * @returns { Number } the id of the new inserted template
+   * @param { { string: String, bBoolean: Boolean, idOther: Number } } template
+   * @returns { Promise<Number> } the id of the new inserted template
    */
   static async add (template) {
     const sql = `
@@ -93,10 +91,12 @@ export default class Template extends HalResource {
     return rows.insertId || -1
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Template } template
-   * @returns { Boolean } if the template could have been updated
+   * @param { Number } id id of the template
+   * @param { { string: String, bBoolean: Boolean } } template
+   * @returns { Promise<Boolean> } if the template could have been updated
    */
   static async update (id, template) {
     const sql = `
@@ -112,9 +112,11 @@ export default class Template extends HalResource {
     return rows.affectedRows === 1
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the template could have been removed
+   * @param { Number } id id of the template
+   * @returns { Promise<Boolean> } if the template could have been removed
    */
   static async remove (id) {
     const sql = `
