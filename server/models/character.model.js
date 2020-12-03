@@ -155,19 +155,18 @@ export default class Character extends HalResource {
 
   /**
    * @param { { name: String, backstory: String, idUser: Number, idUniverse: Number } } character
-   * @returns { Promise<Number> } the id of the new inserted character
+   * @returns { Promise<Character> } the id of the new inserted character
    */
   static async add (character) {
     const sql = `
       INSERT INTO 
         \`character\`(name, backstory, user_idUser, universe_idUniverse) 
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [character.name, character.backstory, character.idUser, character.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Character((await mariadbStore.client.query(sql, params))[0])
   }
 
   /**

@@ -90,19 +90,18 @@ export default class Inventory extends HalResource {
 
   /**
    * @param { { name: String, number: Number, description: String, weight: Number, idCharacter: Number } } inventory
-   * @returns { Promise<Number> } the id of the new inserted inventory
+   * @returns { Promise<Inventory> } the id of the new inserted inventory
    */
   static async add (inventory) {
     const sql = `
       INSERT INTO 
         inventory(name, number, description, weight, character_idCharacter) 
-        VALUES(?, ?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [inventory.name, inventory.number, inventory.description, inventory.weight, inventory.idCharacter]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Inventory((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

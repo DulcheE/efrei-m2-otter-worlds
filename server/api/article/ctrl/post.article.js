@@ -6,7 +6,7 @@ import Article from '../../../models/article.model'
  */
 export default async function postArticle (req, res) {
   try {
-    const insertedId = await Article.add(new Article(req.body))
+    const insertedId = await Article.add(req.body)
     res.status(201).json(insertedId)
   } catch (err) {
     // eslint-disable-next-line no-console

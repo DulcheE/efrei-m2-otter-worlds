@@ -1,4 +1,5 @@
 import Inventory from '../../../models/inventory.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import Inventory from '../../../models/inventory.model'
  */
 export default async function postInventory (req, res) {
   try {
-    const insertedId = await Inventory.add(new Inventory(req.body))
-    res.status(201).json(insertedId)
+    const newInventory = await Inventory.add(req.body)
+    res.status(201).json(newInventory.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

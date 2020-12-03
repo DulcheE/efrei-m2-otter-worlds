@@ -1,4 +1,5 @@
 import Universe from '../../../models/universe.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import Universe from '../../../models/universe.model'
  */
 export default async function postUniverse (req, res) {
   try {
-    const insertedId = await Universe.add(new Universe(req.body))
-    res.status(201).json(insertedId)
+    const newUniverse = await Universe.add(req.body)
+    res.status(201).json(newUniverse.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

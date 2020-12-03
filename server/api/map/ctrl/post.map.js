@@ -1,4 +1,5 @@
 import Map from '../../../models/Map.model.js'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import Map from '../../../models/Map.model.js'
  */
 export default async function postTemplate (req, res) {
   try {
-    const insertedId = await Map.add(new Map(req.body))
-    res.status(201).json(insertedId)
+    const newMap = await Map.add(req.body)
+    res.status(201).json(newMap.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

@@ -84,19 +84,18 @@ export default class TemplateCategory extends HalResource {
 
   /**
    * @param { { name: String, order: Number, idUniverse: Number } } templateCategory
-   * @returns { Promise<Number> } the id of the new inserted templateCategory
+   * @returns { Promise<TemplateCategory> } the id of the new inserted templateCategory
    */
   static async add (templateCategory) {
     const sql = `
       INSERT INTO
         templateCategory(name, \`order\`, universe_idUniverse)
-        VALUES(?, ?, ?)`
+        VALUES(?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [templateCategory.name, templateCategory.order, templateCategory.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new TemplateCategory((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

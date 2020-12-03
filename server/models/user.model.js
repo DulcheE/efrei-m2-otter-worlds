@@ -98,11 +98,14 @@ export default class User extends HalResource {
    * @returns { Promise<User> }
    */
   static async add (user) {
-    const sql = 'INSERT INTO user(username, password) VALUES(?,?)'
+    const sql = `
+      INSERT INTO
+        user(username, password)
+        VALUES(?, ?)
+      RETURNING *`
     const params = [user.username, user.password]
-    const row = await mariadbStore.client.query(sql, params)
 
-    return row.insertId || -1
+    return new User((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

@@ -75,22 +75,29 @@ export default class SubTopic extends HalResource {
     return new SubTopic((await mariadbStore.client.query('SELECT * FROM subTopic WHERE idSubTopic = ?', id))[0])
   }
 
+  /**
+   * @param { Number } id id of the topic
+   * @returns { Promise<SubTopic> }
+   */
+  static async getByTopic (id) {
+    return await mariadbStore.client.query('SELECT * FROM subTopic WHERE topic_idTopic = ?', id)
+  }
+
   /// POST
 
   /**
    * @param { { name: String, order: Number, idTopic: Number, idArticle: Number? } } subTopic
-   * @returns { Promise<Number> } the id of the new inserted subTopic
+   * @returns { Promise<SubTopic> } the id of the new inserted subTopic
    */
   static async add (subTopic) {
     const sql = `
     INSERT INTO 
-      subTopic(name, \`order\`, topic_idTopic, article_idArticle) 
-      VALUES(?, ?, ?, ?)`
+      subTopic(name, \`order\`, topic_idTopic` + (subTopic.idArticle !== undefined ? ', article_idArticle' : '') + `) 
+      VALUES(?, ?, ?` + (subTopic.idArticle !== undefined ? ', ?' : '') + `)
+    RETURNING *`
     const params = [subTopic.name, subTopic.order, subTopic.idTopic, subTopic.idArticle]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new SubTopic((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

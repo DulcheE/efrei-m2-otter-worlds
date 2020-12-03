@@ -87,19 +87,18 @@ export default class InterestPoint extends HalResource {
 
   /**
    * @param { { name: String, coordinate: String, idMap: Number, idArticle: Number? } } interestPoint
-   * @returns { Promise<Number> } the id of the new inserted interestPoint
+   * @returns { Promise<InterestPoint> } the id of the new inserted interestPoint
    */
   static async add (interestPoint) {
     const sql = `
       INSERT INTO
-        interestPoint(name, coordinate, map_idMap, article_idArticle)
-        VALUES(?, ?, ?, ?)`
+        interestPoint(name, coordinate, map_idMap` + (interestPoint.idArticle !== undefined ? ', article_idArticle' : '') + `)
+        VALUES(?, ?, ?` + (interestPoint.idArticle !== undefined ? ', ?' : '') + `)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [interestPoint.name, interestPoint.coordinate, interestPoint.idMap, interestPoint.idArticle]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new InterestPoint((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

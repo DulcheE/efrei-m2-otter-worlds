@@ -94,19 +94,18 @@ export default class Keyword extends HalResource {
 
   /**
    * @param { {name: String, idUniverse: Number} } keyword
-   * @returns { Promise<Number> } the id of the new inserted keyword
+   * @returns { Promise<Keyword> } the id of the new inserted keyword
    */
   static async add (keyword) {
     const sql = `
       INSERT INTO
         keyword(name, universe_idUniverse)
-        VALUES(?)`
+        VALUES(?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [keyword.name, keyword.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Keyword((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

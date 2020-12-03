@@ -1,4 +1,5 @@
 import Character from '../../../models/character.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import Character from '../../../models/character.model'
  */
 export default async function postCharacter (req, res) {
   try {
-    const insertedId = await Character.add(new Character(req.body))
-    res.status(201).json(insertedId)
+    const newCharacter = await Character.add(req.body)
+    res.status(201).json(newCharacter.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

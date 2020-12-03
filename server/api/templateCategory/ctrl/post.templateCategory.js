@@ -1,4 +1,5 @@
 import TemplateCategory from '../../../models/templateCategory.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import TemplateCategory from '../../../models/templateCategory.model'
  */
 export default async function postTemplateCategory (req, res) {
   try {
-    const insertedId = await TemplateCategory.add(new TemplateCategory(req.body))
-    res.status(201).json(insertedId)
+    const newTemplateCategory = await TemplateCategory.add(req.body)
+    res.status(201).json(newTemplateCategory.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

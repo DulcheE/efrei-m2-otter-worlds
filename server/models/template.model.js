@@ -76,19 +76,18 @@ export default class Template extends HalResource {
 
   /**
    * @param { { string: String, bBoolean: Boolean, idOther: Number } } template
-   * @returns { Promise<Number> } the id of the new inserted template
+   * @returns { Promise<Template> } the id of the new inserted template
    */
   static async add (template) {
     const sql = `
       INSERT INTO 
         template(string, bBoolean, idOther) 
-        VALUES(?, ?, ?)`
+        VALUES(?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [template.string, template.bBoolean, template.idOther]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Template((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

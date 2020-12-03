@@ -76,19 +76,18 @@ export default class Map extends HalResource {
 
   /**
    * @param { { name: String, idUniverse: Number, idArticle: Number? } } map
-   * @returns { Promise<Number> } the id of the new inserted map
+   * @returns { Promise<Map> } the id of the new inserted map
    */
   static async add (map) {
     const sql = `
       INSERT INTO
-        map(name, universe_idUniverse, article_idArticle)
-        VALUES(?, ?, ?)`
+        map(name, universe_idUniverse` + (map.idArticle !== undefined ? ', article_idArticle' : '') + `)
+        VALUES(?, ?` + (map.idArticle !== undefined ? ', ?' : '') + `)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [map.name, map.idUniverse, map.idArticle]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Map((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

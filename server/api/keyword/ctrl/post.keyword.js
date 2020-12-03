@@ -1,4 +1,5 @@
 import Keyword from '../../../models/keyword.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import Keyword from '../../../models/keyword.model'
  */
 export default async function postKeyword (req, res) {
   try {
-    const insertedId = await Keyword.add(new Keyword(req.body))
-    res.status(201).json(insertedId)
+    const newKeyword = await Keyword.add(req.body)
+    res.status(201).json(newKeyword.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

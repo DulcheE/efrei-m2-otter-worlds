@@ -87,19 +87,18 @@ export default class TemplateStat extends HalResource {
 
   /**
    * @param { { name: String, bIsNumber: Boolean, bIsRequired: Boolean, idTemplateCategory: Number } } templateStat
-   * @returns { Promise<Number> } the id of the new inserted templateStat
+   * @returns { Promise<TemplateStat> } the id of the new inserted templateStat
    */
   static async add (templateStat) {
     const sql = `
       INSERT INTO 
         templateStat(name, bIsNumber, bIsRequired, templateCategory_idTemplateCategory) 
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [templateStat.name, templateStat.bIsNumber, templateStat.bIsRequired, templateStat.idTemplateCategory]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new TemplateStat((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

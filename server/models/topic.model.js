@@ -43,7 +43,6 @@ export default class Topic extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'topics') {
     return super.asResource(baseAPI, resourcePath)
@@ -69,79 +68,43 @@ export default class Topic extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the topic
    * @returns { Promise<Topic> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM topic WHERE idTopic = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Topic ${id} don't exist !`)
-    }
-
-    return new Topic(conn)
-  }
-
-  /**
-   * @param { Number } id
-   * @returns { Promise<SubTopics> }
-   */
-  static async getSubTopics (id) {
-    return await mariadbStore.client.query('SELECT * FROM subTopic WHERE topic_idTopic = ?', id)
+    return new Topic((await mariadbStore.client.query('SELECT * FROM topic WHERE idTopic = ?', id))[0])
   }
 
   /// POST
 
   /**
-   * @param { Topic } topic
-   * @returns { Number } the id of the new inserted topic
+   * @param { { name: String, order: Number, idUniverse: Number, idArticle: Number? } } topic
+   * @returns { Promise<Topic> } the id of the new inserted topic
    */
   static async add (topic) {
-    let sql = ''
-    let params = []
-
-    if (topic.idArticle) {
-      sql = `
+    const sql = `
       INSERT INTO 
-        topic(name, \`order\`, universe_idUniverse, article_idArticle) 
-        VALUES(?, ?, ?, ?)`
-      params = [topic.name, topic.order, topic.idUniverse, topic.idArticle]
-    } else {
-      sql = `
-      INSERT INTO 
-        topic(name, \`order\`, universe_idUniverse) 
-        VALUES(?, ?, ?)`
-      params = [topic.name, topic.order, topic.idUniverse]
-    }
+        topic(name, \`order\`, universe_idUniverse` + (topic.idArticle !== undefined ? ', article_idArticle' : '') + `) 
+        VALUES(?, ?, ?` + (topic.idArticle !== undefined ? ', ?' : '') + `)
+      RETURNING *`
+    const params = [topic.name, topic.order, topic.idUniverse, topic.idArticle]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Topic((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT
 
   /**
-   * @param {Number } id
-   * @param { Topic } topic
-   * @returns { Boolean } if the topic could have been updated
+   * @param { Number } id id of the topic
+   * @param { { name: String, order: Number, idArticle: Number? } } topic
+   * @returns { Promise<Boolean> } if the topic could have been updated
    */
   static async update (id, topic) {
-    let sql = ''
-    let params = []
-
-    if (topic.idArticle) {
-      sql = `
+    const sql = `
       UPDATE topic
         SET name = ?, \`order\` = ?, article_idArticle = ?
         WHERE idTopic = ?`
-      params = [topic.name, topic.order, topic.idArticle, id]
-    } else {
-      sql = `
-      UPDATE topic
-        SET name = ?, \`order\` = ?
-        WHERE idTopic = ?`
-      params = [topic.name, topic.order, id]
-    }
+    const params = [topic.name, topic.order, topic.idArticle, id]
 
     const rows = await mariadbStore.client.query(sql, params)
 
@@ -151,8 +114,8 @@ export default class Topic extends HalResource {
   /// DELETE
 
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the topic could have been removed
+   * @param { Number } id id of the topic
+   * @returns { Promise<Boolean> } if the topic could have been removed
    */
   static async remove (id) {
     const sql = `

@@ -103,19 +103,18 @@ export default class Event extends HalResource {
 
   /**
    * @param { { name: String, year: Number, month: Number, day: Number, description: String, idTimeline: Number, idArticle: Number? } } event
-   * @returns { Promise<Number> } the id of the new inserted Event
+   * @returns { Promise<Event> } the id of the new inserted Event
    */
   static async add (event) {
     const sql = `
       INSERT INTO
-        Event(name, year, month, day, description, timeline_idTimeline, article_idArticle)
-        VALUES(?, ?, ?, ?, ?, ?, ?)`
+        Event(name, year, month, day, description, timeline_idTimeline` + (event.idArticle !== undefined ? ', article_idArticle' : '') + `)
+        VALUES(?, ?, ?, ?, ?, ?` + (event.idArticle !== undefined ? ', ?' : '') + `)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [event.name, event.year, event.month, event.day, event.description, event.idTimeline, event.idArticle]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Event((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

@@ -94,19 +94,18 @@ export default class Article extends HalResource {
 
   /**
    * @param { { title: String, content: String, thumbnail: String, idSubTopic: Number } } article
-   * @returns { Promise<Number> } the id of the new inserted article
+   * @returns { Promise<Article> } the id of the new inserted article
    */
   static async add (article) {
     const sql = `
       INSERT INTO
         article(title, content, thumbnail, subtopic_idSubTopic)
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [article.title, article.content, article.thumbnail, article.idSubTopic]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Article((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// PUT

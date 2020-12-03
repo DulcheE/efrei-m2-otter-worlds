@@ -100,18 +100,17 @@ export default class Universe extends HalResource {
 
   /**
    * @param { { name: String, description: String, bIsPublic: Boolean?, idUser: Number } } universe
-   * @returns { Promise<Number> } the id of the new inserted universe
+   * @returns { Promise<Universe> } the id of the new inserted universe
    */
   static async add (universe) {
     const sql = `
       INSERT INTO 
         universe(name, description, bIsPublic, user_idUser) 
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?)
+      RETURNING *`
     const params = [universe.name, universe.description, universe.bIsPublic, universe.idUser]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Universe((await mariadbStore.client.query(sql, params))[0])
   }
 
   /**
