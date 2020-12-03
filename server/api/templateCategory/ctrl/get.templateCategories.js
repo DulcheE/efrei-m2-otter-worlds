@@ -1,11 +1,11 @@
 import TemplateCategory from '../../../models/templateCategory.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getTemplateCategories (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  TemplateCategory.getAll()
-    .then((templateCategories) => {
-      res.status(200).json(TemplateCategory.asResourceList(req, templateCategories))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getTemplateCategories (req, res) {
+  const templateCategories = await TemplateCategory.getAll()
+  res.status(200).json(TemplateCategory.asResourceList(baseAPI(req), templateCategories))
 }

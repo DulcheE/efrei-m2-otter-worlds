@@ -15,10 +15,14 @@ import timelineRouter from './timeline/timeline.js'
 import topicRouter from './topic/topic.js'
 import universeRouter from './universe/universe.js'
 import userRouter from './user/user.js'
-const apiRouter = Router()
 
-const apiRoute = '/api/v1/'
-const baseAPI = (req) => {
+export const apiRouter = Router()
+export const apiRoute = '/api/v1/'
+/**
+ * @param { import('express').Request } req
+ * @returns { String }
+ */
+export function baseAPI (req) {
   return req.protocol + '://' + req.get('host') + apiRoute
 }
 
@@ -33,7 +37,7 @@ apiRouter.get('/', (req, res) => {
       'interest-points': `${baseAPI(req)}interest-points`,
       inventories: `${baseAPI(req)}inventories`,
       maps: `${baseAPI(req)}maps`,
-      subTopics: `${baseAPI(req)}sub-topics`,
+      'sub-topics': `${baseAPI(req)}sub-topics`,
       'template-categories': `${baseAPI(req)}template-categories`,
       'template-stats': `${baseAPI(req)}template-stats`,
       timelines: `${baseAPI(req)}timelines`,
@@ -61,4 +65,4 @@ apiRouter.use('/topics', topicRouter)
 apiRouter.use('/universes', universeRouter)
 apiRouter.use('/users', userRouter)
 
-export { apiRouter, apiRoute, baseAPI }
+export default { apiRouter, apiRoute, baseAPI }

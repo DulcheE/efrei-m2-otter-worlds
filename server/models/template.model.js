@@ -1,75 +1,71 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Template {
-  /** @type {Number} */
-  idTemplate
-  /** @type {String} */
+class HalResourceDataTemplate extends HalResourceData {
+  /** @type { String } */
   string
-  /** @type {Boolean} */
+  /** @type { Boolean } */
   bBoolean
-  /** @type {Number} */
-  idOther
+}
+
+class HalToOneLinksTemplate extends HalToOneLinks {
+  /** @type { Number } */
+  other
+}
+
+export default class Template extends HalResource {
+  /** @type { HalResourceDataTemplate } */
+  data
+  /** @type { HalToOneLinksTemplate } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['otherOther']
 
   /**
-   * @param {Template} template
+   * @param { Template } template
    */
   constructor (template) {
-    this.idTemplate = template.idTemplate
-    this.string = template.string
-    this.bBoolean = template.bBoolean
-    this.idOther = template.idOther
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idTemplate,
-        string: this.string,
-        bBoolean: !!this.bBoolean
-      },
-      `${baseAPI(req)}templates/${this.idTemplate}`)
+    this.id = template.idTemplate || template.id
 
-    // the links one to one and many to one
-    resource.link('other',
-      `${baseAPI(req)}others/${this.idOther}`)
+    this.data = new HalResourceDataTemplate()
+    this.data.string = template.string || template.data.string
+    this.data.bBoolean = template.bBoolean || template.data.bBoolean
 
-    // the links one to many
-    resource.link('otherOthers',
-      `${baseAPI(req)}templates/${this.idTemplate}/otherOthers`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksTemplate()
+    this.toOneLinks.other = template.idOther || template.toOneLinks.other
   }
 
   /**
-   * @param req
-   * @param templates {Template[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, templates, selfLink = 'templates') {
-    const resourceTemplates = []
-    for (const template of templates) {
-      const _template = new Template(template)
-      resourceTemplates.push(_template.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ templates: resourceTemplates }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'templates') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Template[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'templates', resourcePath = 'templates') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Template)
+  }
+
+  /**
+   * @returns { Promise<Template[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM template')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Template>}
+   * @param { Number } id
+   * @returns { Promise<Template> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0]
@@ -81,8 +77,8 @@ export default class Template {
   }
 
   /**
-   * @param {Template} template
-   * @returns {Number} the id of the new inserted template
+   * @param { Template } template
+   * @returns { Number } the id of the new inserted template
    */
   static async add (template) {
     const sql = `
@@ -98,9 +94,9 @@ export default class Template {
   }
 
   /**
-   * @param {Number} id
-   * @param {Template} template
-   * @returns {Boolean} if the template could have been updated
+   * @param { Number } id
+   * @param { Template } template
+   * @returns { Boolean } if the template could have been updated
    */
   static async update (id, template) {
     const sql = `
@@ -117,8 +113,8 @@ export default class Template {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the template could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the template could have been removed
    */
   static async remove (id) {
     const sql = `

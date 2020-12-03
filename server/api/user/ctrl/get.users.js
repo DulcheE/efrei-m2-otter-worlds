@@ -1,10 +1,11 @@
 import User from '../../../models/user.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getUsers (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  User.getAll()
-    .then((users) => {
-      res.status(200).json(User.asResourceList(req, users))
-    })
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getUsers (req, res) {
+  const users = await User.getAll()
+  res.status(200).json(User.asResourceList(baseAPI(req), users))
 }

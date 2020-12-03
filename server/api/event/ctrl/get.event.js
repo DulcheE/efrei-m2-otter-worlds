@@ -1,9 +1,15 @@
 import Event from '../../../models/event.model.js'
+import { baseAPI } from '../../routes.js'
 
-export default function getEvent (req, res) {
-  Event.get(parseInt(req.params.id))
-    .then((event) => {
-      res.status(200).json(event.asResource(req))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getEvent (req, res) {
+  try {
+    const event = await Event.get(parseInt(req.params.id))
+    res.status(200).json(event.asResource(baseAPI(req)))
+  } catch (err) {
+    res.status(404).json(err.message)
+  }
 }

@@ -1,92 +1,90 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class InterestPoint {
-  /** @type {Number} */
-  idInterestPoint
-  /** @type {String} */
+class HalResourceDataInterestPoint extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {String} */
+  /** @type { String } */
   coordinate
-  /** @type {Number} */
-  idMap
-  /** @type {Number} */
-  idArticle
+}
+
+class HalToOneLinksInterestPoint extends HalToOneLinks {
+  /** @type { Number } */
+  map
+  /** @type { Number } */
+  article
+}
+
+export default class InterestPoint extends HalResource {
+  /** @type { HalResourceDataInterestPoint } */
+  data
+  /** @type { HalToOneLinksInterestPoint } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = []
 
   /**
-   * @param {InterestPoint} interestPoint
+   * @param { InterestPoint } interestPoint
    */
   constructor (interestPoint) {
-    this.idInterestPoint = interestPoint.idInterestPoint || interestPoint.id_interestPoint
-    this.name = interestPoint.name
-    this.coordinate = interestPoint.coordinate
-    this.idMap = interestPoint.idMap || interestPoint.map_idMap
-    this.idArticle = interestPoint.idArticle || interestPoint.article_idArticle
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idInterestPoint,
-        name: this.name,
-        coordinate: this.coordinate
-      },
-      `${baseAPI(req)}interestPoints/${this.idInterestPoint}`)
+    this.id = interestPoint.id_interestPoint || interestPoint.id
 
-    // the links one to one and many to one
-    resource.link('Map',
-      `${baseAPI(req)}Maps/${this.idMap}`)
-    resource.link('Article',
-      `${baseAPI(req)}Articles/${this.idArticle}`)
+    this.data = new HalResourceDataInterestPoint()
+    this.data.name = interestPoint.name || interestPoint.data.name
+    this.data.coordinate = interestPoint.coordinate || interestPoint.data.coordinate
 
-    return resource
+    this.toOneLinks = new HalToOneLinksInterestPoint()
+    this.toOneLinks.map = interestPoint.map_idMap || interestPoint.toOneLinks.map
+    this.toOneLinks.article = interestPoint.article_idArticle || (interestPoint.toOneLinks !== undefined) ? interestPoint.toOneLinks.article : undefined
   }
 
   /**
-   * @param req
-   * @param interestPoints {InterestPoint[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, interestPoints, selfLink = 'interestPoints') {
-    const resourceInterestPoints = []
-    for (const interestPoint of interestPoints) {
-      const _interestPoint = new InterestPoint(interestPoint)
-      resourceInterestPoints.push(_interestPoint.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ interestPoints: resourceInterestPoints }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'interest-points') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<InterestPoint[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'interest-points', resourcePath = 'interest-points') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, InterestPoint)
+  }
+
+  /**
+   * @returns { Promise<InterestPoint[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM interestPoint')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<InterestPoint[]>}
+   * @param { Number } id
+   * @returns { Promise<InterestPoint[]> }
    */
   static async getAllforMap (id) {
     return await mariadbStore.client.query('SELECT * FROM interestPoint WHERE map_idMap=?', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<InterestPoint[]>}
+   * @param { Number } id
+   * @returns { Promise<InterestPoint[]> }
    */
   static async getAllforArticle (id) {
     return await mariadbStore.client.query('SELECT * FROM interestPoint WHERE article_idArticle=?', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<InterestPoint>}
+   * @param { Number } id
+   * @returns { Promise<InterestPoint> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM interestPoint WHERE id_interestPoint = ?', id))[0]
@@ -98,8 +96,8 @@ export default class InterestPoint {
   }
 
   /**
-   * @param {InterestPoint} interestPoint
-   * @returns {Number} the id of the new inserted interestPoint
+   * @param { InterestPoint } interestPoint
+   * @returns { Number } the id of the new inserted interestPoint
    */
   static async add (interestPoint) {
     const sql = `
@@ -115,9 +113,9 @@ export default class InterestPoint {
   }
 
   /**
-   * @param {Number} id
-   * @param {InterestPoint} interestPoint
-   * @returns {Boolean} if the interestPoint could have been updated
+   * @param { Number } id
+   * @param { InterestPoint } interestPoint
+   * @returns { Boolean } if the interestPoint could have been updated
    */
   static async update (id, interestPoint) {
     const sql = `
@@ -134,8 +132,8 @@ export default class InterestPoint {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the interestPoint could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the interestPoint could have been removed
    */
   static async remove (id) {
     const sql = `

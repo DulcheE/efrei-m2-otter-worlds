@@ -33,6 +33,7 @@ router.get('/:id', canGet, tryTo(getUniverse, emptyError))
 router.get('/:id/characters', canGet, tryTo(getUniverseCharacters, emptyError))
 router.get('/:id/template-categories', canGet, tryTo(getUniverseTemplateCategories, emptyError))
 router.get('/:id/users-playing', canGet, isConnected, tryTo(getUniverseUsersPlaying, emptyError))
+// maps timelines topics
 
 // Post
 router.post('/', isConnected, tryTo(postUniverse, emptyError))

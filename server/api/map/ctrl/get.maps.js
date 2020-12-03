@@ -1,11 +1,11 @@
 import Map from '../../../models/map.model.js'
+import { baseAPI } from '../../routes.js'
 
-export default function getTemplates (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  Map.getAll()
-    .then((maps) => {
-      res.status(200).json(Map.asResourceList(req, maps))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getTemplates (req, res) {
+  const maps = await Map.getAll()
+  res.status(200).json(Map.asResourceList(baseAPI(req), maps))
 }

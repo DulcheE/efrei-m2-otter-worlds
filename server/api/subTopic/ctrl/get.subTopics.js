@@ -1,11 +1,11 @@
 import SubTopic from '../../../models/subTopic.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getSubTopics (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  SubTopic.getAll()
-    .then((subTopics) => {
-      res.status(200).json(SubTopic.asResourceList(req, subTopics))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getSubTopics (req, res) {
+  const subTopics = await SubTopic.getAll()
+  res.status(200).json(SubTopic.asResourceList(baseAPI(req), subTopics))
 }

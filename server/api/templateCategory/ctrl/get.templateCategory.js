@@ -1,9 +1,15 @@
 import TemplateCategory from '../../../models/templateCategory.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getTemplateCategory (req, res) {
-  TemplateCategory.get(parseInt(req.params.id))
-    .then((templateCategory) => {
-      res.status(200).json(templateCategory.asResource(req))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getTemplateCategory (req, res) {
+  try {
+    const templateCategory = await TemplateCategory.get(parseInt(req.params.id))
+    res.status(200).json(templateCategory.asResource(baseAPI(req)))
+  } catch (err) {
+    res.status(404).json(err.message)
+  }
 }

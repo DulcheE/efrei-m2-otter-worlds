@@ -1,11 +1,11 @@
 import InterestPoint from '../../../models/interestPoint.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getTemplates (req, res) {
-  // NOTE: remove the "res.status(501).send({ message: 'not implemented' }})"
-  //       to make it work
-  InterestPoint.getAll()
-    .then((interestPoints) => {
-      res.status(200).json(InterestPoint.asResourceList(req, interestPoints))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getInterestPoints (req, res) {
+  const interestPoints = await InterestPoint.getAll()
+  res.status(200).json(InterestPoint.asResourceList(baseAPI(req), interestPoints))
 }

@@ -1,89 +1,73 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Universe {
-  /** @type {Number} */
-  idUniverse
-  /** @type {String} */
+class HalResourceDataUniverse extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {String} */
+  /** @type { String } */
   description
-  /** @type {Boolean} */
+  /** @type { Boolean } */
   bIsPublic
-  /** @type {Number} */
-  idUser
+}
+
+class HalToOneLinksUniverse extends HalToOneLinks {
+  /** @type { Number } */
+  user
+}
+
+export default class Universe extends HalResource {
+  /** @type { HalResourceDataUniverse } */
+  data
+  /** @type { HalToOneLinksUniverse } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['groups', 'characters', 'maps', 'template-categories', 'timelines', 'topics', 'users-playing']
 
   /**
-   * @param {Universe} universe
+   * @param { Universe } universe
    */
   constructor (universe) {
-    this.idUniverse = universe.idUniverse
-    this.name = universe.name
-    this.description = universe.description
-    this.bIsPublic = universe.bIsPublic
-    this.idUser = universe.user_idUser || universe.idUser
+    super()
+
+    this.id = universe.idUniverse || universe.id
+
+    this.data = new HalResourceDataUniverse()
+    this.data.name = universe.name || universe.data.name
+    this.data.description = universe.description || universe.data.description
+    this.data.bIsPublic = (universe.bIsPublic !== universe) ? !!universe.bIsPublic : universe.data.bIsPublic
+
+    this.toOneLinks = new HalToOneLinksUniverse()
+    this.toOneLinks.user = universe.user_idUser || universe.toOneLinks.user
   }
 
   /**
-   * @param {import('express').Request} req
+   * @param { String } baseAPI
+   * @param { String } resourcePath
    */
-  asResource (req) {
-    const resource = hal.Resource(
-      {
-        id: this.idUniverse,
-        name: this.name,
-        description: this.description,
-        bIsPublic: !!this.bIsPublic
-      },
-      `${baseAPI(req)}universes/${this.idUniverse}`)
-
-    resource.link('user',
-      `${baseAPI(req)}users/${this.idUser}`)
-
-    resource.link('characters',
-      `${baseAPI(req)}universes/${this.idUniverse}/characters`)
-    resource.link('maps',
-      `${baseAPI(req)}universes/${this.idUniverse}/maps`)
-    resource.link('template-categories',
-      `${baseAPI(req)}universes/${this.idUniverse}/template-categories`)
-    resource.link('timelines',
-      `${baseAPI(req)}universes/${this.idUniverse}/timelines`)
-    resource.link('topics',
-      `${baseAPI(req)}universes/${this.idUniverse}/topics`)
-    resource.link('usersPlaying',
-      `${baseAPI(req)}universes/${this.idUniverse}/users-playing`)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'universes') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @param {import('express').Request} req
-   * @param {Universe[]} universes
-   * @param {string} selfLink
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
    */
-  static asResourceList (req, universes, selfLink = 'universes') {
-    const resourceUniverses = []
-    for (const universe of universes) {
-      const _universe = new Universe(universe)
-      resourceUniverses.push(_universe.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ universes: resourceUniverses }, baseAPI(req) + selfLink)
-
-    return resource
+  static asResourceList (baseAPI, list, selfLink = 'universes', resourcePath = 'universes') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Universe)
   }
 
   /**
-   * @returns {Promise<Universe[]>}
+   * @returns { Promise<Universe[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM universe')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Universe>}
+   * @param { Number } id
+   * @returns { Promise<Universe> }
    */
   static async get (id) {
     const rows = (await mariadbStore.client.query('SELECT * FROM universe WHERE idUniverse = ?', id))[0]
@@ -95,24 +79,24 @@ export default class Universe {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<import('./character.model.js').default[]>}
+   * @param { Number } id
+   * @returns { Promise<import('./character.model.js').default[]> }
    */
   static async getCharacters (id) {
     return await mariadbStore.client.query('SELECT * FROM `character` WHERE universe_idUniverse = ?', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<import('./templateCategory.model.js').default[]>}
+   * @param { Number } id
+   * @returns { Promise<import('./templateCategory.model.js').default[]> }
    */
   static async getTemplateCategories (id) {
     return await mariadbStore.client.query('SELECT * FROM templateCategory WHERE universe_idUniverse = ?', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<import('./character.model.js').default[]>}
+   * @param { Number } id
+   * @returns { Promise<import('./character.model.js').default[]> }
    */
   static async getUsersPlaying (id) {
     return await mariadbStore.client.query(`
@@ -124,8 +108,8 @@ export default class Universe {
   }
 
   /**
-   * @param {Universe} universe
-   * @returns {Number} the id of the new inserted universe
+   * @param { Universe } universe
+   * @returns { Number } the id of the new inserted universe
    */
   static async add (universe) {
     const sql = `
@@ -140,10 +124,10 @@ export default class Universe {
   }
 
   /**
-   * @param {Number} idUniverse
-   * @param {Number} idUser
-   * @param {Number} bIsGM
-   * @returns {Boolean} the id of the new inserted universe
+   * @param { Number } idUniverse
+   * @param { Number } idUser
+   * @param { Number } bIsGM
+   * @returns { Boolean } the id of the new inserted universe
    */
   static async inviteUser (idUniverse, idUser, bIsGM) {
     const sql = `
@@ -158,9 +142,9 @@ export default class Universe {
   }
 
   /**
-   * @param {Number} id
-   * @param {Universe} universe
-   * @returns {Boolean} if the universe could have been updated
+   * @param { Number } id
+   * @param { Universe } universe
+   * @returns { Boolean } if the universe could have been updated
    */
   static async update (id, universe) {
     const sql = `
@@ -175,10 +159,10 @@ export default class Universe {
   }
 
   /**
-   * @param {Number} idUniverse
-   * @param {Number} idUser
-   * @param {Boolean} bIsGM
-   * @returns {Boolean} if the universe could have been updated
+   * @param { Number } idUniverse
+   * @param { Number } idUser
+   * @param { Boolean } bIsGM
+   * @returns { Boolean } if the universe could have been updated
    */
   static async updateUserRole (idUniverse, idUser, bIsGM) {
     const sql = `
@@ -193,8 +177,8 @@ export default class Universe {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the universe could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the universe could have been removed
    */
   static async remove (id) {
     const sql = `
@@ -208,9 +192,9 @@ export default class Universe {
   }
 
   /**
-   * @param {Number} idUniverse
-   * @param {Number} idUser
-   * @returns {Boolean} if the universe could have been removed
+   * @param { Number } idUniverse
+   * @param { Number } idUser
+   * @returns { Boolean } if the universe could have been removed
    */
   static async kickUser (idUniverse, idUser) {
     const sql = `

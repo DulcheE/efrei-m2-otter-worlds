@@ -1,69 +1,63 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class User {
-  /** @type {Number} */
-  idUser
-  /** @type {String} */
+class HalResourceDataUser extends HalResourceData {
+  /** @type { String } */
   username
-  /** @type {String} */
-  password
+}
+
+class HalToOneLinksUser extends HalToOneLinks { }
+
+export default class User extends HalResource {
+  /** @type { HalResourceDataUser } */
+  data
+  /** @type { HalToOneLinksUser } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['groups', 'universes', 'universes-plays']
 
   /**
-   * @param {User} user
+   * @param { User } user
    */
   constructor (user) {
-    this.idUser = user.idUser
-    this.username = user.username
-    this.password = user.password
-  }
+    super()
 
-  asResource (req) {
-    const resource = hal.Resource(
-      {
-        id: this.idUser,
-        username: this.username
-      },
-      `${baseAPI(req)}users/${this.idUser}`)
+    this.id = user.idUser || user.id
 
-    resource.link('groups',
-      `${baseAPI(req)}users/${this.idUser}/groups`)
-    resource.link('universes',
-      `${baseAPI(req)}users/${this.idUser}/universes`)
-    resource.link('universesPlays',
-        `${baseAPI(req)}users/${this.idUser}/universes-plays`)
+    this.data = new HalResourceDataUser()
+    this.data.username = user.username || user.data.username
 
-    return resource
+    this.toOneLinks = new HalToOneLinksUser()
   }
 
   /**
-   * @param req
-   * @param users {User[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
    */
-  static asResourceList (req, users, selfLink = 'users') {
-    const resourceUsers = []
-    for (const user of users) {
-      const _user = new User(user)
-      resourceUsers.push(_user.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ users: resourceUsers }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'users') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<User[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'users', resourcePath = 'users') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, User)
+  }
+
+  /**
+   * @returns { Promise<User[]> }
    */
   static async getAll () {
-    return await mariadbStore.client.query('SELECT * FROM user')
+    return await mariadbStore.client.query('SELECT idUser, username FROM user')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<User>}
+   * @param { Number } id
+   * @returns { Promise<User> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM user WHERE idUser = ?', id))[0]
@@ -75,25 +69,25 @@ export default class User {
   }
 
   /**
-   * @param {String} username
-   * @returns {Boolean}
+   * @param { String } username
+   * @returns { Object }
    */
   static async getByName (username) {
     return (await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', [username]))[0]
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Characters>}
+   * @param { Number } id
+   * @returns { Promise<Characters> }
    */
   static async getCharacters (id) {
     return await mariadbStore.client.query('SELECT * FROM `character` WHERE user_idUser = ?', id)
   }
 
   /**
-   * @param {Number} idUser id of the user that we want the groups
-   * @param {Number} idUniverse id of the universe that we want the groups for the user
-   * @returns {Promise<Groups>}
+   * @param { Number } idUser id of the user that we want the groups
+   * @param { Number } idUniverse id of the universe that we want the groups for the user
+   * @returns { Promise<Groups> }
    */
   static async getGroups (idUser, idUniverse) {
     return await mariadbStore.client.query(`
@@ -107,16 +101,16 @@ export default class User {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Universe>}
+   * @param { Number } id
+   * @returns { Promise<Universe> }
    */
   static async getUniverses (id) {
     return await mariadbStore.client.query('SELECT * FROM `universe` WHERE user_idUser = ?', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Universe>}
+   * @param { Number } id
+   * @returns { Promise<import('./universe.model').default[]> }
    */
   static async getUniversesPlays (id) {
     return await mariadbStore.client.query(`
@@ -128,8 +122,8 @@ export default class User {
   }
 
   /**
-   * @param {User} user
-   * @returns {Promise<User>}
+   * @param { User } user
+   * @returns { Promise<User> }
    */
   static async add (user) {
     const sql = 'INSERT INTO user(username, password) VALUES(?,?)'
@@ -140,16 +134,16 @@ export default class User {
   }
 
   /**
-   * @param {Number} idUser
-   * @returns {Promise<User>}
+   * @param { Number } idUser
+   * @returns { Promise<User> }
    */
   static async remove (idUser) {
     return await mariadbStore.client.query('DELETE FROM user WHERE idUser = ?', [idUser])
   }
 
   /**
-   * @param {User} user
-   * @return {Promise<User>}
+   * @param { User } user
+   * @return { Promise<User> }
    */
   static async modifyName (user, id) {
     const sql = 'SELECT * FROM user WHERE idUser = ?'
@@ -164,10 +158,10 @@ export default class User {
   }
 
   /**
-   * @param {User} user
-   * @param {String} code
-   * @param {Number} id
-   * @return {Promise<User>}
+   * @param { User } user
+   * @param { String } code
+   * @param { Number } id
+   * @return { Promise<User> }
    */
   static async ChangePasseword (user, code, id) {
     const sql = 'SELECT * FROM user WHERE idUser = ?'

@@ -1,9 +1,15 @@
 import Character from '../../../models/character.model'
+import { baseAPI } from '../../routes.js'
 
-export default function getCharacter (req, res) {
-  Character.get(parseInt(req.params.id))
-    .then((character) => {
-      res.status(200).json(character.asResource(req))
-    })
-    .catch(err => res.status(404).json(err.message))
+/**
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ */
+export default async function getCharacter (req, res) {
+  try {
+    const character = await Character.get(parseInt(req.params.id))
+    res.status(200).json(character.asResource(baseAPI(req)))
+  } catch (err) {
+    res.status(404).json(err.message)
+  }
 }

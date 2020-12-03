@@ -1,81 +1,71 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-// import InterestPoint from './interestPoint.model'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Map {
-  /** @type {Number} */
-  idMap
-  /** @type {String} */
+class HalResourceDataMap extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {Number} */
-  idUniverse
-  /** @type {Number} */
-  idArticle
-  /** @type{ InterestPoint[] } */
-  interestPoints
+}
+
+class HalToOneLinksMap extends HalToOneLinks {
+  /** @type { Number } */
+  universe
+  /** @type { Number } */
+  article
+}
+
+export default class Map extends HalResource {
+  /** @type { HalResourceDataMap } */
+  data
+  /** @type { HalToOneLinksMap } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['interest-points']
 
   /**
-   * @param {Map} map
+   * @param { Map } map
    */
   constructor (map) {
-    this.idMap = map.idMap
-    this.name = map.name
-    this.interestPoints = []
-    this.idUniverse = map.idUniverse || map.universe_idUniverse
-    this.idArticle = map.idArticle || map.article_idArticle
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idMap,
-        name: this.name,
-        interestPoints: this.interestPoints
-      },
-      `${baseAPI(req)}maps/${this.idMap}`)
+    this.id = map.idMap || map.id
 
-    // the links one to one and many to one
-    resource.link('Article',
-      `${baseAPI(req)}Articles/${this.idArticle}`)
-    resource.link('Universe',
-      `${baseAPI(req)}Universes/${this.idUniverse}`)
+    this.data = new HalResourceDataMap()
+    this.data.name = map.name || map.data.name
 
-    // the links one to many
-    resource.link('InterestPoints',
-      `${baseAPI(req)}maps/${this.idMap}/InterestPoints`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksMap()
+    this.toOneLinks.universe = map.universe_idUniverse || map.toOneLinks.universe
+    this.toOneLinks.article = map.article_idArticle || (map.toOneLinks !== undefined) ? map.toOneLinks.article : undefined
   }
 
   /**
-   * @param req
-   * @param maps {Map[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, maps, selfLink = 'maps') {
-    const resourcemaps = []
-    for (const map of maps) {
-      const _map = new Map(map)
-      resourcemaps.push(_map.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ maps: resourcemaps }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'maps') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Map[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'maps', resourcePath = 'maps') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Map)
+  }
+
+  /**
+   * @returns { Promise<Map[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM map')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Map>}
+   * @param { Number } id
+   * @returns { Promise<Map> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM map WHERE idMap = ?', id))[0]
@@ -87,16 +77,8 @@ export default class Map {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Map>}
-   */
-  static async getForArticle (id) {
-    return await mariadbStore.client.query('SELECT * FROM map WHERE article_idArticle = ?', id)
-  }
-
-  /**
-   * @param {Map} map
-   * @returns {Number} the id of the new inserted map
+   * @param { Map } map
+   * @returns { Number } the id of the new inserted map
    */
   static async add (map) {
     const sql = `
@@ -112,9 +94,9 @@ export default class Map {
   }
 
   /**
-   * @param {Number} id
-   * @param {Map} map
-   * @returns {Number} if the map could have been updated
+   * @param { Number } id
+   * @param { Map } map
+   * @returns { Number } if the map could have been updated
    */
   static async update (id, map) {
     const sql = `
@@ -131,8 +113,8 @@ export default class Map {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Number} if the map could have been removed
+   * @param { Number } id
+   * @returns { Number } if the map could have been removed
    */
   static async remove (id) {
     const sql = `

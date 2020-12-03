@@ -1,91 +1,83 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Article {
-  /** @type {Number} */
-  idArticle
-  /** @type {String} */
+class HalResourceDataArticle extends HalResourceData {
+  /** @type { String } */
   title
-  /** @type {string} */
+  /** @type { String } */
   content
-  /** @type {string} */
+  /** @type { string } */
   thumbnail
-  /** @type {Number} */
-  idSubTopic
+}
+
+class HalToOneLinksArticle extends HalToOneLinks {
+  /** @type { Number } */
+  subTopic
+}
+
+export default class Article extends HalResource {
+  /** @type { HalResourceDataCharacter } */
+  data
+  /** @type { HalToOneLinksCharacter } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = ['keywords']
 
   /**
-   * @param {Article} article
+   * @param { Article } article
    */
   constructor (article) {
-    this.idArticle = article.idArticle
-    this.title = article.title
-    this.content = article.content
-    this.thumbnail = article.thumbnail
-    this.idSubTopic = article.idSubTopic || article.subtopic_idSubTopic
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idArticle,
-        title: this.title,
-        content: this.content,
-        thumbnail: this.thumbnail
-      },
-      `${baseAPI(req)}Articles/${this.idArticle}`)
+    this.id = article.idArticle || article.id
 
-    // the links one to one and many to one
-    resource.link('SubTopic',
-      `${baseAPI(req)}SubTopics/${this.idSubTopic}`)
+    this.data = new HalResourceDataArticle()
+    this.data.title = article.title || article.data.title
+    this.data.content = article.content || article.data.content
+    this.data.thumbnail = article.thumbnail || article.data.thumbnail
 
-    // the links one to many
-    resource.link('Maps',
-      `${baseAPI(req)}Articles/${this.idArticle}/maps`)
-    resource.link('Events',
-       `${baseAPI(req)}Articles/${this.idArticle}/events`)
-    resource.link('interestPoints',
-      `${baseAPI(req)}Articles/${this.idArticle}/interestPoints`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksArticle()
+    this.toOneLinks.subTopic = article.subtopic_idSubTopic || article.toOneLinks.subTopic
   }
 
   /**
-   * @param req
-   * @param Articles {Article[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, Articles, selfLink = 'Articles') {
-    const resourceArticles = []
-    for (const article of Articles) {
-      const _article = new Article(article)
-      resourceArticles.push(_article.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ Articles: resourceArticles }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'articles') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Article[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   * @param { class } Classe
+   */
+  static asResourceList (baseAPI, list, selfLink = 'articles', resourcePath = 'articles') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Article)
+  }
+
+  /**
+   * @returns { Promise<Article[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM article')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Article[]>}
+   * @param { Number } id
+   * @returns { Promise<Article[]> }
    */
   static async getAllArticleForKeyword (id) {
     return await mariadbStore.client.query('select * from article a left outer join keywordarticle ka on a.idArticle = ka.article_idArticle where ka.keywords_idKeyword = ?', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Article>}
+   * @param { Number } id
+   * @returns { Promise<Article> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM article WHERE idArticle = ?', id))[0]
@@ -97,8 +89,8 @@ export default class Article {
   }
 
   /**
-   * @param {Article} article
-   * @returns {Number} the id of the new inserted article
+   * @param { Article } article
+   * @returns { Number } the id of the new inserted article
    */
   static async add (article) {
     const sql = `
@@ -114,9 +106,9 @@ export default class Article {
   }
 
   /**
-   * @param {Number} id
-   * @param {Article} article
-   * @returns {string} if the article could have been updated
+   * @param { Number } id
+   * @param { Article } article
+   * @returns { Boolean } if the article could have been updated
    */
   static async update (id, article) {
     const sql = `
@@ -133,8 +125,8 @@ export default class Article {
   }
 
   /**
-   * @param {Number} id
-   * @returns {string} if the article could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the article could have been removed
    */
   static async remove (id) {
     const sql = `

@@ -1,76 +1,72 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Keyword {
-  /** @type {Number} */
-  idKeyword
-  /** @type {String} */
+class HalResourceDataKeyword extends HalResourceData {
+  /** @type { String } */
   name
+}
+
+class HalToOneLinksKeyword extends HalToOneLinks { }
+
+export default class Keyword extends HalResource {
+  /** @type { HalResourceDataKeyword } */
+  data
+  /** @type { HalToOneLinksKeyword } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = []
 
   /**
-   * @param {Keyword} keyword
+   * @param { Keyword } keyword
    */
   constructor (keyword) {
-    this.idKeyword = keyword.idKeyword
-    this.name = keyword.name
-  }
+    super()
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idKeyword,
-        name: this.name
-      },
-      `${baseAPI(req)}keywords/${this.idKeyword}`)
+    this.id = keyword.idKeyword || keyword.id
 
-    // the links one to one and many to one
-    resource.link('other',
-      `${baseAPI(req)}others/${this.idOther}`)
+    this.data = new HalResourceDataKeyword()
+    this.data.name = keyword.name || keyword.data.name
 
-    // the links one to many
-    resource.link('otherOthers',
-      `${baseAPI(req)}keywords/${this.idKeyword}/otherOthers`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksKeyword()
   }
 
   /**
-   * @param req
-   * @param keywords {Keyword[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, keywords, selfLink = 'keywords') {
-    const resourceKeywords = []
-    for (const keyword of keywords) {
-      const _keyword = new Keyword(keyword)
-      resourceKeywords.push(_keyword.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ keywords: resourceKeywords }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'keywords') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Keyword[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'keywords', resourcePath = 'keywords') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Keyword)
+  }
+
+  /**
+   * @returns { Promise<Keyword[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM keyword')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Keyword[]>}
+   * @param { Number } id
+   * @returns { Promise<Keyword[]> }
    */
   static async getAllForArticle (id) {
     return await mariadbStore.client.query('select * from keyword k left outer join keywordarticle ka on k.idKeyword = ka.keywords_idKeyword where ka.article_idArticle = ?', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Keyword>}
+   * @param { Number } id
+   * @returns { Promise<Keyword> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM keyword WHERE idKeyword = ?', id))[0]
@@ -82,8 +78,8 @@ export default class Keyword {
   }
 
   /**
-   * @param {Keyword} keyword
-   * @returns {Number} the id of the new inserted keyword
+   * @param { Keyword } keyword
+   * @returns { Number } the id of the new inserted keyword
    */
   static async add (keyword) {
     const sql = `
@@ -99,9 +95,9 @@ export default class Keyword {
   }
 
   /**
-   * @param {Number} id
-   * @param {Keyword} keyword
-   * @returns {Boolean} if the keyword could have been updated
+   * @param { Number } id
+   * @param { Keyword } keyword
+   * @returns { Boolean } if the keyword could have been updated
    */
   static async update (id, keyword) {
     const sql = `
@@ -118,8 +114,8 @@ export default class Keyword {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the keyword could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the keyword could have been removed
    */
   static async remove (id) {
     const sql = `

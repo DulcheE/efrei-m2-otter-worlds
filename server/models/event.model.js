@@ -1,104 +1,98 @@
-import { baseAPI } from '../api/routes'
 import mariadbStore from '../mariadb-store'
-const hal = require('hal')
+import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
-export default class Event {
-  /** @type {Number} */
-  idEvent
-  /** @type {String} */
+class HalResourceDataEvent extends HalResourceData {
+  /** @type { String } */
   name
-  /** @type {Number} */
+  /** @type { Number } */
   year
-  /** @type {Number} */
+  /** @type { Number } */
   month
-  /** @type {Number} */
+  /** @type { Number } */
   day
-  /** @type {String} */
+  /** @type { String } */
   description
-  /** @type {Number} */
-  idTimeline
-  /** @type {Number} */
-  idArticle
+}
+
+class HalToOneLinksEvent extends HalToOneLinks {
+  /** @type { Number } */
+  timeline
+  /** @type { Number } */
+  article
+}
+
+export default class Event extends HalResource {
+  /** @type { HalResourceDataEvent } */
+  data
+  /** @type { HalToOneLinksEvent } */
+  toOneLinks
+  /** @type { String[] } */
+  static toManyLinks = []
 
   /**
-   * @param {Event} event
+   * @param { Event } event
    */
   constructor (event) {
-    this.idEvent = event.idEvent
-    this.name = event.name
-    this.year = event.year
-    this.month = event.month || null
-    this.day = event.day || null
-    this.description = event.description
-    this.idTimeline = event.idTimeline || event.timeline_idTimeline
-    this.idArticle = event.idArticle || event.article_idArticle || null
-  }
+    super()
+    this.id = event.idEvent || event.id
 
-  asResource (req) {
-    // The data from the object
-    const resource = hal.Resource(
-      {
-        id: this.idEvent,
-        name: this.name,
-        year: this.year,
-        month: this.month,
-        day: this.day,
-        description: this.description
-      },
-      `${baseAPI(req)}events/${this.idEvent}`)
+    this.data = new HalResourceDataEvent()
+    this.data.name = event.name || event.data.name
+    this.data.year = event.year || event.data.year
+    this.data.month = event.month || event.data.month
+    this.data.day = event.day || event.data.day
+    this.data.description = event.description || event.data.description
 
-    // the links one to one and many to one
-    resource.link('timeline',
-      `${baseAPI(req)}timelines/${this.idTimeline}`)
-    resource.link('article',
-      `${baseAPI(req)}articles/${this.idArticle}`)
-
-    return resource
+    this.toOneLinks = new HalToOneLinksEvent()
+    this.toOneLinks.timeline = event.timeline_idTimeline || event.toOneLinks.timeline
+    this.toOneLinks.article = event.article_idArticle || event.toOneLinks.article
   }
 
   /**
-   * @param req
-   * @param events {Event[]}
-   * @param selfLink {string}
+   * @param { String } baseAPI
+   * @param { String } resourcePath
+   * @returns { hal.Resource }
    */
-  static asResourceList (req, events, selfLink = 'events') {
-    const resourceEvents = []
-    for (const event of events) {
-      const _Event = new Event(event)
-      resourceEvents.push(_Event.asResource(req).toJSON())
-    }
-
-    const resource = hal.Resource({ events: resourceEvents }, baseAPI(req) + selfLink)
-
-    return resource
+  asResource (baseAPI, resourcePath = 'events') {
+    return super.asResource(baseAPI, resourcePath)
   }
 
   /**
-   * @returns {Promise<Event[]>}
+   * @param { String } baseAPI
+   * @param { HalResource[] } list
+   * @param { String } selfLink
+   * @param { String } resourcePath
+   */
+  static asResourceList (baseAPI, list, selfLink = 'events', resourcePath = 'events') {
+    return super.asResourceList(baseAPI, list, selfLink, resourcePath, Event)
+  }
+
+  /**
+   * @returns { Promise<Event[]> }
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM Event  ORDER BY year, month, day')
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Event[]>}
+   * @param { Number } id
+   * @returns { Promise<Event[]> }
    */
   static async getForTimeline (id) {
     return await mariadbStore.client.query('SELECT * FROM Event WHERE timeline_idTimeline = ? ORDER BY year, month, day', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Event[]>}
+   * @param { Number } id
+   * @returns { Promise<Event[]> }
    */
   static async getForArticle (id) {
     return await mariadbStore.client.query('SELECT * FROM Event WHERE article_idArticle = ? ORDER BY year, month, day', id)
   }
 
   /**
-   * @param {Number} id
-   * @returns {Promise<Event>}
+   * @param { Number } id
+   * @returns { Promise<Event> }
    */
   static async get (id) {
     const conn = (await mariadbStore.client.query('SELECT * FROM event WHERE idEvent = ?', id))[0]
@@ -110,8 +104,8 @@ export default class Event {
   }
 
   /**
-   * @param {Event} event
-   * @returns {Number} the id of the new inserted Event
+   * @param { Event } event
+   * @returns { Number } the id of the new inserted Event
    */
   static async add (event) {
     const sql = `
@@ -127,9 +121,9 @@ export default class Event {
   }
 
   /**
-   * @param {Number} id
-   * @param {Event} event
-   * @returns {Boolean} if the event could have been updated
+   * @param { Number } id
+   * @param { Event } event
+   * @returns { Boolean } if the event could have been updated
    */
   static async update (id, event) {
     const sql = `
@@ -146,8 +140,8 @@ export default class Event {
   }
 
   /**
-   * @param {Number} id
-   * @returns {Boolean} if the event could have been removed
+   * @param { Number } id
+   * @returns { Boolean } if the event could have been removed
    */
   static async remove (id) {
     const sql = `
