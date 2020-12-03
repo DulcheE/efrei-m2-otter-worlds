@@ -162,7 +162,7 @@
                     <v-text-field
                       v-model="item.name"
                       :label="item.name.length === 0 ? 'statistic\'s name' : ''"
-                      :rules="[rules.required, rules.counter, rules.ascii]"
+                      :rules="[rules.required, rules.maxSmall]"
                       append-icon="mdi-delete"
                       class="ma-4"
                       type="text"
@@ -194,7 +194,7 @@
                     <v-text-field
                       v-model="item.name"
                       :label="item.name.length === 0 ? 'statistic\'s name' : ''"
-                      :rules="[rules.required, rules.counter, rules.ascii]"
+                      :rules="[rules.required, rules.maxSmall]"
                       append-icon="mdi-delete"
                       class="ma-4"
                       type="text"
@@ -236,7 +236,6 @@
             <CharacterTemplateNewCategory
               :categories="statsRegular"
               :is-magic="false"
-              :rules="rules"
               :add-category="addCategory"
               :delete-category="deleteCategory"
               :add-stat="addStat"
@@ -261,7 +260,6 @@
                 v-if="hasMagic"
                 :categories="statsMagic"
                 :is-magic="true"
-                :rules="rules"
                 :add-category="addCategory"
                 :delete-category="deleteCategory"
                 :add-stat="addStat"
@@ -277,6 +275,7 @@
 
 <script>
 // Imports
+import MixinRules from '@/mixins/mixin-rules'
 import CharacterTemplateNewCategory from '@/components/character-template-new-category'
 
 export default {
@@ -285,6 +284,8 @@ export default {
   components: {
     CharacterTemplateNewCategory
   },
+
+  mixins: [MixinRules],
 
   data: () => ({
     // Some booleans
@@ -297,14 +298,6 @@ export default {
     // Error message, if the template contains an error
     errorMessage: '',
     errorIsActive: false,
-
-    // Rules for the inputs
-    rules: {
-      required: value => !!value || 'Required',
-      counter: value => value.length <= 20 || 'Max 20 characters',
-      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character',
-      empty: value => value.length !== 0 || 'No empty value !'
-    },
 
     // Counter for both categories and statistics, which starts at the smallest negative number
     idCpt: -1,

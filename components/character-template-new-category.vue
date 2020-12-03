@@ -11,7 +11,7 @@
           <v-text-field
             v-model="category.name"
             :label="category.name.length === 0 ? 'Category\'s name' : ''"
-            :rules="[rules.required, rules.counter]"
+            :rules="[rules.required, rules.maxSmall]"
             class="ma-4"
             type="text"
           />
@@ -76,7 +76,7 @@
               <v-text-field
                 v-model="stat.name"
                 :label="stat.name.length === 0 ? 'statistic\'s name' : ''"
-                :rules="[rules.required, rules.counter]"
+                :rules="[rules.required, rules.maxSmall]"
                 append-icon="mdi-delete"
                 class="ma-4"
                 type="text"
@@ -129,8 +129,12 @@
 
 <script>
 // Imports
+import MixinRules from '@/mixins/mixin-rules'
+
 export default {
   name: 'CharacterTemplateNewCategory',
+
+  mixins: [MixinRules],
 
   props: {
     categories: {
@@ -139,10 +143,6 @@ export default {
     },
     isMagic: {
       type: Boolean,
-      required: true
-    },
-    rules: {
-      type: Object,
       required: true
     },
     addCategory: {

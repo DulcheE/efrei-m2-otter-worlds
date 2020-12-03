@@ -17,19 +17,18 @@
 
 <script>
 // Imports
+import MixinRules from '@/mixins/mixin-rules'
+
 export default {
   name: 'CharacterCardBackstory',
+
+  mixins: [MixinRules],
 
   props: {
     isModifying: {
       type: Boolean,
       required: true,
       default: false
-    },
-    rules: {
-      type: Object,
-      required: true,
-      default: () => {}
     },
     backstory: {
       type: String,
