@@ -16,7 +16,7 @@ const getters = {
   getTopic: state => function () {
     return state.topic
   },
-  getArticle: state => function () {
+  getTopicArticle: state => function () {
     return state.article
   }
 }
@@ -73,23 +73,22 @@ const actions = {
       })
   },
   async fetchTopicWithArticle (context, id) {
-    const values = await Promise.all([
-      traverson.from('http://localhost:3000/api/v1/topics/{idTopic}/')
-        .withTemplateParameters({ idTopic: id })
-        .json()
-        .getResource().result,
-      traverson.from('http://localhost:3000/api/v1/topics/{idTopic}/')
-        .follow('$._links.article.href')
+    try {
+      const topic = await traverson.from('http://localhost:3000/api/v1/topics/{idTopic}/')
         .withTemplateParameters({ idTopic: id })
         .json()
         .getResource().result
-    ])
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
-    context.commit('setTopic', values[0])
-    context.commit('setArticle', values[1])
+      context.commit('setTopic', topic)
+      if (topic._links.article !== undefined) {
+        const article = await traverson.from(topic._links.article.href)
+          .json()
+          .getResource().result
+        context.commit('setArticle', article)
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err)
+    }
   },
   async fetchTopicForUniverse (context, id) {
     const document = await traverson.from('http://localhost:3000/api/v1/universes/{iduniverse}/topics')

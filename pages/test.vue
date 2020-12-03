@@ -24,11 +24,16 @@
     <!-- <v-list v-for="group in groups" :key="group.id">
       <h5>{{ group }}</h5>
     </v-list> -->
-    <v-list v-for="top in topics" :key="top.id">
+    <!-- <v-list v-for="top in topics" :key="top.id">
       <h5>{{ top }}</h5>
     </v-list>
     <h5>{{ topic }}</h5>
-    <h5>{{ article }}</h5>
+    <h5>{{ article }}</h5> -->
+    <v-list v-for="sub in subTopics" :key="sub.id">
+      <h5>{{ sub }}</h5>
+    </v-list>
+    <h5>{{ subTopic }}</h5>
+    <h5>{{ articleSub }}</h5>
   </div>
 </template>
 
@@ -44,7 +49,8 @@ export default {
     ...mapGetters('character', ['getCharacters', 'getCharacterByid', 'getCharacter', 'getStat']),
     ...mapGetters('inventory', ['getInventories', 'getInventory']),
     ...mapGetters('group', ['getGroups', 'getGroup']),
-    ...mapGetters('topic', ['getTopics', 'getTopic', 'getTopicByid', 'getArticle']),
+    ...mapGetters('topic', ['getTopics', 'getTopic', 'getTopicByid', 'getTopicArticle']),
+    ...mapGetters('subTopic', ['getSubTopics', 'getSubTopicByid', 'getSubTopic', 'getSubTopicArticle']),
     logged () {
       return this.getLogged()
     },
@@ -81,8 +87,17 @@ export default {
     topic () {
       return this.getTopic()
     },
-    article () {
-      return this.getArticle()
+    articleTopic () {
+      return this.getTopicArticle()
+    },
+    articleSub () {
+      return this.getSubTopicArticle()
+    },
+    subTopics () {
+      return this.getSubTopics()
+    },
+    subTopic () {
+      return this.getSubTopic()
     }
   },
   async mounted () {
@@ -117,7 +132,8 @@ export default {
     // await this.fetchForCharacter(1)
     // await this.fetchGroupForCharacter(1)
     // await this.fetchTopic(3)
-    await this.fetchTopicWithArticle(3)
+    // await this.fetchTopicWithArticle(3)
+    await this.fetchSubTopicWithArticle(1)
   },
   methods: {
     ...mapActions('login', ['login', 'fetchUniverseOwn', 'fetchUniversePlay']),
@@ -128,7 +144,8 @@ export default {
     ...mapActions('character', ['fetchAllCharacters', 'fetchCharacter', 'fetchCharactersForGroup', 'fetchCharactersForUniverse', 'fetchCharactersForUser', 'fetchCharacterWithStat', 'addCharacter', 'putCharacter', 'deleteCharacter']),
     ...mapActions('inventory', ['fetchAllInventories', 'fetchInventory', 'fetchInventoryForCharacter', 'deleteInventory']),
     ...mapActions('group', ['fetchAllGroups', 'fetchGroup', 'fetchGroupForCharacter', 'deleteGroup']),
-    ...mapActions('topic', ['fetchAllTopics', 'fetchTopic', 'fetchTopicWithArticle', 'fetchTopicForUniverse'])
+    ...mapActions('topic', ['fetchAllTopics', 'fetchTopic', 'fetchTopicWithArticle', 'fetchTopicForUniverse']),
+    ...mapActions('subTopic', ['fetchAllSubTopics', 'fetchSubTopic', 'fetchSubTopicWithArticle', 'fetchSubTopicForTopic'])
 
   }
 
