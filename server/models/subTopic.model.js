@@ -92,10 +92,10 @@ export default class SubTopic extends HalResource {
   static async add (subTopic) {
     const sql = `
     INSERT INTO 
-      subTopic(name, \`order\`, topic_idTopic` + (subTopic.idArticle !== undefined ? ', article_idArticle' : '') + `) 
-      VALUES(?, ?, ?` + (subTopic.idArticle !== undefined ? ', ?' : '') + `)
+      subTopic(name, \`order\`, topic_idTopic, article_idArticle) 
+      VALUES(?, ?, ?, ?)
     RETURNING *`
-    const params = [subTopic.name, subTopic.order, subTopic.idTopic, subTopic.idArticle]
+    const params = [subTopic.name, subTopic.order, subTopic.idTopic, subTopic.idArticle || null]
 
     return new SubTopic((await mariadbStore.client.query(sql, params))[0])
   }

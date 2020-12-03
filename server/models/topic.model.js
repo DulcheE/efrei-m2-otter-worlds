@@ -84,10 +84,10 @@ export default class Topic extends HalResource {
   static async add (topic) {
     const sql = `
       INSERT INTO 
-        topic(name, \`order\`, universe_idUniverse` + (topic.idArticle !== undefined ? ', article_idArticle' : '') + `) 
-        VALUES(?, ?, ?` + (topic.idArticle !== undefined ? ', ?' : '') + `)
+        topic(name, \`order\`, universe_idUniverse, article_idArticle) 
+        VALUES(?, ?, ?, ?)
       RETURNING *`
-    const params = [topic.name, topic.order, topic.idUniverse, topic.idArticle]
+    const params = [topic.name, topic.order, topic.idUniverse, topic.idArticle || null]
 
     return new Topic((await mariadbStore.client.query(sql, params))[0])
   }
