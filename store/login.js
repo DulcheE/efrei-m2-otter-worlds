@@ -33,7 +33,7 @@ const mutations = {
 
 const actions = {
   async login (context, credentials) {
-    await traverson.from('http://localhost:3000/api/v1/users/login')
+    await traverson.from('http://localhost:3000/api/v1/auth/login')
       .json()
       .post(credentials).result
       .then((document) => {
