@@ -7,7 +7,12 @@ import { tryTo, emptyError } from '../../middlewares/errors.js'
 import getUniverses from './ctrl/get.universes.js'
 import getUniverse from './ctrl/get.universe.js'
 import getUniverseCharacters from './ctrl/get.universe.characters.js'
+import getUniverseGroups from './ctrl/get.universe.groups.js'
+import getUniverseKeywords from './ctrl/get.universe.keywords.js'
+import getUniverseMaps from './ctrl/get.universe.maps.js'
 import getUniverseTemplateCategories from './ctrl/get.universe.templateCategories.js'
+import getUniverseTimelines from './ctrl/get.universe.timelines.js'
+import getUniverseTopics from './ctrl/get.universe.topics.js'
 import getUniverseUsersPlaying from './ctrl/get.universe.usersPlaying.js'
 import postUniverse from './ctrl/post.universe.js'
 import postUniverseInvitation from './ctrl/post.universe.invitation.js'
@@ -31,9 +36,13 @@ const router = Router()
 router.get('/', tryTo(getUniverses, emptyError))
 router.get('/:id', canGet, tryTo(getUniverse, emptyError))
 router.get('/:id/characters', canGet, tryTo(getUniverseCharacters, emptyError))
+router.get('/:id/groups', canGet, tryTo(getUniverseGroups, emptyError))
+router.get('/:id/keywords', canGet, tryTo(getUniverseKeywords, emptyError))
+router.get('/:id/maps', canGet, tryTo(getUniverseMaps, emptyError))
 router.get('/:id/template-categories', canGet, tryTo(getUniverseTemplateCategories, emptyError))
+router.get('/:id/timelines', canGet, tryTo(getUniverseTimelines, emptyError))
+router.get('/:id/topics', canGet, tryTo(getUniverseTopics, emptyError))
 router.get('/:id/users-playing', canGet, tryTo(getUniverseUsersPlaying, emptyError))
-// maps timelines topics
 
 // Post
 router.post('/', isConnected, tryTo(postUniverse, emptyError))

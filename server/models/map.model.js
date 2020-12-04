@@ -72,6 +72,14 @@ export default class Map extends HalResource {
     return new Map((await mariadbStore.client.query('SELECT * FROM map WHERE idMap = ?', id))[0])
   }
 
+  /**
+   * @param { Number } id id of the universe
+   * @returns { Promise<Map[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM map WHERE universe_idUniverse = ?', id)
+  }
+
   /// POST
 
   /**

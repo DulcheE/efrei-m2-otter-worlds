@@ -75,6 +75,14 @@ export default class Topic extends HalResource {
     return new Topic((await mariadbStore.client.query('SELECT * FROM topic WHERE idTopic = ?', id))[0])
   }
 
+  /**
+   * @param { Number } id id of the universe
+   * @returns { Promise<Topic[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM topic WHERE universe_idUniverse = ?', id)
+  }
+
   /// POST
 
   /**

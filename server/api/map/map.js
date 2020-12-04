@@ -10,7 +10,7 @@ const router = Router()
 // Get
 router.get('/', getMaps)
 router.get('/:id', getMap)
-router.get('/:id/interestPoints', getInterestPoint)
+router.get('/:id/interest-points', getInterestPoint)
 
 // Post
 router.post('/', postMap)

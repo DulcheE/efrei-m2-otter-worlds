@@ -77,6 +77,14 @@ export default class Article extends HalResource {
   }
 
   /**
+   * @param { Number } id id of the subTopic
+   * @returns { Promise<Article[]> }
+   */
+  static async getBySubTopic (id) {
+    return await mariadbStore.client.query('SELECT * FROM article WHERE subTopic_idSubTopic = ?', id)
+  }
+
+  /**
    * @param { Number } idKeyword id of the keyword
    * @returns { Promise<Article[]> }
    */

@@ -77,7 +77,7 @@ export default class SubTopic extends HalResource {
 
   /**
    * @param { Number } id id of the topic
-   * @returns { Promise<SubTopic> }
+   * @returns { Promise<SubTopic[]> }
    */
   static async getByTopic (id) {
     return await mariadbStore.client.query('SELECT * FROM subTopic WHERE topic_idTopic = ?', id)

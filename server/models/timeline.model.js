@@ -75,6 +75,14 @@ export default class Timeline extends HalResource {
     return new Timeline((await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0])
   }
 
+  /**
+   * @param { Number } id id of the universe
+   * @returns { Promise<Timeline[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM timeline WHERE universe_idUniverse = ?', id)
+  }
+
   /// POST
 
   /**
