@@ -222,7 +222,7 @@ export default {
       .follow('$._links.universes')
       .getResource().result
       .then((document) => {
-        this.universes = document.universes
+        this.universes = document.list
         return Promise.all(this.universes.map((universe) => {
           traverson.from(universe._links.user.href)
             .getResource().result

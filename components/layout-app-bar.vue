@@ -204,6 +204,7 @@
 
 <script>
 import LayoutLoginDialog from '@/components/layout-login-dialog'
+import { mapGetters } from 'vuex'
 const traverson = require('traverson-promise')
 
 export default {
@@ -246,7 +247,10 @@ export default {
   },
 
   computed: {
-    // Items to display when a user is NOT browsing an universe
+    // Imports
+    ...mapGetters('login', ['getLogged']),
+
+    /** Items to display when a user is NOT browsing an universe */
     itemsTabDefault () {
       return [
         {
@@ -274,7 +278,7 @@ export default {
       ]
     },
 
-    // Items to display when a user is browsing an universe
+    /** Items to display when a user is browsing an universe */
     itemsTabAdvanced () {
       // We declare some items
       const items = [
@@ -352,7 +356,7 @@ export default {
       return items
     },
 
-    // Returns the items to display in the App bar Tabs depending on the situation
+    /** Returns the items to display in the App bar Tabs depending on the situation */
     itemsTab () {
       if (this.isUniverseSelected) {
         return this.itemsTabAdvanced
@@ -361,17 +365,17 @@ export default {
       }
     },
 
-    // Returns whether a user is logged or not
+    /** Returns whether a user is logged or not */
     isUserLogged () {
-      return this.name.length !== 0
+      return this.getLogged().logged
     },
 
-    // Returns whether a universe is selected or not
+    /** Returns whether a universe is selected or not */
     isUniverseSelected () {
       return false
     },
 
-    // Items to put in the search bar
+    /** Items to put in the search bar */
     searchBarItems () {
       return [
         'John Frusciante',
@@ -400,7 +404,7 @@ export default {
       ]
     },
 
-    // Fills the Search bar with a string containing some of the items from a list
+    /** Fills the Search bar with a string containing some of the items from a list */
     populateSearchBar () {
       // We create a copy of the searchBarItems (since we'll use slice)
       const items = this.searchBarItems
@@ -440,7 +444,7 @@ export default {
       .follow('$._links.universes')
       .getResource().result
       .then((document) => {
-        this.universes = document.universes
+        this.universes = document.list
         return Promise.all(this.universes.map((universe) => {
           traverson.from(universe._links.user.href)
             .getResource().result
@@ -455,12 +459,15 @@ export default {
   },
 
   methods: {
+    /** Opens the dialog */
     openDialog () {
       this.isDialogActive = true
     },
 
+    /** Close the dialog */
     closeDialog () {
       this.isDialogActive = false
+      console.log('logged : ', this.isUserLogged)
     }
   }
 }

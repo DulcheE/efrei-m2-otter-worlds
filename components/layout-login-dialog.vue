@@ -96,7 +96,7 @@
         <v-tab-item>
           <v-card-text>
             <v-container>
-              <v-form ref="formSignIn" v-model="formLogin">
+              <v-form ref="formSignIn" v-model="formSignIn">
                 <!-- Text -->
                 <h3 class="pa-4" align="center">
                   Having an account allows you to keep track of your scores
@@ -177,6 +177,7 @@
 
 <script>
 // Imports
+import { mapActions } from 'vuex'
 import MixinRules from '@/mixins/mixin-rules'
 
 export default {
@@ -212,19 +213,32 @@ export default {
   },
 
   methods: {
+    // Imports
+    ...mapActions('login', ['login']),
+
+    /** Close dialog */
     closeDialog () {
       this.$emit('closeDialog')
     },
 
     /** Method to Log in (connect to account) */
-    logIn () {
+    async logIn () {
       // If the form is valid
       if (this.$refs.formLogin.validate()) {
-        alert('LOGIN !')
+        // We create a credentials instance
+        const credentials = {
+          username: this.loginUsername,
+          password: this.loginPassword
+        }
 
-        // We reset the input OF BOTH FORM
+        // We call the login method
+        await this.login(credentials)
+
+        // We reset the inputs
         this.$refs.formLogin.reset()
-        this.$refs.formSignIn.reset()
+
+        // We close the dialog
+        this.closeDialog()
       }
     },
 
