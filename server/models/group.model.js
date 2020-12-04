@@ -129,20 +129,18 @@ export default class Group extends HalResource {
   /**
    * @param { Number } id id of the group
    * @param { { name: String } } group
-   * @returns { Promise<Boolean> } if the group could have been updated
+   * @returns { Promise<Group> } if the group could have been updated
    */
   static async update (id, group) {
     const sql = `
-      UPDATE \`group\`
-        SET name = ?
-        WHERE idGroup = ?`
-    // All the cols you want to update for a group + the id of the group you want to update
-    // /!\ You may never want to change the links
-    const params = [group.name, id]
+      INSERT INTO
+        \`group\`(idGroup) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?
+      RETURNING *`
+    const params = [id, group.name]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return Group((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

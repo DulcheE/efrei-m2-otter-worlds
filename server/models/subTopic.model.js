@@ -105,18 +105,18 @@ export default class SubTopic extends HalResource {
   /**
    * @param { Number } id id of the subTopic
    * @param { { name: String, order: Number, idArticle: Number? } } subTopic
-   * @returns { Promise<Boolean> } if the subTopic could have been updated
+   * @returns { Promise<SubTopic> } if the subTopic could have been updated
    */
   static async update (id, subTopic) {
     const sql = `
-      UPDATE subTopic
-        SET name = ?, \`order\` = ?, article_idArticle = ?
-        WHERE idSubTopic = ?`
-    const params = [subTopic.name, subTopic.order, subTopic.idArticle, id]
+      INSERT INTO
+        subTopic(idSubTopic) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, \`order\` = ?, article_idArticle = ?
+      RETURNING *`
+    const params = [id, subTopic.name, subTopic.order, subTopic.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new SubTopic((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

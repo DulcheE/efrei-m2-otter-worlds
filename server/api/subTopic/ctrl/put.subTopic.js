@@ -1,4 +1,5 @@
 import SubTopic from '../../../models/subTopic.model'
+import { baseAPI } from '../../routes'
 
 /**
  * @param { import('express').Request } req
@@ -6,12 +7,8 @@ import SubTopic from '../../../models/subTopic.model'
  */
 export default async function putSubTopic (req, res) {
   try {
-    const bSucceded = await SubTopic.update(parseInt(req.params.id), new SubTopic(req.body))
-    if (bSucceded) {
-      res.status(200).json(bSucceded)
-    } else {
-      res.status(404).json(`SubTopic ${req.params.id} don't exist !`)
-    }
+    const subTopic = await SubTopic.update(parseInt(req.params.id), req.body)
+    res.status(200).json(subTopic.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

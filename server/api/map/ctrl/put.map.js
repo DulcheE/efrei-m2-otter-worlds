@@ -1,4 +1,5 @@
 import Map from '../../../models/map.model.js'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,13 +7,10 @@ import Map from '../../../models/map.model.js'
  */
 export default async function putTemplate (req, res) {
   try {
-    const bSucceded = await Map.update(parseInt(req.params.id), new Map(req.body))
-    if (bSucceded) {
-      res.status(200).json(bSucceded)
-    } else {
-      res.status(404).json(`Map ${req.params.id} don't exist !`)
-    }
+    const map = await Map.update(parseInt(req.params.id), req.body)
+    res.status(200).json(map.asResource(baseAPI(req)))
   } catch (err) {
+    console.log(err)
     // eslint-disable-next-line no-console
     console.log(err.code)
     const jsonErr = { code: err.code, message: 'Error while updating the new template.\n' }

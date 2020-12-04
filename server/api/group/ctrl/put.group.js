@@ -1,4 +1,5 @@
 import Group from '../../../models/group.model'
+import { baseAPI } from '../../routes'
 
 /**
  * @param { import('express').Request } req
@@ -6,12 +7,8 @@ import Group from '../../../models/group.model'
  */
 export default async function putGroup (req, res) {
   try {
-    const bSucceded = await Group.update(parseInt(req.params.id), new Group(req.body))
-    if (bSucceded) {
-      res.status(200).json(bSucceded)
-    } else {
-      res.status(404).json(`Group ${req.params.id} don't exist !`)
-    }
+    const group = await Group.update(parseInt(req.params.id), req.body)
+    res.status(200).json(group.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

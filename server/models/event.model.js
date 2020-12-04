@@ -122,20 +122,20 @@ export default class Event extends HalResource {
   /**
    * @param { Number } id id of the event
    * @param { { name: String, year: Number, month: Number, day: Number, description: String, idArticle: Number? } } event
-   * @returns { Promise<Boolean> } if the event could have been updated
+   * @returns { Promise<Event> } if the event could have been updated
    */
   static async update (id, event) {
     const sql = `
-      UPDATE Event
-        SET name = ?, year = ?, month = ?, day = ?, description=?, article_idArticle = ?
-        WHERE idEvent = ?`
+      INSERT INTO
+        event(idEvent) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, year = ?, month = ?, day = ?, description=?, article_idArticle = ?
+      RETURNING *`
     // All the cols you want to update for a event + the id of the event you want to update
     // /!\ You may never want to change the links
-    const params = [event.name, event.year, event.month, event.day, event.description, event.idArticle, id]
+    const params = [id, event.name, event.year, event.month, event.day, event.description, event.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Event((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

@@ -106,20 +106,18 @@ export default class InterestPoint extends HalResource {
   /**
    * @param { Number } id id of the interestPoint
    * @param { { name: String, coordinate: String, idArticle: Number? } } interestPoint
-   * @returns { Promise<Boolean> } if the interestPoint could have been updated
+   * @returns { Promise<InterestPoint> } if the interestPoint could have been updated
    */
   static async update (id, interestPoint) {
     const sql = `
-      UPDATE interestPoint
-        SET name = ?, coordinate = ?, article_idArticle = ?
-        WHERE id_interestPoint = ?`
-    // All the cols you want to update for a interestPoint + the id of the interestPoint you want to update
-    // /!\ You may never want to change the links
-    const params = [interestPoint.name, interestPoint.coordinate, interestPoint.idArticle, id]
+      INSERT INTO
+        interestPoint(idInterestPoint) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, coordinate = ?, article_idArticle = ?
+      RETURNING *`
+    const params = [id, interestPoint.name, interestPoint.coordinate, interestPoint.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return InterestPoint((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

@@ -136,18 +136,18 @@ export default class Universe extends HalResource {
   /**
    * @param { Number } id id of the universe
    * @param { { name: String, description: String, bIsPublic: Boolean } } universe
-   * @returns { Promise<Boolean> } if the universe could have been updated
+   * @returns { Promise<Universe> } if the universe could have been updated
    */
   static async update (id, universe) {
     const sql = `
-      UPDATE universe
-        SET name = ?, description = ?, bIsPublic = ?
-        WHERE idUniverse = ?`
-    const params = [universe.name, universe.description, universe.bIsPublic, id]
+      INSERT INTO
+        universe(idUniverse) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, description = ?, bIsPublic = ?
+      RETURNING *`
+    const params = [id, universe.name, universe.description, universe.bIsPublic]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Universe((await mariadbStore.client.query(sql, params))[0])
   }
 
   /**

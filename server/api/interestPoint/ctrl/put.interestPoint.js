@@ -1,4 +1,5 @@
 import InterestPoint from '../../../models/interestPoint.model'
+import { baseAPI } from '../../routes'
 
 /**
  * @param { import('express').Request } req
@@ -6,12 +7,8 @@ import InterestPoint from '../../../models/interestPoint.model'
  */
 export default async function putTemplate (req, res) {
   try {
-    const bSucceded = await InterestPoint.update(parseInt(req.params.id), new InterestPoint(req.body))
-    if (bSucceded) {
-      res.status(200).json(bSucceded)
-    } else {
-      res.status(404).json(`InterestPoint ${req.params.id} don't exist !`)
-    }
+    const interestPoint = await InterestPoint.update(parseInt(req.params.id), req.body)
+    res.status(200).json(interestPoint.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

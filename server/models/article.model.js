@@ -113,20 +113,18 @@ export default class Article extends HalResource {
   /**
    * @param { Number } id id of the article
    * @param { { title: String, content: String, thumbnail: String } } article
-   * @returns { Promise<Boolean> } if the article could have been updated
+   * @returns { Promise<Article> } if the article could have been updated
    */
   static async update (id, article) {
     const sql = `
-      UPDATE article
-        SET title = ?, content = ?, thumbnail=?
-        WHERE idArticle = ?`
-    // All the cols you want to update for a article + the id of the article you want to update
-    // /!\ You may never want to change the links
-    const params = [article.title, article.content, article.thumbnail, id]
+      INSERT INTO
+        article(idArticle) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        title = ?, content = ?, thumbnail = ?
+      RETURNING *`
+    const params = [id, article.title, article.content, article.thumbnail]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Article((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

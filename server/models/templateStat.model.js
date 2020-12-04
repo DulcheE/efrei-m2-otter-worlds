@@ -106,20 +106,18 @@ export default class TemplateStat extends HalResource {
   /**
    * @param { Number } id id of the templateStat
    * @param { { name: String, bIsNumber: Boolean, bIsRequired: Boolean } } templateStat
-   * @returns { Promise<Boolean> } if the templateStat could have been updated
+   * @returns { Promise<TemplateStat> } if the templateStat could have been updated
    */
   static async update (id, templateStat) {
     const sql = `
-      UPDATE templateStat
-        SET name = ?, bIsNumber = ?, bIsRequired = ?
-        WHERE idTemplateStat = ?`
-    // All the cols you want to update for a templateStat + the id of the templateStat you want to update
-    // /!\ You may never want to change the links
-    const params = [templateStat.name, templateStat.bIsNumber, templateStat.bIsRequired, id]
+      INSERT INTO
+        templateStat(idTemplateStat) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, bIsNumber = ?, bIsRequired = ?
+      RETURNING *`
+    const params = [id, templateStat.name, templateStat.bIsNumber, templateStat.bIsRequired]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new TemplateStat((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

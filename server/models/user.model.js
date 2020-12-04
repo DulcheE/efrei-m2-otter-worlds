@@ -75,7 +75,7 @@ export default class User extends HalResource {
    * @returns { Promise<User> }
    */
   static async getByName (username) {
-    return new User((await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', [username]))[0])
+    return (await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', [username]))[0]
   }
 
   /**
@@ -113,10 +113,18 @@ export default class User extends HalResource {
   /**
    * @param { String } password
    * @param { Number } id id of the user
-   * @return { Promise<User> }
+   * @return { Promise<Boolean> }
    */
   static async changePasseword (password, id) {
-    return await mariadbStore.client.query('UPDATE user SET password = ? WHERE idUser = ?', [password, id])
+    const sql = `
+      UPDATE user
+        SET password = ?
+      WHERE idUser = ?`
+    const params = [password, id]
+
+    const result = await mariadbStore.client.query(sql, params)
+
+    return result.affectedRows === 1
   }
 
   /// DELETE

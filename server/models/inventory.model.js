@@ -109,20 +109,18 @@ export default class Inventory extends HalResource {
   /**
    * @param { Number } id id of the inventory
    * @param { { name: String, number: Number, description: String, weight: Number } } inventory
-   * @returns { Promise<Boolean> } if the inventory could have been updated
+   * @returns { Promise<Inventory> } if the inventory could have been updated
    */
   static async update (id, inventory) {
     const sql = `
-      UPDATE inventory
-        SET name = ?, number = ?, description = ?, weight = ?
-        WHERE idInventory = ?`
-    // All the cols you want to update for a inventory + the id of the inventory you want to update
-    // /!\ You may never want to change the links
-    const params = [inventory.name, inventory.number, inventory.description, inventory.weight, id]
+      INSERT INTO
+        inventory(idInventory) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, number = ?, description = ?, weight = ?
+      RETURNING *`
+    const params = [id, inventory.name, inventory.number, inventory.description, inventory.weight]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return Inventory((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

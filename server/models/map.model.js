@@ -94,21 +94,19 @@ export default class Map extends HalResource {
 
   /**
    * @param { Number } id id of the map
-   * @param { { name: String, idArticle: Number } } map
-   * @returns { Promise<Number> } if the map could have been updated
+   * @param { { name: String, idArticle: Number? } } map
+   * @returns { Promise<Map> } if the map could have been updated
    */
   static async update (id, map) {
     const sql = `
-      UPDATE map
-        SET name = ?, article_idArticle = ?
-        WHERE idMap = ?`
-    // All the cols you want to update for a map + the id of the map you want to update
-    // /!\ You may never want to change the links
-    const params = [map.name, map.idArticle, id]
+      INSERT INTO
+        map(idMap) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, article_idArticle = ?
+      RETURNING *`
+    const params = [id, map.name, map.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Map((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

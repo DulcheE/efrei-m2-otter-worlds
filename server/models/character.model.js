@@ -192,20 +192,18 @@ export default class Character extends HalResource {
   /**
    * @param { Number } id id of the character
    * @param { { name: String, backstory: String } } character
-   * @returns { Promise<Boolean> } if the character could have been updated
+   * @returns { Promise<Character> } if the character could have been updated
    */
   static async update (id, character) {
     const sql = `
-      UPDATE \`character\`
-        SET name = ?, backstory = ?
-        WHERE idCharacter = ?`
-    // All the cols you want to update for a character + the id of the character you want to update
-    // /!\ You may never want to change the links
-    const params = [character.name, character.backstory, id]
+      INSERT INTO
+        \`character\`(idCharacter) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, backstory = ?
+      RETURNING *`
+    const params = [id, character.name, character.backstory]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Character((await mariadbStore.client.query(sql, params))[0])
   }
 
   /**
@@ -221,7 +219,7 @@ export default class Character extends HalResource {
 
     for (const category of stats) {
       for (const stat of category.stats) {
-        paramsArray.push([stat.value, id, stat.id, stat.value])
+        paramsArray.push([stat.value, id, stat.id])
       }
     }
 
@@ -229,7 +227,7 @@ export default class Character extends HalResource {
     INSERT INTO stat(value, character_idCharacter, templateStat_idTemplateStat)
       VALUES(?, ?, ?)
       ON DUPLICATE KEY
-        UPDATE value = ?`
+        UPDATE value = VALUE(value)`
 
     await Promise.all(paramsArray.map((params, index) => {
       return conn.query(sql, params)

@@ -97,18 +97,18 @@ export default class Topic extends HalResource {
   /**
    * @param { Number } id id of the topic
    * @param { { name: String, order: Number, idArticle: Number? } } topic
-   * @returns { Promise<Boolean> } if the topic could have been updated
+   * @returns { Promise<Topic> } if the topic could have been updated
    */
   static async update (id, topic) {
     const sql = `
-      UPDATE topic
-        SET name = ?, \`order\` = ?, article_idArticle = ?
-        WHERE idTopic = ?`
-    const params = [topic.name, topic.order, topic.idArticle, id]
+      INSERT INTO
+        topic(idTopic) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, \`order\` = ?, article_idArticle = ?
+      RETURNING *`
+    const params = [id, topic.name, topic.order, topic.idArticle]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Topic((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

@@ -98,20 +98,18 @@ export default class Timeline extends HalResource {
   /**
    * @param { Number } id id of the timeline
    * @param { { name: String, description: String, bIsPublic: Boolean } } timeline
-   * @returns { Promise<Boolean> } if the timeline could have been updated
+   * @returns { Promise<Timeline> } if the timeline could have been updated
    */
   static async update (id, timeline) {
     const sql = `
-      UPDATE timeline
-        SET name = ?, description = ?, bIsPublic =?
-        WHERE idTimeline = ?`
-    // All the cols you want to update for a timeline + the id of the timeline you want to update
-    // /!\ You may never want to change the links
-    const params = [timeline.name, timeline.description, timeline.bIsPublic, id]
+      INSERT INTO
+        timeline(idTimeline) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, description = ?, bIsPublic = ?
+      RETURNING *`
+    const params = [id, timeline.name, timeline.description, timeline.bIsPublic]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Timeline((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

@@ -103,18 +103,18 @@ export default class TemplateCategory extends HalResource {
   /**
    * @param { Number } id id of the templateCategory
    * @param { { name: String, order: Number } } templateCategory
-   * @returns { Promise<Boolean> } if the templateCategory could have been updated
+   * @returns { Promise<TemplateCategory> } if the templateCategory could have been updated
    */
   static async update (id, templateCategory) {
     const sql = `
-      UPDATE templateCategory
-        SET name = ?, \`order\` = ?
-        WHERE idTemplateCategory = ?`
-    const params = [templateCategory.name, templateCategory.order, id]
+      INSERT INTO
+        templateCategory(idTemplateCategory) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, \`order\` = ?
+      RETURNING *`
+    const params = [id, templateCategory.name, templateCategory.order]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new TemplateCategory((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE
