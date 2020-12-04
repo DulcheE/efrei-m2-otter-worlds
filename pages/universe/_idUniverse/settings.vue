@@ -387,15 +387,12 @@ export default {
       { icon: 'mdi-human-handsup', title: 'Danger Zone' }
     ],
 
-    // Section 2 - Placeholder in which we modify the data of the universe
+    // Section 1 - Placeholder in which we modify the data of the universe
     formUniverseData: false,
     isModifyingUniverseData: false,
-    universePlaceholder: {
-      name: '',
-      description: ''
-    },
+    universePlaceholder: {},
 
-    // Section 3 - all users in the universe
+    // Section 2 - all users in the universe
     formUser: false,
     dialogUser: false,
     headers: [
@@ -411,7 +408,7 @@ export default {
       role: ''
     },
 
-    // Section 4 - delete the universe
+    // Section 3 - delete the universe
     dialogDeleteUniverse: false,
     deleteUniverseName: ''
   }),
@@ -424,8 +421,7 @@ export default {
 
   mounted () {
     // We fill the placeholder with the universe's data
-    this.universePlaceholder.name = this.universe.name
-    this.universePlaceholder.description = this.universe.description
+    this.universePlaceholder = Object.assign({}, this.universe)
   },
 
   methods: {
@@ -433,6 +429,10 @@ export default {
      * Discard the changes brought to the universe
      */
     discardChangesUniverse () {
+      // We reset the Placeholder
+      this.universePlaceholder = Object.assign({}, this.universe)
+
+      // We end the modification
       this.isModifyingUniverseData = false
     },
 
