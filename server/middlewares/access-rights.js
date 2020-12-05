@@ -38,7 +38,7 @@ function gate (validate, behaviour) {
  * @param { String } where
  * @return { Number }
  */
-const id = (req, param, where) => req[where][param]
+const id = (req, param, where) => parseInt(req[where][param])
 
 /**
  * @param { function(Number, Number): Promise<Boolean> } policy
@@ -47,6 +47,18 @@ const id = (req, param, where) => req[where][param]
 function withId (policy) {
   return (param, where = 'params') =>
     gate(req => policy(req.session.idUser, id(req, param, where)), unauthorized)
+}
+
+/**
+ * @param { function(Number, Number): Promise<Boolean> } policy
+ * @return { function(String, String) : ExpressMiddleware }
+ */
+function withIndirectId (policy) {
+  return (method, param, where = 'params') =>
+    gate(req =>
+      method(id(req, param, where))
+        .then(idUniverse => policy(req.session.idUser, idUniverse))
+    , unauthorized)
 }
 
 // /**
@@ -61,9 +73,9 @@ function withId (policy) {
 module.exports = {
   canGetUniverse: withId(UniversePolicy.canGet),
   canEditUniverse: withId(UniversePolicy.canEdit),
+  canGetUniverseIndirect: withIndirectId(UniversePolicy.canGet),
+  canEditUniverseIndirect: withIndirectId(UniversePolicy.canEdit),
   isUniverseOwner: withId(UniversePolicy.isOwner),
-  isUser: withId(UserPolicy.isUser)
+  isUser: withId(UserPolicy.isUser),
+  isUserIndirect: withIndirectId(UserPolicy.isUser)
 }
-
-// canEditSessionAttempt: withIdSkip(SessionAttemptPolicy.canEdit),
-// canEditSessionAttempt: simpleRight(SessionAttemptPolicy.canEdit),

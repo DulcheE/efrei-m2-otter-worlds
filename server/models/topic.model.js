@@ -114,7 +114,7 @@ export default class Topic extends HalResource {
       ON DUPLICATE KEY UPDATE
         name = ?, \`order\` = ?, article_idArticle = ?
       RETURNING *`
-    const params = [id, topic.name, topic.order, topic.idArticle]
+    const params = [id, topic.name, topic.order, topic.idArticle || null]
 
     return new Topic((await mariadbStore.client.query(sql, params))[0])
   }

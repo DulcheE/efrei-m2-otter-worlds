@@ -215,6 +215,8 @@ export default class Character extends HalResource {
     const conn = await mariadb.createConnection(config.MARIADB)
     await conn.beginTransaction()
 
+    await conn.query('DELETE FROM stat WHERE character_idCharacter = ?', id)
+
     const paramsArray = []
 
     for (const category of stats) {

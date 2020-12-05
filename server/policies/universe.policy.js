@@ -1,14 +1,13 @@
-import Universe from '../models/universe.model.js'
 import mariadbStore from '../mariadb-store'
 
 class UniversePolicy {
   /**
-   * @param {Number} idUser
-   * @param {Number} idUniverse
-   * @returns {Promise<Boolean>}
+   * @param { Number } idUser
+   * @param { Number } idUniverse
+   * @returns { Promise<Boolean> }
    */
   static async canGet (idUser, idUniverse) {
-    if (!parseInt(idUniverse)) { throw new Error('Invalid idUniverse !') }
+    if (isNaN(idUniverse)) { return false }
 
     const sql = `
       SELECT u.bIsPublic, uiu.idUser FROM universe u
@@ -27,11 +26,13 @@ class UniversePolicy {
   }
 
   /**
-   * @param {Number} idUser
-   * @param {Number} idUniverse
-   * @returns {Promise<Boolean>}
+   * @param { Number } idUser
+   * @param { Number } idUniverse
+   * @returns { Promise<Boolean> }
    */
   static async canEdit (idUser, idUniverse) {
+    if (isNaN(idUniverse)) { return false }
+
     const sql = `
       SELECT u.bIsPublic, uiu.bIsGM FROM universe u
       LEFT JOIN (
@@ -47,9 +48,9 @@ class UniversePolicy {
   }
 
   /**
-   * @param {Number} idUser
-   * @param {Number} idUniverse
-   * @returns {Promise<Boolean>}
+   * @param { Number } idUser
+   * @param { Number } idUniverse
+   * @returns { Promise<Boolean> }
    */
   static async isOwner (idUser, idUniverse) {
     const sql = `

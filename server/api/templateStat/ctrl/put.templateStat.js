@@ -22,6 +22,5 @@ export default async function putTemplateStat (req, res) {
     jsonErr.message += 'Please verify that your data is valid !'
 
     res.status(400).json(jsonErr)
-    throw err
   }
 }

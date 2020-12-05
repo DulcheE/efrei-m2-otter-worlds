@@ -32,6 +32,6 @@ router.get('/:id/universes-plays', tryTo(getUserUniversesPlays, emptyError)) // 
 router.post('/', tryTo(postUser, emptyError))
 
 // Delete
-router.delete('/:id', isConnected, isUser('id'), passwordConfirmation, tryTo(deleteUser, emptyError))
+router.delete('/:id', isConnected, isUser('id', 'params'), passwordConfirmation, tryTo(deleteUser, emptyError))
 
 export default router
