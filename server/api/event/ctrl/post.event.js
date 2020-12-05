@@ -1,4 +1,5 @@
 import Event from '../../../models/event.model.js'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import Event from '../../../models/event.model.js'
  */
 export default async function postEvent (req, res) {
   try {
-    const insertedId = await Event.add(new Event(req.body))
-    res.status(201).json(insertedId)
+    const newEvent = await Event.add(req.body)
+    res.status(201).json(newEvent.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

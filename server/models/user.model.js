@@ -48,6 +48,8 @@ export default class User extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, User)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<User[]> }
    */
@@ -56,7 +58,7 @@ export default class User extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the user
    * @returns { Promise<User> }
    */
   static async get (id) {
@@ -70,68 +72,62 @@ export default class User extends HalResource {
 
   /**
    * @param { String } username
-   * @returns { Object }
+   * @returns { Promise<User> }
    */
   static async getByName (username) {
     return (await mariadbStore.client.query('SELECT * FROM `user` WHERE username = ?', [username]))[0]
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<Characters> }
+   * @param { Number } id id of the universe
+   * @returns { Promise<User[]> }
    */
-  static async getCharacters (id) {
-    return await mariadbStore.client.query('SELECT * FROM `character` WHERE user_idUser = ?', id)
-  }
-
-  /**
-   * @param { Number } idUser id of the user that we want the groups
-   * @param { Number } idUniverse id of the universe that we want the groups for the user
-   * @returns { Promise<Groups> }
-   */
-  static async getGroups (idUser, idUniverse) {
+  static async getUsersPlayingInUniverse (id) {
     return await mariadbStore.client.query(`
-      SELECT g.idGroup, g.name, g.universe_idUniverse FROM \`group\` g
-      INNER JOIN characterInGroup cg
-        ON cg.group_idGroup = g.idGroup
-      INNER JOIN \`character\` c
-        ON c.idCharacter = cg.character_idCharacter
-      WHERE c.user_idUser = ? AND g.universe_idUniverse = ?
-    `, [idUser, idUniverse])
-  }
-
-  /**
-   * @param { Number } id
-   * @returns { Promise<Universe> }
-   */
-  static async getUniverses (id) {
-    return await mariadbStore.client.query('SELECT * FROM `universe` WHERE user_idUser = ?', id)
-  }
-
-  /**
-   * @param { Number } id
-   * @returns { Promise<import('./universe.model').default[]> }
-   */
-  static async getUniversesPlays (id) {
-    return await mariadbStore.client.query(`
-      SELECT u.*, uin.bIsGM FROM universe u
+      SELECT u.*, uin.bIsGM FROM user u
       INNER JOIN userinuniverse uin
-        ON uin.idUniverse = u.idUniverse
-      WHERE idUser = ?
+        ON uin.idUser = u.idUser
+      WHERE idUniverse = ?
     `, id)
   }
 
+  /// POST
+
   /**
-   * @param { User } user
+   * @param { { username: String, password: String } } user
    * @returns { Promise<User> }
    */
   static async add (user) {
-    const sql = 'INSERT INTO user(username, password) VALUES(?,?)'
+    const sql = `
+      INSERT INTO
+        user(username, password)
+        VALUES(?, ?)
+      RETURNING *`
     const params = [user.username, user.password]
-    const row = await mariadbStore.client.query(sql, params)
 
-    return row.insertId || -1
+    return new User((await mariadbStore.client.query(sql, params))[0])
   }
+
+  /// PUT
+
+  /**
+   * @param { String } password
+   * @param { Number } id id of the user
+   * @return { Promise<Boolean> }
+   */
+  static async changePasseword (password, id) {
+    const sql = `
+      UPDATE user
+        SET password = ?
+      WHERE idUser = ?`
+    const params = [password, id]
+
+    const result = await mariadbStore.client.query(sql, params)
+
+    return result.affectedRows === 1
+  }
+
+  /// DELETE
 
   /**
    * @param { Number } idUser
@@ -139,39 +135,5 @@ export default class User extends HalResource {
    */
   static async remove (idUser) {
     return await mariadbStore.client.query('DELETE FROM user WHERE idUser = ?', [idUser])
-  }
-
-  /**
-   * @param { User } user
-   * @return { Promise<User> }
-   */
-  static async modifyName (user, id) {
-    const sql = 'SELECT * FROM user WHERE idUser = ?'
-    const param = [id]
-    const row = await mariadbStore.client.query(sql, param)
-    const result = new User(row[0])
-    if (result.password === user.password) {
-      return await mariadbStore.client.query('UPDATE user SET username = ? WHERE idUSer = ?', [user.username, id])
-    } else {
-      throw new Error('wrong passeword')
-    }
-  }
-
-  /**
-   * @param { User } user
-   * @param { String } code
-   * @param { Number } id
-   * @return { Promise<User> }
-   */
-  static async ChangePasseword (user, code, id) {
-    const sql = 'SELECT * FROM user WHERE idUser = ?'
-    const param = [id]
-    const row = await mariadbStore.client.query(sql, param)
-    const result = new User(row[0])
-    if (result.password === code) {
-      return await mariadbStore.client.query('UPDATE user SET password = ? WHERE idUSer = ?', [user.password, id])
-    } else {
-      throw new Error('wrong passeword')
-    }
   }
 }

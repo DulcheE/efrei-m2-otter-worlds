@@ -1,4 +1,5 @@
 import InterestPoint from '../../../models/interestPoint.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import InterestPoint from '../../../models/interestPoint.model'
  */
 export default async function postTemplate (req, res) {
   try {
-    const insertedId = await InterestPoint.add(new InterestPoint(req.body))
-    res.status(201).json(insertedId)
+    const newInterestPoint = await InterestPoint.add(req.body)
+    res.status(201).json(newInterestPoint.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

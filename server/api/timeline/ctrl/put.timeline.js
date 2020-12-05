@@ -1,4 +1,5 @@
 import Timeline from '../../../models/timeline.model.js'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,12 +7,8 @@ import Timeline from '../../../models/timeline.model.js'
  */
 export default async function putTimeline (req, res) {
   try {
-    const bSucceded = await Timeline.update(parseInt(req.params.id), new Timeline(req.body))
-    if (bSucceded) {
-      res.status(200).json(bSucceded)
-    } else {
-      res.status(404).json(`Template ${req.params.id} don't exist !`)
-    }
+    const timeline = await Timeline.update(parseInt(req.params.id), req.body)
+    res.status(200).json(timeline.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

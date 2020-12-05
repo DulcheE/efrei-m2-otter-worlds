@@ -51,7 +51,6 @@ export default class Character extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'characters') {
     return super.asResource(baseAPI, resourcePath)
@@ -67,6 +66,8 @@ export default class Character extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Character)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Character[]> }
    */
@@ -75,42 +76,29 @@ export default class Character extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the character
    * @returns { Promise<Character> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM `character` WHERE idCharacter = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Character ${id} don't exist !`)
-    }
-
-    return new Character(conn)
+    return new Character((await mariadbStore.client.query('SELECT * FROM `character` WHERE idCharacter = ?', id))[0])
   }
 
   /**
-   * @param { Number } id id of the character that we want the group
-   * @returns { Promise<Groups> }
+   * @param { Number } id id of the group that we want the characters
+   * @returns { Promise<Character[]> }
    */
-  static async getGroups (id) {
+  static async getByGroup (id) {
     return await mariadbStore.client.query(`
-      SELECT g.idGroup, g.name, g.universe_idUniverse FROM \`group\` g
+      SELECT * FROM \`character\` c
       INNER JOIN characterInGroup cg
-        ON cg.group_idGroup = g.idGroup
-      WHERE cg.character_idCharacter = ?
+        ON cg.character_idCharacter = c.idCharacter
+      WHERE group_idGroup = ?
     `, id)
   }
 
   /**
-   * @param { Number } id id of the character that we want the inventory
-   * @returns { Promise<Inventories> }
-   */
-  static async getInventories (id) {
-    return await mariadbStore.client.query('SELECT * FROM inventory WHERE character_idCharacter = ?', id)
-  }
-
-  /**
    * @param { Number } id id of the character that we want all the stats
-   * @returns { Promise<Character[]> }
+   * @returns { Promise<{ categories: { id: Number, name: String, order: Number, stats: { id: Number, name: String, bIsNumber: Boolean, bIsRequired: Boolean, value: String|Number }[] }[] }> }
    */
   static async getStats (id) {
     const rows = await mariadbStore.client.query('SELECT * FROM characterStats WHERE `character` = ?', id)
@@ -138,7 +126,7 @@ export default class Character extends HalResource {
         name: row.stat,
         bIsNumber: !!row.bIsNumber,
         bIsRequired: !!row.bIsRequired,
-        value: row.value
+        value: (row.bIsNumber) ? parseInt(row.value) : row.value
       })
     }
 
@@ -148,28 +136,45 @@ export default class Character extends HalResource {
   }
 
   /**
-   * @param { Character } character
-   * @returns { Number } the id of the new inserted character
+   * @param { Number } id id of the universe
+   * @returns { Promise<Character[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM `character` WHERE universe_idUniverse = ?', id)
+  }
+
+  /**
+   * @param { Number } id id of the user
+   * @returns { Promise<Character[]> }
+   */
+  static async getByUser (id) {
+    return await mariadbStore.client.query('SELECT * FROM `character` WHERE user_idUser = ?', id)
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, backstory: String, idUser: Number, idUniverse: Number } } character
+   * @returns { Promise<Character> } the id of the new inserted character
    */
   static async add (character) {
     const sql = `
       INSERT INTO 
         \`character\`(name, backstory, user_idUser, universe_idUniverse) 
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [character.name, character.backstory, character.idUser, character.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Character((await mariadbStore.client.query(sql, params))[0])
   }
 
   /**
    * @param { Number } idCharacter the id of the character we want to add in the group
    * @param { Number } idGroup the id of the group we want to add to the character
-   * @returns { Boolean } if the group was succesfully add to the character
+   * @returns { Promise<Boolean> } if the group was succesfully add to the character
    */
-  static async addGroup (idCharacter, idGroup) {
+  static async insertInGroup (idCharacter, idGroup) {
     const sql = `
       INSERT INTO 
         characterInGroup(group_idGroup, character_idCharacter) 
@@ -182,39 +187,41 @@ export default class Character extends HalResource {
     return rows.affectedRows === 1
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Character } character
-   * @returns { Boolean } if the character could have been updated
+   * @param { Number } id id of the character
+   * @param { { name: String, backstory: String } } character
+   * @returns { Promise<Character> } if the character could have been updated
    */
   static async update (id, character) {
     const sql = `
-      UPDATE \`character\`
-        SET name = ?, backstory = ?
-        WHERE idCharacter = ?`
-    // All the cols you want to update for a character + the id of the character you want to update
-    // /!\ You may never want to change the links
-    const params = [character.name, character.backstory, id]
+      INSERT INTO
+        \`character\`(idCharacter) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, backstory = ?
+      RETURNING *`
+    const params = [id, character.name, character.backstory]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Character((await mariadbStore.client.query(sql, params))[0])
   }
 
   /**
-   * @param { Number } id
-   * @param { Object } stats
-   * @returns { Boolean } if the character could have been updated
+   * @param { Number } id id of the character
+   * @param { { stats: { id: Number, value: String|Number }[] }[] } stats
+   * @returns { Promise<Boolean> } if the character could have been updated
    */
   static async updateStats (id, stats) {
     const conn = await mariadb.createConnection(config.MARIADB)
     await conn.beginTransaction()
 
+    await conn.query('DELETE FROM stat WHERE character_idCharacter = ?', id)
+
     const paramsArray = []
 
     for (const category of stats) {
       for (const stat of category.stats) {
-        paramsArray.push([stat.value, id, stat.id, stat.value])
+        paramsArray.push([stat.value, id, stat.id])
       }
     }
 
@@ -222,7 +229,7 @@ export default class Character extends HalResource {
     INSERT INTO stat(value, character_idCharacter, templateStat_idTemplateStat)
       VALUES(?, ?, ?)
       ON DUPLICATE KEY
-        UPDATE value = ?`
+        UPDATE value = VALUE(value)`
 
     await Promise.all(paramsArray.map((params, index) => {
       return conn.query(sql, params)
@@ -238,9 +245,11 @@ export default class Character extends HalResource {
     return true
   }
 
+  // DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the character could have been removed
+   * @param { Number } id id of the character
+   * @returns { Promise<Boolean> } if the character could have been removed
    */
   static async remove (id) {
     const sql = `
@@ -256,7 +265,7 @@ export default class Character extends HalResource {
   /**
    * @param { Number } idCharacter the id of the character we want to remove from the group
    * @param { Number } idGroup the id of the group we want to remove to the character
-   * @returns { Boolean } if the character could have been removed
+   * @returns { Promise<Boolean> } if the character could have been removed
    */
   static async removeGroup (idCharacter, idGroup) {
     const sql = `

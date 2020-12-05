@@ -137,7 +137,7 @@ INSERT INTO `universe` (`idUniverse`, `name`, `description`, `bIsPublic`, `user_
 INSERT INTO `user` (`idUser`, `username`, `password`) VALUES
 	(1, 'Eddy', 'edypaswor'),
 	(2, 'Hugues', 'hugespaword'),
-	(3, 'François', 'françoispwrd'),
+	(3, 'François', 'françoispwd'),
 	(4, 'Paul', 'paulsword');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 

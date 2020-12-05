@@ -1,4 +1,5 @@
 import Universe from '../../../models/universe.model'
+import { baseAPI } from '../../routes'
 
 /**
  * @param { import('express').Request } req
@@ -6,12 +7,8 @@ import Universe from '../../../models/universe.model'
  */
 export default async function putUniverse (req, res) {
   try {
-    const bSucceded = await Universe.update(parseInt(req.params.id), new Universe(req.body))
-    if (bSucceded) {
-      res.status(200).json(bSucceded)
-    } else {
-      res.status(404).json(`Universe ${req.params.id} don't exist !`)
-    }
+    const universe = await Universe.update(parseInt(req.params.id), req.body)
+    res.status(200).json(universe.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

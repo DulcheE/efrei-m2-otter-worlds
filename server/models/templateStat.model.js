@@ -43,7 +43,6 @@ export default class TemplateStat extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'template-stats') {
     return super.asResource(baseAPI, resourcePath)
@@ -59,6 +58,8 @@ export default class TemplateStat extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, TemplateStat)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<TemplateStat[]> }
    */
@@ -67,57 +68,65 @@ export default class TemplateStat extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the templateStat
    * @returns { Promise<TemplateStat> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM templateStat WHERE idTemplateStat = ?', id))[0]
-    if (!conn) {
-      throw new Error(`TemplateStat ${id} don't exist !`)
-    }
-
-    return new TemplateStat(conn)
+    return new TemplateStat((await mariadbStore.client.query('SELECT * FROM templateStat WHERE idTemplateStat = ?', id))[0])
   }
 
   /**
-   * @param { TemplateStat } templateStat
-   * @returns { Number } the id of the new inserted templateStat
+   * @param { Number } id id of the templateCategory
+   * @returns { Promise<TemplateStat[]> }
+   */
+  static async getByTemplateCategory (id) {
+    return await mariadbStore.client.query('SELECT * FROM templateStat WHERE templateCategory_idTemplateCategory = ?', id)
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, bIsNumber: Boolean, bIsRequired: Boolean?, idTemplateCategory: Number } } templateStat
+   * @returns { Promise<TemplateStat> } the id of the new inserted templateStat
    */
   static async add (templateStat) {
     const sql = `
-      INSERT INTO 
+      INSERT INTO
         templateStat(name, bIsNumber, bIsRequired, templateCategory_idTemplateCategory) 
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ` + (templateStat.bIsRequired !== undefined ? '?' : 'DEFAULT(bIsRequired)') + `, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [templateStat.name, templateStat.bIsNumber, templateStat.bIsRequired, templateStat.idTemplateCategory]
+    const params = [templateStat.name, templateStat.bIsNumber]
+    if (templateStat.bIsRequired !== undefined) { params.push(templateStat.bIsRequired) }
+    params.push(templateStat.idTemplateCategory)
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new TemplateStat((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { TemplateStat } templateStat
-   * @returns { Boolean } if the templateStat could have been updated
+   * @param { Number } id id of the templateStat
+   * @param { { name: String, bIsNumber: Boolean, bIsRequired: Boolean } } templateStat
+   * @returns { Promise<TemplateStat> } if the templateStat could have been updated
    */
   static async update (id, templateStat) {
     const sql = `
-      UPDATE templateStat
-        SET name = ?, bIsNumber = ?, bIsRequired = ?
-        WHERE idTemplateStat = ?`
-    // All the cols you want to update for a templateStat + the id of the templateStat you want to update
-    // /!\ You may never want to change the links
-    const params = [templateStat.name, templateStat.bIsNumber, templateStat.bIsRequired, id]
+      INSERT INTO
+        templateStat(idTemplateStat) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, bIsNumber = ?, bIsRequired = ?
+      RETURNING *`
+    const params = [id, templateStat.name, templateStat.bIsNumber, templateStat.bIsRequired]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new TemplateStat((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the templateStat could have been removed
+   * @param { Number } id id of the templateStat
+   * @returns { Promise<Boolean> } if the templateStat could have been removed
    */
   static async remove (id) {
     const sql = `

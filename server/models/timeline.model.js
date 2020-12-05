@@ -43,7 +43,6 @@ export default class Timeline extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'timelines') {
     return super.asResource(baseAPI, resourcePath)
@@ -59,6 +58,8 @@ export default class Timeline extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Timeline)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Timeline[]> }
    */
@@ -67,57 +68,63 @@ export default class Timeline extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the timeline
    * @returns { Promise<Timeline> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Timeline ${id} don't exist !`)
-    }
-
-    return new Timeline(conn)
+    return new Timeline((await mariadbStore.client.query('SELECT * FROM timeline WHERE idTimeline = ?', id))[0])
   }
 
   /**
-   * @param { Timeline } timeline
-   * @returns { Number } the id of the new inserted timeline
+   * @param { Number } id id of the universe
+   * @returns { Promise<Timeline[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM timeline WHERE universe_idUniverse = ?', id)
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, description: String, bIsPublic: Boolean, idUniverse: Number } } timeline
+   * @returns { Promise<Timeline> } the id of the new inserted timeline
    */
   static async add (timeline) {
     const sql = `
       INSERT INTO
         timeline(name, description, bIsPublic, universe_idUniverse)
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [timeline.name, timeline.description, timeline.bIsPublic, timeline.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Timeline((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Timeline } timeline
-   * @returns { Boolean } if the timeline could have been updated
+   * @param { Number } id id of the timeline
+   * @param { { name: String, description: String, bIsPublic: Boolean } } timeline
+   * @returns { Promise<Timeline> } if the timeline could have been updated
    */
   static async update (id, timeline) {
     const sql = `
-      UPDATE timeline
-        SET name = ?, description = ?, bIsPublic =?
-        WHERE idTimeline = ?`
-    // All the cols you want to update for a timeline + the id of the timeline you want to update
-    // /!\ You may never want to change the links
-    const params = [timeline.name, timeline.description, timeline.bIsPublic, id]
+      INSERT INTO
+        timeline(idTimeline) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, description = ?, bIsPublic = ?
+      RETURNING *`
+    const params = [id, timeline.name, timeline.description, timeline.bIsPublic]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Timeline((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the timeline could have been removed
+   * @param { Number } id id of the timeline
+   * @returns { Promise<Boolean> } if the timeline could have been removed
    */
   static async remove (id) {
     const sql = `

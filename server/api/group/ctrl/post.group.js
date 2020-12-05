@@ -1,4 +1,5 @@
 import Group from '../../../models/group.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import Group from '../../../models/group.model'
  */
 export default async function postGroup (req, res) {
   try {
-    const insertedId = await Group.add(new Group(req.body))
-    res.status(201).json(insertedId)
+    const newGroup = await Group.add(req.body)
+    res.status(201).json(newGroup.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

@@ -40,7 +40,6 @@ export default class Map extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'maps') {
     return super.asResource(baseAPI, resourcePath)
@@ -56,6 +55,8 @@ export default class Map extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Map)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Map[]> }
    */
@@ -64,57 +65,63 @@ export default class Map extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the map
    * @returns { Promise<Map> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM map WHERE idMap = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Map ${id} don't exist !`)
-    }
-
-    return new Map(conn)
+    return new Map((await mariadbStore.client.query('SELECT * FROM map WHERE idMap = ?', id))[0])
   }
 
   /**
-   * @param { Map } map
-   * @returns { Number } the id of the new inserted map
+   * @param { Number } id id of the universe
+   * @returns { Promise<Map[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM map WHERE universe_idUniverse = ?', id)
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, idUniverse: Number, idArticle: Number? } } map
+   * @returns { Promise<Map> } the id of the new inserted map
    */
   static async add (map) {
     const sql = `
       INSERT INTO
         map(name, universe_idUniverse, article_idArticle)
-        VALUES(?, ?, ?)`
+        VALUES(?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [map.name, map.idUniverse, map.idArticle]
+    const params = [map.name, map.idUniverse, map.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Map((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Map } map
-   * @returns { Number } if the map could have been updated
+   * @param { Number } id id of the map
+   * @param { { name: String, idArticle: Number? } } map
+   * @returns { Promise<Map> } if the map could have been updated
    */
   static async update (id, map) {
     const sql = `
-      UPDATE map
-        SET name = ?
-        WHERE idMap = ?`
-    // All the cols you want to update for a map + the id of the map you want to update
-    // /!\ You may never want to change the links
-    const params = [map.name, id]
+      INSERT INTO
+        map(idMap) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, article_idArticle = ?
+      RETURNING *`
+    const params = [id, map.name, map.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Map((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Number } if the map could have been removed
+   * @param { Number } id id of the map
+   * @returns { Promise<Number> } if the map could have been removed
    */
   static async remove (id) {
     const sql = `

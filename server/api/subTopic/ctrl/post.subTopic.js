@@ -1,4 +1,5 @@
 import SubTopic from '../../../models/subTopic.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import SubTopic from '../../../models/subTopic.model'
  */
 export default async function postSubTopic (req, res) {
   try {
-    const insertedId = await SubTopic.add(new SubTopic(req.body))
-    res.status(201).json(insertedId)
+    const newSubTopic = await SubTopic.add(req.body)
+    res.status(201).json(newSubTopic.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

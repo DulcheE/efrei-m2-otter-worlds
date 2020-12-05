@@ -1,4 +1,3 @@
-import Characters from '../../../models/character.model'
 import Inventory from '../../../models/inventory.model'
 import { baseAPI } from '../../routes.js'
 
@@ -7,7 +6,7 @@ import { baseAPI } from '../../routes.js'
  * @param { import('express').Response } res
  */
 export default async function getCharacterInventories (req, res) {
-  const inventories = await Characters.getInventories(parseInt(req.params.id))
+  const inventories = await Inventory.getByCharacter(parseInt(req.params.id))
   const characterInventories = Inventory.asResourceList(baseAPI(req), inventories, 'characters' + req.url)
   characterInventories.totalWeight = 0
   characterInventories.list.forEach((inventory) => {

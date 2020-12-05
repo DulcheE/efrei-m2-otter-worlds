@@ -40,7 +40,6 @@ export default class Template extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'templates') {
     return super.asResource(baseAPI, resourcePath)
@@ -56,6 +55,8 @@ export default class Template extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Template)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Template[]> }
    */
@@ -64,57 +65,57 @@ export default class Template extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the template
    * @returns { Promise<Template> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Template ${id} don't exist !`)
-    }
-
-    return new Template(conn)
+    return new Template((await mariadbStore.client.query('SELECT * FROM template WHERE idTemplate = ?', id))[0])
   }
 
+  /// POST
+
   /**
-   * @param { Template } template
-   * @returns { Number } the id of the new inserted template
+   * @param { { string: String, bBoolean: Boolean, idOther: Number } } template
+   * @returns { Promise<Template> } the id of the new inserted template
    */
   static async add (template) {
     const sql = `
       INSERT INTO 
         template(string, bBoolean, idOther) 
-        VALUES(?, ?, ?)`
+        VALUES(?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [template.string, template.bBoolean, template.idOther]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Template((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Template } template
-   * @returns { Boolean } if the template could have been updated
+   * @param { Number } id id of the template
+   * @param { { string: String, bBoolean: Boolean } } template
+   * @returns { Promise<Template> } if the template could have been updated
    */
   static async update (id, template) {
     const sql = `
-      UPDATE template
-        SET string = ?, bBoolean = ?
-        WHERE idTemplate = ?`
+      INSERT INTO
+        template(idTemplate) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        string = ?, bBoolean = ?
+      RETURNING *`
     // All the cols you want to update for a template + the id of the template you want to update
     // /!\ You may never want to change the links
-    const params = [template.string, template.bBoolean, id]
+    const params = [id, template.string, template.bBoolean]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Template((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the template could have been removed
+   * @param { Number } id id of the template
+   * @returns { Promise<Boolean> } if the template could have been removed
    */
   static async remove (id) {
     const sql = `

@@ -51,7 +51,6 @@ export default class Event extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'events') {
     return super.asResource(baseAPI, resourcePath)
@@ -67,6 +66,8 @@ export default class Event extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Event)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Event[]> }
    */
@@ -75,73 +76,73 @@ export default class Event extends HalResource {
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<Event[]> }
+   * @param { Number } id id of the event
+   * @returns { Promise<Event> }
    */
-  static async getForTimeline (id) {
-    return await mariadbStore.client.query('SELECT * FROM Event WHERE timeline_idTimeline = ? ORDER BY year, month, day', id)
+  static async get (id) {
+    return new Event((await mariadbStore.client.query('SELECT * FROM event WHERE idEvent = ?', id))[0])
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the article
    * @returns { Promise<Event[]> }
    */
-  static async getForArticle (id) {
+  static async getByArticle (id) {
     return await mariadbStore.client.query('SELECT * FROM Event WHERE article_idArticle = ? ORDER BY year, month, day', id)
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<Event> }
+   * @param { Number } id if of the timeline
+   * @returns { Promise<Event[]> }
    */
-  static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM event WHERE idEvent = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Event ${id} don't exist !`)
-    }
-
-    return new Event(conn)
+  static async getByTimeline (id) {
+    return await mariadbStore.client.query('SELECT * FROM Event WHERE timeline_idTimeline = ? ORDER BY year, month, day', id)
   }
 
+  /// POST
+
   /**
-   * @param { Event } event
-   * @returns { Number } the id of the new inserted Event
+   * @param { { name: String, year: Number, month: Number, day: Number, description: String, idTimeline: Number, idArticle: Number? } } event
+   * @returns { Promise<Event> } the id of the new inserted Event
    */
   static async add (event) {
     const sql = `
       INSERT INTO
         Event(name, year, month, day, description, timeline_idTimeline, article_idArticle)
-        VALUES(?, ?, ?, ?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [event.name, event.year, event.month, event.day, event.description, event.idTimeline, event.idArticle]
+    const params = [event.name, event.year, event.month, event.day, event.description, event.idTimeline, event.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Event((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Event } event
-   * @returns { Boolean } if the event could have been updated
+   * @param { Number } id id of the event
+   * @param { { name: String, year: Number, month: Number, day: Number, description: String, idArticle: Number? } } event
+   * @returns { Promise<Event> } if the event could have been updated
    */
   static async update (id, event) {
     const sql = `
-      UPDATE Event
-        SET name = ?, year = ?, month = ?, day = ?, description=?, article_idArticle = ?
-        WHERE idEvent = ?`
+      INSERT INTO
+        event(idEvent) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, year = ?, month = ?, day = ?, description=?, article_idArticle = ?
+      RETURNING *`
     // All the cols you want to update for a event + the id of the event you want to update
     // /!\ You may never want to change the links
-    const params = [event.name, event.year, event.month, event.day, event.description, event.idArticle, id]
+    const params = [id, event.name, event.year, event.month, event.day, event.description, event.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new Event((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the event could have been removed
+   * @param { Number } id id of the event
+   * @returns { Promise<Boolean> } if the event could have been removed
    */
   static async remove (id) {
     const sql = `

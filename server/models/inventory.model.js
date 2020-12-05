@@ -46,7 +46,6 @@ export default class Inventory extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'inventories') {
     return super.asResource(baseAPI, resourcePath)
@@ -62,6 +61,8 @@ export default class Inventory extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Inventory)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Inventory[]> }
    */
@@ -70,57 +71,63 @@ export default class Inventory extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the inventory
    * @returns { Promise<Inventory> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM inventory WHERE idInventory = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Inventory ${id} don't exist !`)
-    }
-
-    return new Inventory(conn)
+    return new Inventory((await mariadbStore.client.query('SELECT * FROM inventory WHERE idInventory = ?', id))[0])
   }
 
   /**
-   * @param { Inventory } inventory
-   * @returns { Number } the id of the new inserted inventory
+   * @param { Number } id id of the character that we want the inventories
+   * @returns { Promise<Inventory[]> }
+   */
+  static async getByCharacter (id) {
+    return await mariadbStore.client.query('SELECT * FROM inventory WHERE character_idCharacter = ?', id)
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, number: Number, description: String, weight: Number, idCharacter: Number } } inventory
+   * @returns { Promise<Inventory> } the id of the new inserted inventory
    */
   static async add (inventory) {
     const sql = `
       INSERT INTO 
         inventory(name, number, description, weight, character_idCharacter) 
-        VALUES(?, ?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [inventory.name, inventory.number, inventory.description, inventory.weight, inventory.idCharacter]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Inventory((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Inventory } inventory
-   * @returns { Boolean } if the inventory could have been updated
+   * @param { Number } id id of the inventory
+   * @param { { name: String, number: Number, description: String, weight: Number } } inventory
+   * @returns { Promise<Inventory> } if the inventory could have been updated
    */
   static async update (id, inventory) {
     const sql = `
-      UPDATE inventory
-        SET name = ?, number = ?, description = ?, weight = ?
-        WHERE idInventory = ?`
-    // All the cols you want to update for a inventory + the id of the inventory you want to update
-    // /!\ You may never want to change the links
-    const params = [inventory.name, inventory.number, inventory.description, inventory.weight, id]
+      INSERT INTO
+        inventory(idInventory) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, number = ?, description = ?, weight = ?
+      RETURNING *`
+    const params = [id, inventory.name, inventory.number, inventory.description, inventory.weight]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return Inventory((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the inventory could have been removed
+   * @param { Number } id id of the inventory
+   * @returns { Promise<Boolean> } if the inventory could have been removed
    */
   static async remove (id) {
     const sql = `

@@ -1,4 +1,5 @@
 import Article from '../../../models/article.model'
+import { baseAPI } from '../../routes'
 
 /**
  * @param { import('express').Request } req
@@ -6,12 +7,8 @@ import Article from '../../../models/article.model'
  */
 export default async function putArticle (req, res) {
   try {
-    const bSucceded = await Article.update(parseInt(req.params.id), new Article(req.body))
-    if (bSucceded) {
-      res.status(200).json(bSucceded)
-    } else {
-      res.status(404).json(`Template ${req.params.id} don't exist !`)
-    }
+    const article = await Article.update(parseInt(req.params.id), req.body)
+    res.status(200).json(article.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

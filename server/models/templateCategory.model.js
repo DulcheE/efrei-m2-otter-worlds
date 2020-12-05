@@ -40,7 +40,6 @@ export default class TemplateCategory extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'template-categories') {
     return super.asResource(baseAPI, resourcePath)
@@ -56,6 +55,8 @@ export default class TemplateCategory extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, TemplateCategory)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<TemplateCategory[]> }
    */
@@ -64,65 +65,63 @@ export default class TemplateCategory extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the templateCategory
    * @returns { Promise<TemplateCategory> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM templateCategory WHERE idTemplateCategory = ?', id))[0]
-    if (!conn) {
-      throw new Error(`TemplateCategory ${id} don't exist !`)
-    }
-
-    return new TemplateCategory(conn)
+    return new TemplateCategory((await mariadbStore.client.query('SELECT * FROM templateCategory WHERE idTemplateCategory = ?', id))[0])
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<TemplateStat> }
+   * @param { Number } id id of the universe
+   * @returns { Promise<TemplateCategory[]> }
    */
-  static async getTemplateStats (id) {
-    return await mariadbStore.client.query('SELECT * FROM templateStat WHERE templateCategory_idTemplateCategory = ?', id)
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM templateCategory WHERE universe_idUniverse = ?', id)
   }
 
+  /// POST
+
   /**
-   * @param { TemplateCategory } templateCategory
-   * @returns { Number } the id of the new inserted templateCategory
+   * @param { { name: String, order: Number, idUniverse: Number } } templateCategory
+   * @returns { Promise<TemplateCategory> } the id of the new inserted templateCategory
    */
   static async add (templateCategory) {
     const sql = `
       INSERT INTO
         templateCategory(name, \`order\`, universe_idUniverse)
-        VALUES(?, ?, ?)`
+        VALUES(?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [templateCategory.name, templateCategory.order, templateCategory.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new TemplateCategory((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { TemplateCategory } templateCategory
-   * @returns { Boolean } if the templateCategory could have been updated
+   * @param { Number } id id of the templateCategory
+   * @param { { name: String, order: Number } } templateCategory
+   * @returns { Promise<TemplateCategory> } if the templateCategory could have been updated
    */
   static async update (id, templateCategory) {
     const sql = `
-      UPDATE templateCategory
-        SET name = ?, \`order\` = ?
-        WHERE idTemplateCategory = ?`
-    // All the cols you want to update for a templateCategory + the id of the templateCategory you want to update
-    // /!\ You may never want to change the links
-    const params = [templateCategory.name, templateCategory.order, id]
+      INSERT INTO
+        templateCategory(idTemplateCategory) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, \`order\` = ?
+      RETURNING *`
+    const params = [id, templateCategory.name, templateCategory.order]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return new TemplateCategory((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the templateCategory could have been removed
+   * @param { Number } id id of the templateCategory
+   * @returns { Promise<Boolean> } if the templateCategory could have been removed
    */
   static async remove (id) {
     const sql = `

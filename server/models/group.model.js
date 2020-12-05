@@ -37,7 +37,6 @@ export default class Group extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'groups') {
     return super.asResource(baseAPI, resourcePath)
@@ -53,6 +52,8 @@ export default class Group extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Group)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Group[]> }
    */
@@ -61,70 +62,92 @@ export default class Group extends HalResource {
   }
 
   /**
-   * @param { Number } id
+   * @param { Number } id id of the group
    * @returns { Promise<Group> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM `group` WHERE idGroup = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Group ${id} don't exist !`)
-    }
-
-    return new Group(conn)
+    return new Group((await mariadbStore.client.query('SELECT * FROM `group` WHERE idGroup = ?', id))[0])
   }
 
   /**
-   * @param { Number } id id of the character that we want the inventory
-   * @returns { Promise<Characters> }
+   * @param { Number } id id of the character that we want the groups
+   * @returns { Promise<Group[]> }
    */
-  static async getCharacters (id) {
+  static async getByCharacter (id) {
     return await mariadbStore.client.query(`
-      SELECT * FROM \`character\` c
+      SELECT g.idGroup, g.name, g.universe_idUniverse FROM \`group\` g
       INNER JOIN characterInGroup cg
-        ON cg.character_idCharacter = c.idCharacter
-      WHERE group_idGroup = ?
+        ON cg.group_idGroup = g.idGroup
+      WHERE cg.character_idCharacter = ?
     `, id)
   }
 
   /**
-   * @param { Group } group
-   * @returns { Number } the id of the new inserted group
+   * @param { Number } id id of the universe
+   * @returns { Promise<Group[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM `group` WHERE universe_idUniverse = ?', id)
+  }
+
+  /**
+   * @param { Number } idUser id of the user that we want the groups
+   * @param { Number } idUniverse id of the universe that we want the groups for the user
+   * @returns { Promise<Group[]> }
+   */
+  static async getByUserInUniverse (idUser, idUniverse) {
+    return await mariadbStore.client.query(`
+      SELECT g.idGroup, g.name, g.universe_idUniverse FROM \`group\` g
+      INNER JOIN characterInGroup cg
+        ON cg.group_idGroup = g.idGroup
+      INNER JOIN \`character\` c
+        ON c.idCharacter = cg.character_idCharacter
+      WHERE c.user_idUser = ? AND g.universe_idUniverse = ?
+    `, [idUser, idUniverse])
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, idUniverse: Number } } group
+   * @returns { Promise<Group> } the id of the new inserted group
    */
   static async add (group) {
     const sql = `
       INSERT INTO 
         \`group\`(name, universe_idUniverse) 
-        VALUES(?, ?)`
+        VALUES(?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
     const params = [group.name, group.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Group((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { Group } group
-   * @returns { Boolean } if the group could have been updated
+   * @param { Number } id id of the group
+   * @param { { name: String } } group
+   * @returns { Promise<Group> } if the group could have been updated
    */
   static async update (id, group) {
     const sql = `
-      UPDATE \`group\`
-        SET name = ?
-        WHERE idGroup = ?`
-    // All the cols you want to update for a group + the id of the group you want to update
-    // /!\ You may never want to change the links
-    const params = [group.name, id]
+      INSERT INTO
+        \`group\`(idGroup) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?
+      RETURNING *`
+    const params = [id, group.name]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return Group((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the group could have been removed
+   * @param { Number } id id of the group
+   * @returns { Promise<Boolean> } if the group could have been removed
    */
   static async remove (id) {
     const sql = `

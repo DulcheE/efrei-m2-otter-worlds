@@ -1,4 +1,5 @@
 import User from '../../../models/user.model'
+import { baseAPI } from '../../routes.js'
 
 /**
  * @param { import('express').Request } req
@@ -6,8 +7,8 @@ import User from '../../../models/user.model'
  */
 export default async function PostUser (req, res) {
   try {
-    const insertedID = await User.add(new User(req.body))
-    res.status(201).json(insertedID)
+    const newUser = await User.add(req.body)
+    res.status(201).json(newUser.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log(err.code)

@@ -43,7 +43,6 @@ export default class InterestPoint extends HalResource {
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'interest-points') {
     return super.asResource(baseAPI, resourcePath)
@@ -59,6 +58,8 @@ export default class InterestPoint extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, InterestPoint)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<InterestPoint[]> }
    */
@@ -67,73 +68,63 @@ export default class InterestPoint extends HalResource {
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<InterestPoint[]> }
-   */
-  static async getAllforMap (id) {
-    return await mariadbStore.client.query('SELECT * FROM interestPoint WHERE map_idMap=?', id)
-  }
-
-  /**
-   * @param { Number } id
-   * @returns { Promise<InterestPoint[]> }
-   */
-  static async getAllforArticle (id) {
-    return await mariadbStore.client.query('SELECT * FROM interestPoint WHERE article_idArticle=?', id)
-  }
-
-  /**
-   * @param { Number } id
+   * @param { Number } id id of the interestPoint
    * @returns { Promise<InterestPoint> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM interestPoint WHERE id_interestPoint = ?', id))[0]
-    if (!conn) {
-      throw new Error(`InterestPoint ${id} don't exist !`)
-    }
-
-    return new InterestPoint(conn)
+    return new InterestPoint((await mariadbStore.client.query('SELECT * FROM interestPoint WHERE id_interestPoint = ?', id))[0])
   }
 
   /**
-   * @param { InterestPoint } interestPoint
-   * @returns { Number } the id of the new inserted interestPoint
+   * @param { Number } id id of the map
+   * @returns { Promise<InterestPoint[]> }
+   */
+  static async getByMap (id) {
+    return await mariadbStore.client.query('SELECT * FROM interestPoint WHERE map_idMap=?', id)
+  }
+
+  /// POST
+
+  /**
+   * @param { { name: String, coordinate: String, idMap: Number, idArticle: Number? } } interestPoint
+   * @returns { Promise<InterestPoint> } the id of the new inserted interestPoint
    */
   static async add (interestPoint) {
     const sql = `
       INSERT INTO
         interestPoint(name, coordinate, map_idMap, article_idArticle)
-        VALUES(?, ?, ?, ?)`
+        VALUES(?, ?, ?, ?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [interestPoint.name, interestPoint.coordinate, interestPoint.idMap, interestPoint.idArticle]
+    const params = [interestPoint.name, interestPoint.coordinate, interestPoint.idMap, interestPoint.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new InterestPoint((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// PUT
+
   /**
-   * @param { Number } id
-   * @param { InterestPoint } interestPoint
-   * @returns { Boolean } if the interestPoint could have been updated
+   * @param { Number } id id of the interestPoint
+   * @param { { name: String, coordinate: String, idArticle: Number? } } interestPoint
+   * @returns { Promise<InterestPoint> } if the interestPoint could have been updated
    */
   static async update (id, interestPoint) {
     const sql = `
-      UPDATE interestPoint
-        SET name = ?, coordinate = ?
-        WHERE id_interestPoint = ?`
-    // All the cols you want to update for a interestPoint + the id of the interestPoint you want to update
-    // /!\ You may never want to change the links
-    const params = [interestPoint.name, interestPoint.coordinate, id]
+      INSERT INTO
+        interestPoint(idInterestPoint) VALUES(?)
+      ON DUPLICATE KEY UPDATE
+        name = ?, coordinate = ?, article_idArticle = ?
+      RETURNING *`
+    const params = [id, interestPoint.name, interestPoint.coordinate, interestPoint.idArticle || null]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
+    return InterestPoint((await mariadbStore.client.query(sql, params))[0])
   }
 
+  /// DELETE
+
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the interestPoint could have been removed
+   * @param { Number } id id of the interestPoint
+   * @returns { Promise<Boolean> } if the interestPoint could have been removed
    */
   static async remove (id) {
     const sql = `

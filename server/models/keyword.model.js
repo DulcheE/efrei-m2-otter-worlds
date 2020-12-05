@@ -6,7 +6,10 @@ class HalResourceDataKeyword extends HalResourceData {
   name
 }
 
-class HalToOneLinksKeyword extends HalToOneLinks { }
+class HalToOneLinksKeyword extends HalToOneLinks {
+  /** @type { Number } */
+  universe
+}
 
 export default class Keyword extends HalResource {
   /** @type { HalResourceDataKeyword } */
@@ -28,12 +31,12 @@ export default class Keyword extends HalResource {
     this.data.name = keyword.name || keyword.data.name
 
     this.toOneLinks = new HalToOneLinksKeyword()
+    this.toOneLinks.universe = keyword.universe_idUniverse || keyword.toOneLinks.universe
   }
 
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
-   * @returns { hal.Resource }
    */
   asResource (baseAPI, resourcePath = 'keywords') {
     return super.asResource(baseAPI, resourcePath)
@@ -49,6 +52,8 @@ export default class Keyword extends HalResource {
     return super.asResourceList(baseAPI, list, selfLink, resourcePath, Keyword)
   }
 
+  /// GET
+
   /**
    * @returns { Promise<Keyword[]> }
    */
@@ -57,65 +62,57 @@ export default class Keyword extends HalResource {
   }
 
   /**
-   * @param { Number } id
-   * @returns { Promise<Keyword[]> }
-   */
-  static async getAllForArticle (id) {
-    return await mariadbStore.client.query('select * from keyword k left outer join keywordarticle ka on k.idKeyword = ka.keywords_idKeyword where ka.article_idArticle = ?', id)
-  }
-
-  /**
-   * @param { Number } id
+   * @param { Number } id id of the keyword
    * @returns { Promise<Keyword> }
    */
   static async get (id) {
-    const conn = (await mariadbStore.client.query('SELECT * FROM keyword WHERE idKeyword = ?', id))[0]
-    if (!conn) {
-      throw new Error(`Keyword ${id} don't exist !`)
-    }
-
-    return new Keyword(conn)
+    return new Keyword((await mariadbStore.client.query('SELECT * FROM keyword WHERE idKeyword = ?', id))[0])
   }
 
   /**
-   * @param { Keyword } keyword
-   * @returns { Number } the id of the new inserted keyword
+   * @param { Number } id id of the universe
+   * @returns { Promise<Keyword[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query('SELECT * FROM keyword WHERE universe_idUniverse = ?', id)
+  }
+
+  /**
+   * @param { Number } id id of the article
+   * @returns { Promise<Keyword[]> }
+   */
+  static async getByArticle (id) {
+    return await mariadbStore.client.query(`
+      SELECT * FROM keyword k
+      LEFT OUTER JOIN keywordarticle ka
+        ON k.idKeyword = ka.keywords_idKeyword
+      WHERE ka.article_idArticle = ?
+    `, id)
+  }
+
+  /// POST
+
+  /**
+   * @param { {name: String, idUniverse: Number} } keyword
+   * @returns { Promise<Keyword> } the id of the new inserted keyword
    */
   static async add (keyword) {
     const sql = `
       INSERT INTO
-        keyword(name)
-        VALUES(?)`
+        keyword(name, universe_idUniverse)
+        VALUES(?)
+      RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [keyword.name]
+    const params = [keyword.name, keyword.idUniverse]
 
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.insertId || -1
+    return new Keyword((await mariadbStore.client.query(sql, params))[0])
   }
 
-  /**
-   * @param { Number } id
-   * @param { Keyword } keyword
-   * @returns { Boolean } if the keyword could have been updated
-   */
-  static async update (id, keyword) {
-    const sql = `
-      UPDATE keyword
-        SET name = ?
-        WHERE idKeyword = ?`
-    // All the cols you want to update for a keyword + the id of the keyword you want to update
-    // /!\ You may never want to change the links
-    const params = [keyword.name, id]
-
-    const rows = await mariadbStore.client.query(sql, params)
-
-    return rows.affectedRows === 1
-  }
+  /// DELETE
 
   /**
-   * @param { Number } id
-   * @returns { Boolean } if the keyword could have been removed
+   * @param { Number } id id of the article
+   * @returns { Promise<Boolean> } if the keyword could have been removed
    */
   static async remove (id) {
     const sql = `
