@@ -140,7 +140,7 @@ export default class Group extends HalResource {
       RETURNING *`
     const params = [id, group.name]
 
-    return Group((await mariadbStore.client.query(sql, params))[0])
+    return new Group((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE

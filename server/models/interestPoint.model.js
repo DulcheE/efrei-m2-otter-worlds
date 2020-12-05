@@ -117,7 +117,7 @@ export default class InterestPoint extends HalResource {
       RETURNING *`
     const params = [id, interestPoint.name, interestPoint.coordinate, interestPoint.idArticle || null]
 
-    return InterestPoint((await mariadbStore.client.query(sql, params))[0])
+    return new InterestPoint((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE
