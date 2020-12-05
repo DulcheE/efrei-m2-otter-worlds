@@ -1,12 +1,6 @@
 <script>
 export default {
-  name: 'Mixin',
-
-  components: {
-  },
-
-  data: () => ({
-  })
+  name: 'MixinCss'
 }
 </script>
 

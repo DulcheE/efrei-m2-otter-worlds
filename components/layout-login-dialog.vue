@@ -42,7 +42,7 @@
         <v-tab-item>
           <v-card-text>
             <v-container>
-              <v-form>
+              <v-form ref="formLogin" v-model="formLogin">
                 <!-- Text -->
                 <h3 class="pa-4" align="center">
                   Have you tried "user1" and "test" ?
@@ -58,19 +58,19 @@
                   clearable
                   prepend-icon="mdi-face"
                   label="Username"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.maxSmall]"
                 />
 
                 <!-- Field : Password -->
                 <v-text-field
                   v-model="loginPassword"
                   class="pa-4"
-                  counter="45"
+                  counter="50"
                   clearable
                   prepend-icon="mdi-lock"
                   label="Password"
                   type="password"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.maxSmall]"
                 />
               </v-form>
 
@@ -96,7 +96,7 @@
         <v-tab-item>
           <v-card-text>
             <v-container>
-              <v-form>
+              <v-form ref="formSignIn" v-model="formSignIn">
                 <!-- Text -->
                 <h3 class="pa-4" align="center">
                   Having an account allows you to keep track of your scores
@@ -108,35 +108,35 @@
                 <v-text-field
                   v-model="signUpUsername"
                   class="pa-4"
-                  counter="45"
+                  counter="50"
                   clearable
                   prepend-icon="mdi-face"
                   label="Username"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.maxSmall]"
                 />
 
                 <!-- Field : Password -->
                 <v-text-field
                   v-model="signUpPassword"
                   class="pa-4"
-                  counter="45"
+                  counter="50"
                   clearable
                   prepend-icon="mdi-lock"
                   label="Password"
                   type="password"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.maxSmall]"
                 />
 
                 <!-- Field : Password verif -->
                 <v-text-field
                   v-model="signUpPasswordVerif"
                   class="pa-4"
-                  counter="15"
+                  counter="50"
                   clearable
                   prepend-icon="mdi-lock"
                   label="Password verification"
                   type="password"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.maxSmall]"
                 />
               </v-form>
               <br><br><br>
@@ -176,8 +176,15 @@
 </template>
 
 <script>
+// Imports
+import { mapActions } from 'vuex'
+import MixinRules from '@/mixins/mixin-rules'
+
 export default {
   name: 'LayoutAppBar',
+
+  mixins: [MixinRules],
+
   props: {
     isDialogActive: Boolean
   },
@@ -185,29 +192,67 @@ export default {
   data () {
     return {
       tabModel: null,
+
+      // Data - login
       loginUsername: '',
       loginPassword: '',
+
+      // Data -signIn
       signUpUsername: '',
       signUpPassword: '',
       signUpPasswordVerif: '',
+
+      // Form holder
+      formLogin: false,
+      formSignIn: false,
+
+      // Whether a form failed or not
       loginFailed: false,
-      signUpFailed: false,
-      rules: {
-        required: value => !!value || 'Required.'
-      }
+      signUpFailed: false
     }
   },
 
   methods: {
+    // Imports
+    ...mapActions('login', ['login']),
+
+    /** Close dialog */
     closeDialog () {
       this.$emit('closeDialog')
     },
 
     /** Method to Log in (connect to account) */
-    logIn () {},
+    async logIn () {
+      // If the form is valid
+      if (this.$refs.formLogin.validate()) {
+        // We create a credentials instance
+        const credentials = {
+          username: this.loginUsername,
+          password: this.loginPassword
+        }
+
+        // We call the login method
+        await this.login(credentials)
+
+        // We reset the inputs
+        this.$refs.formLogin.reset()
+
+        // We close the dialog
+        this.closeDialog()
+      }
+    },
 
     /** Method to Sign in (create new account) */
-    signUp () {}
+    signUp () {
+      // If the form is valid
+      if (this.$refs.formSignIn.validate()) {
+        alert('SIGNIN !')
+
+        // We reset the input OF BOTH FORM
+        this.$refs.formLogin.reset()
+        this.$refs.formSignIn.reset()
+      }
+    }
   }
 }
 </script>

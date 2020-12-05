@@ -26,7 +26,7 @@
 <script>
 import LayoutAppBar from '@/components/layout-app-bar'
 import LayoutGmDashboard from '@/components/layout-gm-dashboard'
-import Mixin from '@/mixins/mixin'
+import MixinCss from '@/mixins/mixin-css'
 
 export default {
   components: {
@@ -34,9 +34,7 @@ export default {
     LayoutGmDashboard
   },
 
-  mixins: {
-    Mixin
-  },
+  mixins: [MixinCss],
 
   data () {
     return {

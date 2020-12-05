@@ -42,7 +42,7 @@
                       min-height="150"
                       max-height="150"
                       lazy-src="/logo.png"
-                      :src="character.src"
+                      :src="characterPlaceholder.src"
                       contain
                       v-bind="isModifying && attrs"
                       v-on="isModifying && on"
@@ -55,7 +55,7 @@
                       min-height="350"
                       max-height="350"
                       lazy-src="/logo.png"
-                      :src="character.src"
+                      :src="characterPlaceholder.src"
                       v-bind="isModifying && attrs"
                       v-on="isModifying && on"
                     />
@@ -103,12 +103,12 @@
                     <v-card-actions>
                       <v-spacer />
                       <!-- Cancel the choice -->
-                      <v-btn color="warning" text @click="dialogPicture = false; pictureSelected = character.src">
+                      <v-btn color="warning" text @click="dialogPicture = false; pictureSelected = characterPlaceholder.src">
                         Cancel
                       </v-btn>
 
                       <!-- Save the choice -->
-                      <v-btn color="success" text @click="dialogPicture = false; character.src = pictureSelected">
+                      <v-btn color="success" text @click="dialogPicture = false; characterPlaceholder.src = pictureSelected">
                         Save
                       </v-btn>
                     </v-card-actions>
@@ -125,11 +125,11 @@
                   <!-- Character's name -->
                   <v-col cols="12" sm="6" md="3">
                     <v-text-field
-                      v-model="character.name"
+                      v-model="characterPlaceholder.name"
                       label="Name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       class="ma-4"
                       type="text"
                       required
@@ -139,11 +139,11 @@
                   <!-- Character's race -->
                   <v-col cols="12" sm="6" md="3">
                     <v-text-field
-                      v-model="character.race"
+                      v-model="characterPlaceholder.race"
                       label="Race"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       required
                       class="ma-4"
                       type="text"
@@ -153,11 +153,11 @@
                   <!-- Character's job -->
                   <v-col cols="12" sm="6" md="3">
                     <v-text-field
-                      v-model="character.job"
+                      v-model="characterPlaceholder.job"
                       label="Job"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       required
                       class="ma-4"
                     />
@@ -166,7 +166,7 @@
                   <!-- Character's age -->
                   <v-col cols="12" sm="6" md="3">
                     <v-text-field
-                      v-model="character.age"
+                      v-model="characterPlaceholder.age"
                       label="Age"
                       :disabled="!isModifying"
                       :clearable="isModifying"
@@ -218,7 +218,7 @@
                       :label="item.name"
                       :disabled="!isModifying"
                       :clearable="isModifying"
-                      :rules="[rules.required, rules.counter]"
+                      :rules="[rules.required, rules.maxSmall]"
                       class="ma-4"
                       type="text"
                     />
@@ -256,22 +256,22 @@
         <v-tabs-items v-model="tab">
           <!-- Tab n° 1 - Statistics -->
           <v-tab-item>
-            <CharacterCardStatistics :is-modifying="isModifying" :rules="rules" :stats="statsRegular" :order-by-name="orderByName" />
+            <CharacterCardStatistics :is-modifying="isModifying" :stats="statsRegular" />
           </v-tab-item>
 
           <!-- Tab n° 2 - Inventory -->
           <v-tab-item>
-            <CharacterCardInventory :is-modifying="isModifying" :rules="rules" :inventory="inventory" />
+            <CharacterCardInventory :is-modifying="isModifying" :inventory="inventory" />
           </v-tab-item>
 
           <!-- Tab n° 3 - Magic (may be passed) -->
           <v-tab-item v-if="hasMagic">
-            <CharacterCardMagic :is-modifying="isModifying" :rules="rules" :stats="statsMagic" :order-by-name="orderByName" />
+            <CharacterCardMagic :is-modifying="isModifying" :stats="statsMagic" />
           </v-tab-item>
 
           <!-- Tab n° 4 - BackStory -->
           <v-tab-item>
-            <CharacterCardBackstory :is-modifying="isModifying" :rules="rules" :backstory="backstory" />
+            <CharacterCardBackstory :is-modifying="isModifying" :backstory="backstory" />
           </v-tab-item>
         </v-tabs-items>
       </v-card>
@@ -340,10 +340,13 @@
 
 <script>
 // Imports
+import MixinRules from '@/mixins/mixin-rules'
+import MixinOrderByName from '@/mixins/mixin-order-by-name'
 import CharacterCardStatistics from '@/components/character-card-statistics'
 import CharacterCardInventory from '@/components/character-card-inventory'
 import CharacterCardMagic from '@/components/character-card-magic'
 import CharacterCardBackstory from '@/components/character-card-backstory'
+const lodash = require('lodash')
 
 export default {
   name: 'PageCharacter',
@@ -354,6 +357,8 @@ export default {
     CharacterCardMagic,
     CharacterCardBackstory
   },
+
+  mixins: [MixinRules, MixinOrderByName],
 
   data: () => ({
     // Whether the user is able to modify its data or not
@@ -367,11 +372,152 @@ export default {
 
     // TEMPORARY - Data about the character to be displayed
     character: {
+      id: -1,
+      user: {
+        username: ''
+      },
+      name: '',
+      race: '',
+      job: '',
+      age: 20,
+      src: 'https://picsum.photos/500/300?image=1',
+      stats: [
+        {
+          name: 'Essential',
+          id: -1,
+          isMagic: false,
+          content: []
+        }
+      ]
+    },
+    characterPlaceholder: {
+      id: -1,
+      user: {
+        username: ''
+      },
+      name: '',
+      race: '',
+      job: '',
+      age: 20,
+      src: 'https://picsum.photos/500/300?image=1',
+      stats: [
+        {
+          name: 'Essential',
+          id: -1,
+          isMagic: false,
+          content: []
+        }
+      ]
+    },
+
+    // Status of the character's card
+    status: 'Work in progress',
+
+    // Whether the picture dialog is open or not
+    dialogPicture: false,
+    pictureSelected: '',
+    pictures: [
+      'https://qph.fs.quoracdn.net/main-qimg-4ab11fd74be31e6c46ee07a7de8a050c',
+      'http://www.pokepedia.fr/images/thumb/7/70/Simiabraz-DP.png/250px-Simiabraz-DP.png',
+      'http://images.wikia.com/es.pokemon/images/b/bb/Empoleon_%28dream_world%29.png'
+    ],
+
+    // Tab currently selected on the menu
+    tab: null
+  }),
+
+  computed: {
+    /** Items contained in the status widget */
+    statusItems () {
+      // We initialize a list
+      const allItems = [
+        {
+          title: 'Work in progress',
+          color: 'primary',
+          isForAdmin: false
+        },
+        {
+          title: 'Waiting validation',
+          color: 'warning',
+          isForAdmin: false
+        },
+        {
+          title: 'Refused by MJ',
+          color: 'error',
+          isForAdmin: true
+        },
+        {
+          title: 'Validated by MJ',
+          color: 'success',
+          isForAdmin: true
+        }
+      ]
+
+      // We return the correct / reduced list
+      return allItems.filter(item => item.isForAdmin === this.isAdmin || item.title === this.status)
+    },
+
+    /** Items contained in the tab */
+    itemsTab () {
+      const items = [
+        {
+          title: 'Statistics',
+          icon: 'mdi-counter'
+        },
+        {
+          title: 'Inventory',
+          icon: 'mdi-bag-checked'
+        },
+        {
+          title: 'Magic',
+          icon: 'mdi-wizard-hat'
+        },
+        {
+          title: 'Backstory',
+          icon: 'mdi-feather'
+        }
+      ]
+
+      if (!this.hasMagic) {
+        items.splice(2, 1)
+      }
+
+      return items
+    },
+
+    /** Category (the first in order) containing all Essential stats */
+    statsEssential () {
+      return this.characterPlaceholder.stats[0]
+    },
+
+    /** Categories of stats that are neither Magic nor Essential */
+    statsRegular () {
+      return this.characterPlaceholder.stats.filter(category => !category.isMagic && category.id !== 0)
+    },
+
+    /** Categories of stats that are Magic */
+    statsMagic () {
+      return this.characterPlaceholder.stats.filter(category => category.isMagic)
+    }
+  },
+
+  mounted () {
+    // We initialize the value of the picture selected by the user
+    // this.pictureSelected = this.characterPlaceholder.src
+
+    // If accessing the page to CREATE a character's sheet for the 1st time, the user can directly modify his data
+    const idCharacter = this.$route.params.idCharacter
+    if (idCharacter === undefined) {
+      this.isModifying = true
+    }
+
+    // TO BE REPLACED - We fill the character object
+    this.character = {
       id: 1234,
       user: {
         username: 'J3@n C@st3x'
       },
-      name: '',
+      name: 'John Doe',
       race: 'Human',
       job: 'Soldier',
       age: 22,
@@ -533,155 +679,41 @@ export default {
       ],
       inventory: [],
       backstory: ''
-    },
-
-    // Status of the character's card
-    status: 'Work in progress',
-    rules: {
-      required: value => !!value || 'Required',
-      counter: value => value.length <= 50 || 'Max 50 characters',
-      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
-    },
-
-    // Whether the picture dialog is open or not
-    dialogPicture: false,
-    pictureSelected: '',
-    pictures: [
-      'https://qph.fs.quoracdn.net/main-qimg-4ab11fd74be31e6c46ee07a7de8a050c',
-      'http://www.pokepedia.fr/images/thumb/7/70/Simiabraz-DP.png/250px-Simiabraz-DP.png',
-      'http://images.wikia.com/es.pokemon/images/b/bb/Empoleon_%28dream_world%29.png'
-    ],
-
-    // Tab currently selected on the menu
-    tab: null
-  }),
-
-  computed: {
-    statusItems () {
-      // We initialize a list
-      const allItems = [
-        {
-          title: 'Work in progress',
-          color: 'primary',
-          isForAdmin: false
-        },
-        {
-          title: 'Waiting validation',
-          color: 'warning',
-          isForAdmin: false
-        },
-        {
-          title: 'Refused by MJ',
-          color: 'error',
-          isForAdmin: true
-        },
-        {
-          title: 'Validated by MJ',
-          color: 'success',
-          isForAdmin: true
-        }
-      ]
-
-      // We return the correct / reduced list
-      return allItems.filter(item => item.isForAdmin === this.isAdmin || item.title === this.status)
-    },
-
-    itemsTab () {
-      const items = [
-        {
-          title: 'Statistics',
-          icon: 'mdi-counter'
-        },
-        {
-          title: 'Inventory',
-          icon: 'mdi-bag-checked'
-        },
-        {
-          title: 'Magic',
-          icon: 'mdi-wizard-hat'
-        },
-        {
-          title: 'Backstory',
-          icon: 'mdi-feather'
-        }
-      ]
-
-      if (!this.hasMagic) {
-        items.splice(2, 1)
-      }
-
-      return items
-    },
-
-    /** Category (the first in order) containing all Essential stats */
-    statsEssential () {
-      return this.character.stats[0]
-    },
-
-    /** Categories of stats that are neither Magic nor Essential */
-    statsRegular () {
-      return this.character.stats.filter(category => !category.isMagic && category.id !== 0)
-    },
-
-    /** Categories of stats that are Magic */
-    statsMagic () {
-      return this.character.stats.filter(category => category.isMagic)
     }
-  },
 
-  mounted () {
-    // We initialize the value of the picture selected by the user
-    this.pictureSelected = this.character.src
-
-    // Display an alert showing if creating or accessing an existing character
-    const idCharacter = this.$route.params.idCharacter
-    if (idCharacter === undefined) {
-      alert('creating a NEW character !')
-    } else {
-      alert('accessing the character of id : ' + idCharacter)
-    }
+    // We fill the placeholder with the character's data
+    this.characterPlaceholder = lodash.cloneDeep(this.character)
   },
 
   methods: {
     /**
-     * Sorts a complex array by it's string field "name"
-     * @param {[]} array Array of complex objects containing a field "name"
-     */
-    orderByName (array) {
-      return array.sort((a, b) => {
-        const na = a.name.toLowerCase()
-        const nb = b.name.toLowerCase()
-
-        if (na < nb) {
-          return -1
-        }
-        if (na > nb) {
-          return 1
-        }
-        return 0
-      })
-    },
-
-    /**
      * Discard the changes brought to the character card
      */
     discardChanges () {
+      // We reset the placeholder
+      this.characterPlaceholder = lodash.cloneDeep(this.character)
+
+      // We close the modifications
       this.isModifying = false
     },
 
     /**
-     * Saves the changes brought to the character card, IF VALID
+     * Saves the changes brought to the character's sheet, IF VALID
      */
     saveChanges () {
       // If the form is valid
       if (this.$refs.form.validate()) {
+        // We modify the character's data
+        this.character = lodash.cloneDeep(this.characterPlaceholder)
+
+        // We close the modifications
         this.isModifying = false
       }
     }
   },
 
   head () {
-    return { title: this.character.name }
+    return { title: (this.$route.params.idCharacter === undefined) ? 'new character' : 'not new' } // this.character.name }
   }
 }
 </script>

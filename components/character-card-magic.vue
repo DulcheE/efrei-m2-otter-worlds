@@ -5,9 +5,7 @@
       v-for="category in stats"
       :key="category.id"
       :is-modifying="isModifying"
-      :rules="rules"
       :category="category"
-      :order-by-name="orderByName"
     />
   </v-container>
 </template>
@@ -28,16 +26,8 @@ export default {
       type: Boolean,
       required: true
     },
-    rules: {
-      type: Object,
-      required: true
-    },
     stats: {
       type: Array,
-      required: true
-    },
-    orderByName: {
-      type: Function,
       required: true
     }
   },

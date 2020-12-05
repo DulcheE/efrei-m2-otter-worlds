@@ -91,11 +91,22 @@
 
             <!-- Dialog's input(s) -->
             <v-card-text>
+              <!-- New user's name -->
               <v-container>
                 <v-text-field
-                  v-model="username"
+                  v-model="newUser.username"
                   label="username"
-                  :rules="[rules.required, rules.counter]"
+                  :rules="[rules.required, rules.maxSmall]"
+                />
+              </v-container>
+
+              <!-- New user's role -->
+              <v-container>
+                <v-select
+                  v-model="newUser.role"
+                  :items="getRolesNames()"
+                  label="role"
+                  :rules="[rules.required]"
                 />
               </v-container>
             </v-card-text>
@@ -173,11 +184,14 @@
 </template>
 
 <script>
+// Imports
+import MixinRules from '@/mixins/mixin-rules'
+import MixinRoles from '@/mixins/mixin-roles'
+
 export default {
   name: 'LayoutGmDashboard',
 
-  components: {
-  },
+  mixins: [MixinRules, MixinRoles],
 
   data: () => ({
     // Drawer
@@ -213,11 +227,9 @@ export default {
     // All about the form to invite a user
     dialogInviteUser: false,
     formInviteUser: false,
-    username: '',
-    rules: {
-      required: value => !!value || 'Required',
-      counter: value => value.length <= 50 || 'Max 50 characters',
-      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
+    newUser: {
+      username: '',
+      role: ''
     }
   }),
 
@@ -232,10 +244,10 @@ export default {
       // If the form is valid
       if (this.$refs.formInviteUser.validate()) {
         // We display the name of the invited user
-        alert('inviting ' + this.username)
+        alert('inviting ' + this.newUser.username + ' as a ' + this.newUser.role)
 
-        // We reset the username
-        this.username = ''
+        // We reset the form
+        this.$refs.formInviteUser.reset()
 
         // We close the dialog
         this.dialogInviteUser = false

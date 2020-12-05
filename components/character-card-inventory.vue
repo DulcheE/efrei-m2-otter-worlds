@@ -14,7 +14,7 @@
           v-model="item.name"
           :disabled="!isModifying"
           :clearable="isModifying"
-          :rules="isModifying ? [rules.required, rules.ascii] : []"
+          :rules="isModifying ? [rules.required] : []"
           type="text"
         />
       </template>
@@ -25,7 +25,7 @@
           v-model="item.description"
           :disabled="!isModifying"
           :clearable="isModifying"
-          :rules="isModifying ? [rules.required, rules.ascii] : []"
+          :rules="isModifying ? [rules.required] : []"
           type="text"
         />
       </template>
@@ -191,19 +191,18 @@
 
 <script>
 // Imports
+import MixinRules from '@/mixins/mixin-rules'
+
 export default {
   name: 'CharacterCardInventory',
+
+  mixins: [MixinRules],
 
   props: {
     isModifying: {
       type: Boolean,
       required: true,
       default: false
-    },
-    rules: {
-      type: Object,
-      required: true,
-      default: () => {}
     },
     inventory: {
       type: Array,

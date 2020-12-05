@@ -190,12 +190,14 @@
 </template>
 
 <script>
+// Imports
+import MixinRules from '@/mixins/mixin-rules'
 const traverson = require('traverson-promise')
 
 export default {
   name: 'MostKnownUniverses',
-  components: {
-  },
+
+  mixins: [MixinRules],
 
   data: () => ({
     // Universe to display
@@ -209,17 +211,6 @@ export default {
       description: '',
       bIsPublic: false,
       user: {}
-    },
-    newUniversePlaceholder: {
-      name: '',
-      description: '',
-      bIsPublic: false,
-      user: {}
-    },
-    rules: {
-      required: value => !!value || 'Required',
-      counter: value => value.length <= 50 || 'Max 50 characters',
-      ascii: value => (value !== null && value.split('').every(v => v.charCodeAt(0) >= 32 && v.charCodeAt(0) <= 255)) || 'Contains invalid character'
     }
   }),
 
@@ -231,7 +222,7 @@ export default {
       .follow('$._links.universes')
       .getResource().result
       .then((document) => {
-        this.universes = document.universes
+        this.universes = document.list
         return Promise.all(this.universes.map((universe) => {
           traverson.from(universe._links.user.href)
             .getResource().result
@@ -255,10 +246,10 @@ export default {
         }
 
         // We add the universe to the list
-        this.universes.push(this.newUniverse)
+        alert('creating ' + this.newUniverse.name + ' by ' + this.newUniverse.user.username)
 
-        // We reset the universe with its placeholder
-        this.newUniverse = this.newUniversePlaceholder
+        // We reset the form
+        this.$refs.formNewUniverse.reset()
 
         // We close the dialog
         this.dialogNewUniverse = false
