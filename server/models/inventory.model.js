@@ -120,7 +120,7 @@ export default class Inventory extends HalResource {
       RETURNING *`
     const params = [id, inventory.name, inventory.number, inventory.description, inventory.weight]
 
-    return Inventory((await mariadbStore.client.query(sql, params))[0])
+    return new Inventory((await mariadbStore.client.query(sql, params))[0])
   }
 
   /// DELETE
