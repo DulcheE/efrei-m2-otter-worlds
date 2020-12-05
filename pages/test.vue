@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!--<v-list v-for="user in users" :key="user.id">
+    <v-list v-for="user in users" :key="user.id">
       <h1>{{ user }}</h1>
     </v-list>
     <h1>{{ logged }}</h1> -->
@@ -29,11 +29,11 @@
     </v-list>
     <h5>{{ topic }}</h5>
     <h5>{{ article }}</h5> -->
-    <v-list v-for="sub in subTopics" :key="sub.id">
+    <!-- <v-list v-for="sub in subTopics" :key="sub.id">
       <h5>{{ sub }}</h5>
     </v-list>
     <h5>{{ subTopic }}</h5>
-    <h5>{{ articleSub }}</h5>
+    <h5>{{ articleSub }}</h5> -->
   </div>
 </template>
 
@@ -56,9 +56,6 @@ export default {
     },
     users () {
       return this.getUsers()
-    },
-    universes () {
-      return this.getUniverses()
     },
     templateCategories () {
       return this.getTemplateCategories()
@@ -101,8 +98,8 @@ export default {
     }
   },
   async mounted () {
-    /* await this.login({ username: 'Eddy', password: 'edypaswor' })
-    await this.fetchAllUsers()
+    await this.login({ username: 'Eddy', password: 'edypaswor' })
+    /* await this.fetchAllUsers()
     await this.fetchUniverseOwn()
     await this.fetchUniversePlay() */
     // await this.fetchUniverse(1)
@@ -133,7 +130,7 @@ export default {
     // await this.fetchGroupForCharacter(1)
     // await this.fetchTopic(3)
     // await this.fetchTopicWithArticle(3)
-    await this.fetchSubTopicWithArticle(1)
+    // await this.fetchSubTopicWithArticle(1)
   },
   methods: {
     ...mapActions('login', ['login', 'fetchUniverseOwn', 'fetchUniversePlay']),
