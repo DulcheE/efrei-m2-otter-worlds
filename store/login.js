@@ -38,7 +38,7 @@ const actions = {
       .post(credentials).result
       .then((document) => {
         const result = JSON.parse(document.text)
-        context.commit('setLogin', { logged: true, iduser: result.idUser, username: result.username })
+        context.commit('setLogin', { logged: true, id: result.id, username: result.username })
       })
       .catch((err) => {
         // eslint-disable-next-line
