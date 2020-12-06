@@ -45,7 +45,7 @@ const actions = {
   },
   async fetchUniverse (context, id) {
     // eslint-disable-next-line
-    console.log(context.state)
+    // console.log(context.state)
     await traverson.from('http://localhost:3000/api/v1/universes/{idUniverse}')
       .withTemplateParameters({ idUniverse: id })
       .json()

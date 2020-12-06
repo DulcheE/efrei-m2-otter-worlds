@@ -33,8 +33,8 @@
             </v-btn>
           </template>
 
-          <!-- Dialog -->
-          <v-card>
+          <!-- Dialog if logged in : create a new universe -->
+          <v-card v-if="isUserLogged">
             <v-card-title>
               <span class="headline">New Universe</span>
             </v-card-title>
@@ -82,6 +82,20 @@
               </v-container>
             </v-card-text>
 
+            <!-- ALERT - displayed if an error occurs -->
+            <v-container>
+              <v-alert
+                :value="errorMessage.length !== 0"
+                dense
+                outlined
+                prominent
+                type="error"
+                transition="scale-transition"
+              >
+                {{ errorMessage }}
+              </v-alert>
+            </v-container>
+
             <!-- Divider -->
             <v-divider />
 
@@ -89,13 +103,52 @@
             <v-card-actions>
               <v-spacer />
 
-              <!-- Button to create the Universe -->
+              <!-- Button - cancel -->
+              <v-btn
+                color="warning"
+                text
+                @click="dialogNewUniverse = false"
+              >
+                Cancel
+              </v-btn>
+
+              <!-- Button - create -->
               <v-btn
                 color="primary"
                 text
                 @click="createUniverse"
               >
                 Create new Universe !
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+
+          <!-- Dialog if NOT logged in : warning -->
+          <v-card v-else>
+            <v-card-title>
+              <span class="headline">Sign into your account !</span>
+            </v-card-title>
+
+            <v-container>
+              Sorry, you are trying to access a feature that is only accessible to logged in users !
+            </v-container>
+            <v-container>
+              Please log into your account or create a new one to access this feature.
+            </v-container>
+
+            <!-- Divider -->
+            <v-divider />
+
+            <!-- Actions -->
+            <v-card-actions>
+              <v-spacer />
+              <!-- Button - dismiss -->
+              <v-btn
+                color="primary"
+                text
+                @click="dialogNewUniverse = false"
+              >
+                Dismiss
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -124,7 +177,7 @@
         md="4"
         lg="3"
       >
-        <NuxtLink :to="'/universe/' + universe.name" class="text-decoration-none">
+        <NuxtLink :to="'/universe/' + universe.id" class="text-decoration-none">
           <!-- Card for the current universe -->
           <v-card
             class="zoom-xs"
@@ -192,7 +245,7 @@
 <script>
 // Imports
 import MixinRules from '@/mixins/mixin-rules'
-const traverson = require('traverson-promise')
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'MostKnownUniverses',
@@ -211,48 +264,61 @@ export default {
       description: '',
       bIsPublic: false,
       user: {}
-    }
+    },
+    errorMessage: ''
   }),
 
   computed: {
+    // Imports
+    ...mapGetters('login', ['getLogged']),
+    ...mapGetters('universe', ['getUniverses']),
+
+    /** Return whether a user is logged */
+    isUserLogged () {
+      return this.getLogged().logged
+    },
+
+    /** Return the id of the user (-1 if none is logged) */
+    idUser () {
+      return this.getLogged().iduser
+    }
   },
 
-  mounted () {
-    traverson.from('http://localhost:3000/api/v1')
-      .follow('$._links.universes')
-      .getResource().result
-      .then((document) => {
-        this.universes = document.list
-        return Promise.all(this.universes.map((universe) => {
-          traverson.from(universe._links.user.href)
-            .getResource().result
-            .then((document) => {
-              this.$set(universe, 'user', document)
-            })
-        }))
-      })
-      .catch((err) => {
-        throw err.message
-      })
+  async mounted () {
+    // We fetch all the Universes from the database
+    await this.fetchAllUniverses()
+
+    // We get these universes
+    this.universes = await this.getUniverses()
   },
 
   methods: {
-    createUniverse () {
+    ...mapActions('universe', ['fetchAllUniverses', 'addUniverse']),
+
+    async createUniverse () {
       // If the form is valid
       if (this.$refs.formNewUniverse.validate()) {
-        // We set the user in the universe
-        this.newUniverse.user = {
-          username: 'CREATED BY FORM'
+        // We check if a user is logged in
+        if (this.isUserLogged) {
+          // We create the object we'll send to the database
+          const universe = {
+            name: this.newUniverse.name,
+            description: this.newUniverse.description,
+            bIsPublic: this.newUniverse.bIsPublic,
+            idUser: this.idUser
+          }
+
+          // We send the new universe and get the response
+          const response = await this.addUniverse(universe)
+
+          // If the response is positive : reforward the user to the page of the newly created universe
+          // Otherwise : try again
+          if (response.id >= 0) {
+            document.location.href = '/universe/' + response.id
+          } else {
+            this.errorMessage = 'Something went wrong, please try again'
+          }
         }
-
-        // We add the universe to the list
-        alert('creating ' + this.newUniverse.name + ' by ' + this.newUniverse.user.username)
-
-        // We reset the form
-        this.$refs.formNewUniverse.reset()
-
-        // We close the dialog
-        this.dialogNewUniverse = false
       }
     }
   },
