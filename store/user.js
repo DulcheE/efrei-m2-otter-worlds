@@ -28,7 +28,20 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        context.commit('setUsers', document.users)
+        context.commit('setUsers', document.list)
+      })
+      .catch((err) => {
+        // eslint-disable-next-line
+        console.log(err)
+      })
+  },
+  async fetchUser (context, id) {
+    await traverson.from('http://localhost:3000/api/v1/users/{idUser}')
+      .withTemplateParameters({ idUser: id })
+      .json()
+      .getResource().result
+      .then((document) => {
+        context.commit('putUser', document)
       })
       .catch((err) => {
         // eslint-disable-next-line

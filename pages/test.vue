@@ -113,8 +113,8 @@ export default {
     /* await this.fetchAllUsers()
     await this.fetchUniverseOwn()
     await this.fetchUniversePlay() */
-    await this.fetchAllUniverses()
-    await this.putUniverse({ id: 5, universe: { name: 'Unity', description: 'a mix of fantasy post apocaliptic and weird scify', bIsPublic: true, idUser: 3 } })
+    // await this.fetchAllUniverses()
+    // await this.putUniverse({ id: 5, universe: { name: 'Unity', description: 'a mix of fantasy post apocaliptic and weird scify', bIsPublic: true, idUser: 3 } })
     // await this.fetchForUniverse(4)
     // await this.fetchAllTemplateCategories()
     // await this.fetchAllTemplateStats()
