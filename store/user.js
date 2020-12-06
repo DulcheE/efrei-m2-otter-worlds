@@ -7,6 +7,9 @@ const state = () => ({
 const getters = {
   getUsers: state => function () {
     return state.users
+  },
+  getUser: state => function (id) {
+    return state.users.find(element => element.id === id)
   }
 }
 
