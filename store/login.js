@@ -20,7 +20,7 @@ const getters = {
 const mutations = {
   setLogin (state, login) {
     state.logged = login.logged
-    state.iduser = login.iduser
+    state.iduser = login.id
     state.username = login.username
   },
   setUniversePlay (state, universes) {
