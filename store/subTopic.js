@@ -18,6 +18,13 @@ const getters = {
   },
   getSubTopicArticle: state => function () {
     return state.article
+  },
+  changeInventory (state, subTopic) {
+    const id = state.subTopics.findIndex((element) => {
+      return element.id === subTopic.id
+    })
+    state.subTopics[id] = subTopic
+    state.SubTopics = { ...state.SubTopics }
   }
 }
 
@@ -45,7 +52,7 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
-    context.commit('setSubTopics', document.subTopics)
+    context.commit('setSubTopics', document.list)
   },
   async fetchSubTopic (context, id) {
     // eslint-disable-next-line
@@ -99,18 +106,33 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
-    context.commit('setSubTopics', document.subTopics)
+    context.commit('setSubTopics', document.list)
   },
   addSubTopic (context, template) {
-    return traverson.from('http://localhost:3000/api/v1/sub-topics/')
+    traverson.from('http://localhost:3000/api/v1/sub-topics/')
       .json()
       .post(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putSubTopic', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
-  async putSubTopic (context, { template, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/sub-topics/{idtemplate}')
+  putSubTopic (context, { template, id }) {
+    traverson.from('http://localhost:3000/api/v1/sub-topics/{idtemplate}')
       .withTemplateParameters({ idtemplate: id })
       .json()
       .put(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeSubTopic', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async deleteSubTopic (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/sub-topics/{idtemplate}')

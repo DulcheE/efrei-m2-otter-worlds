@@ -33,6 +33,13 @@ const mutations = {
   },
   setTopic (state, Topic) {
     state.topic = Topic
+  },
+  changeTopic (state, topic) {
+    const id = state.topics.findIndex((element) => {
+      return element.id === topic.id
+    })
+    state.topics[id] = topic
+    state.topics = { ...state.topics }
   }
 }
 
@@ -45,7 +52,7 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
-    context.commit('setTopics', document.topics)
+    context.commit('setTopics', document.list)
   },
   async fetchTopic (context, id) {
     // eslint-disable-next-line
@@ -99,18 +106,33 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
-    context.commit('setTopics', document.topics)
+    context.commit('setTopics', document.list)
   },
   addTopic (context, template) {
-    return traverson.from('http://localhost:3000/api/v1/topics/')
+    traverson.from('http://localhost:3000/api/v1/topics/')
       .json()
       .post(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putTopic', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
-  async putTopic (context, { template, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/topics/{idtemplate}')
-      .withTemplateParameters({ idtemplate: id })
+  putTopic (context, { topic, id }) {
+    traverson.from('http://localhost:3000/api/v1/topics/{idtopic}')
+      .withTemplateParameters({ idtopic: id })
       .json()
-      .put(template).result
+      .put(topic).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeTopic', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async deleteTopic (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/topics/{idtemplate}')

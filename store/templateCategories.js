@@ -6,7 +6,7 @@ const state = () => ({
 
 const getters = {
   getTemplateCategories: state => function () {
-    return state.TemplateCategories
+    return state.templateCategories
   },
   getTemplateCategory: state => function (id) {
     return state.templateCategories.find(element => element.id === id)
@@ -19,6 +19,13 @@ const mutations = {
   },
   putTemplateCategory (state, TemplateCategory) {
     state.templateCategories.push(TemplateCategory)
+  },
+  changeTemplateCategory (state, TemplateCategory) {
+    const id = state.templateCategories.findIndex((element) => {
+      return element.id === TemplateCategory.id
+    })
+    state.templateCategories[id] = TemplateCategory
+    state.TemplateCategories = { ...state.templateCategories }
   }
 }
 
@@ -28,9 +35,7 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setTemplateCategories', document.templateCategories)
+        context.commit('setTemplateCategories', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -70,9 +75,7 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setTemplateCategories', document.templateCategories)
+        context.commit('setTemplateCategories', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -80,15 +83,32 @@ const actions = {
       })
   },
   addTemplateCategory (context, template) {
-    return traverson.from('http://localhost:3000/api/v1/template-categories/')
+    traverson.from('http://localhost:3000/api/v1/template-categories/')
       .json()
       .post(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putTemplateCategory', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
-  async putTemplateCategory (context, { template, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/template-categories/{idtemplate}')
+  putTemplateCategory (context, { template, id }) {
+    // eslint-disable-next-line no-console
+    console.log(template)
+    traverson.from('http://localhost:3000/api/v1/template-categories/{idtemplate}')
       .withTemplateParameters({ idtemplate: id })
       .json()
       .put(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeTemplateCategory', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async deleteTemplateCategory (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/template-categories/{idtemplate}')

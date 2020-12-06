@@ -467,6 +467,7 @@ export default {
     /** Close the dialog */
     closeDialog () {
       this.isDialogActive = false
+      // eslint-disable-next-line no-console
       console.log('logged : ', this.isUserLogged)
     }
   }

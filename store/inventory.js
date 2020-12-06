@@ -19,6 +19,12 @@ const mutations = {
   },
   putInventory (state, Inventory) {
     state.inventories.push(Inventory)
+  },
+  changeInventory (state, Inventory) {
+    const id = state.inventories.findIndex((element) => {
+      return element.id === Inventory.id
+    })
+    state.inventories[id] = Inventory
   }
 }
 
@@ -28,9 +34,7 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setInventories', document.inventories)
+        context.commit('setInventories', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -38,8 +42,6 @@ const actions = {
       })
   },
   async fetchInventory (context, id) {
-    // eslint-disable-next-line
-    console.log(context.state)
     await traverson.from('http://localhost:3000/api/v1/inventories/{idTemplate}')
       .withTemplateParameters({ idTemplate: id })
       .json()
@@ -70,9 +72,7 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setInventories', document.inventories)
+        context.commit('setInventories', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -80,15 +80,30 @@ const actions = {
       })
   },
   addInventory (context, template) {
-    return traverson.from('http://localhost:3000/api/v1/inventories/')
+    traverson.from('http://localhost:3000/api/v1/inventories/')
       .json()
       .post(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putInventory', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
-  async putInventory (context, { template, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/inventories/{idtemplate}')
-      .withTemplateParameters({ idtemplate: id })
+  putInventory (context, { inventory, id }) {
+    traverson.from('http://localhost:3000/api/v1/inventories/{idIventory}')
+      .withTemplateParameters({ idIventory: id })
       .json()
-      .put(template).result
+      .put(inventory).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeInventory', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async deleteInventory (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/inventories/{idtemplate}')

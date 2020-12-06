@@ -10,6 +10,12 @@ const getters = {
   },
   getGroup: state => function (id) {
     return state.groups.find(element => element.id === id)
+  },
+  changeInventory (state, group) {
+    const id = state.groups.findIndex((element) => {
+      return element.id === group.id
+    })
+    state.groups[id] = group
   }
 }
 
@@ -19,6 +25,12 @@ const mutations = {
   },
   putGroup (state, Group) {
     state.groups.push(Group)
+  },
+  changeGroup (state, group) {
+    const id = state.groups.findIndex((element) => {
+      return element.id === group.id
+    })
+    state.groups[id] = group
   }
 }
 
@@ -31,11 +43,9 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
-    context.commit('setGroups', document.groups)
+    context.commit('setGroups', document.list)
   },
   async fetchGroup (context, id) {
-    // eslint-disable-next-line
-    console.log(context.state)
     const document = await traverson.from('http://localhost:3000/api/v1/groups/{idTemplate}')
       .withTemplateParameters({ idTemplate: id })
       .json()
@@ -67,7 +77,7 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
-    context.commit('setGroups', document.groups)
+    context.commit('setGroups', document.list)
   },
   async fetchGroupForUniverse (context, id) {
     const document = await traverson.from('http://localhost:3000/api/v1/universes/{iduniverse}/groups')
@@ -78,18 +88,33 @@ const actions = {
         // eslint-disable-next-line
         console.log(err)
       })
-    context.commit('setGroups', document.groups)
+    context.commit('setGroups', document.list)
   },
   addGroup (context, template) {
-    return traverson.from('http://localhost:3000/api/v1/groups/')
+    traverson.from('http://localhost:3000/api/v1/groups/')
       .json()
       .post(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putGroup', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
-  async putGroup (context, { template, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/groups/{idtemplate}')
-      .withTemplateParameters({ idtemplate: id })
+  putGroup (context, { group, id }) {
+    traverson.from('http://localhost:3000/api/v1/groups/{idgroup}')
+      .withTemplateParameters({ idgroup: id })
       .json()
-      .put(template).result
+      .put(group).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeGroup', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async deleteGroup (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/groups/{idtemplate}')

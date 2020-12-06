@@ -19,6 +19,13 @@ const mutations = {
   },
   putTemplateStat (state, TemplateStat) {
     state.templateStats.push(TemplateStat)
+  },
+  changeTemplateStat (state, TemplateStat) {
+    const id = state.templateStats.findIndex((element) => {
+      return element.id === TemplateStat.id
+    })
+    state.templateStats[id] = TemplateStat
+    state.templateStats = { ...state.templateStats }
   }
 }
 
@@ -30,7 +37,7 @@ const actions = {
       .then((document) => {
         // eslint-disable-next-line no-console
         console.log(document)
-        context.commit('setTemplateStats', document.templateStats)
+        context.commit('setTemplateStats', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -72,7 +79,7 @@ const actions = {
       .then((document) => {
         // eslint-disable-next-line no-console
         console.log(document)
-        context.commit('setTemplateStats', document.templateStats)
+        context.commit('setTemplateStats', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -83,12 +90,27 @@ const actions = {
     return traverson.from('http://localhost:3000/api/v1/template-stats/')
       .json()
       .post(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putTemplateStat', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async putTemplateStat (context, { template, id }) {
     return await traverson.from('http://localhost:3000/api/v1/template-stats/{idtemplate}')
       .withTemplateParameters({ idtemplate: id })
       .json()
       .put(template).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeTemplateStat', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async deleteTemplateStat (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/template-stats/{idtemplate}')

@@ -33,6 +33,17 @@ const mutations = {
   },
   setStat (state, stats) {
     state.stats = stats
+  },
+  changeCharacter (state, character) {
+    const id = state.characters.findIndex((element) => {
+      return element.id === character.id
+    })
+    // eslint-disable-next-line no-console
+    console.log(state.characters[id])
+    state.characters[id] = character
+    // eslint-disable-next-line no-console
+    console.log(state.characters[id])
+    state.character = character
   }
 }
 
@@ -44,7 +55,7 @@ const actions = {
       .then((document) => {
         // eslint-disable-next-line no-console
         console.log(document)
-        context.commit('setCharacters', document.characters)
+        context.commit('setCharacters', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -86,7 +97,7 @@ const actions = {
       .then((document) => {
         // eslint-disable-next-line no-console
         console.log(document)
-        context.commit('setCharacters', document.characters)
+        context.commit('setCharacters', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -101,7 +112,7 @@ const actions = {
       .then((document) => {
         // eslint-disable-next-line no-console
         console.log(document)
-        context.commit('setCharacters', document.characters)
+        context.commit('setCharacters', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -117,7 +128,7 @@ const actions = {
         // eslint-disable-next-line no-console
         console.log(err)
       })
-    context.commit('setCharacters', document.characters)
+    context.commit('setCharacters', document.list)
   },
   async fetchCharacterWithStat (context, id) {
     const values = await Promise.all([
@@ -139,18 +150,33 @@ const actions = {
     context.commit('setStat', values[1])
   },
   addCharacter (context, character) {
-    return traverson.from('http://localhost:3000/api/v1/characters/')
+    traverson.from('http://localhost:3000/api/v1/characters/')
       .json()
       .post(character).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putCharacter', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
-  async putCharacter (context, { character, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}')
+  putCharacter (context, { character, id }) {
+    traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}')
       .withTemplateParameters({ idcharacter: id })
       .json()
       .put(character).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeCharacter', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
-  async deleteCharacter (context, id) {
-    return await traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}')
+  deleteCharacter (context, id) {
+    return traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}')
       .withTemplateParameters({ idcharacter: id })
       .json()
       .delete().result

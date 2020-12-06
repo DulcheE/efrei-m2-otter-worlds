@@ -19,7 +19,15 @@ const mutations = {
   },
   putUniverse (state, universe) {
     state.universes.push(universe)
+  },
+  changeUniverse (state, universe) {
+    const id = state.universes.findIndex((element) => {
+      return element.id === universe.id
+    })
+    state.universes[id] = universe
+    state.universes = { ...state.universes }
   }
+
 }
 
 const actions = {
@@ -28,7 +36,7 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        context.commit('setUniverses', document.universes)
+        context.commit('setUniverses', document.list)
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -66,12 +74,27 @@ const actions = {
     return traverson.from('http://localhost:3000/api/v1/universes/')
       .json()
       .post(universe).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('putUniverse', result)
+        return result
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async putUniverse (context, { universe, id }) {
     return await traverson.from('http://localhost:3000/api/v1/universes/{iduniverse}')
       .withTemplateParameters({ iduniverse: id })
       .json()
       .put(universe).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeUniverse', result)
+      })
+      .catch((err) => {
+        throw err
+      })
   },
   async deleteUniverse (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/universes/{iduniverse}')
