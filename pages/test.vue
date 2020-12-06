@@ -1,12 +1,12 @@
 <template>
   <div>
-    <!--<v-list v-for="user in users" :key="user.id">
+    <v-list v-for="user in users" :key="user.id">
       <h1>{{ user }}</h1>
-    </v-list> -->
-    <h1>{{ logged }}</h1>
-    <v-list v-for="universe in universes" :key="universe.id">
-      <h5>{{ universe }}</h5>
     </v-list>
+    <h1>{{ logged }}</h1>
+    <!-- <v-list v-for="universe in universes" :key="universe.id">
+      <h5>{{ universe }}</h5>
+    </v-list> -->
     <!-- <v-list v-for="template in templateCategories" :key="template.id">
       <h5>{{ template }}</h5>
     </v-list> -->
@@ -102,6 +102,7 @@ export default {
   },
   async mounted () {
     await this.login({ username: 'François', password: 'françoispwd' })
+    await this.fetchUser(1)
     // await this.fetchTemplateCategoryForUniverse(4)
     // await this.fetchAllCharacters()
     // await this.addCharacter({ name: 'Maynard Plainslayer', backstory: 'A lazy ass mother fucker', bIsDead: false, bIsSheetCompleted: true, idUser: 1, idUniverse: 2 })
@@ -143,7 +144,7 @@ export default {
   },
   methods: {
     ...mapActions('login', ['login', 'fetchUniverseOwn', 'fetchUniversePlay']),
-    ...mapActions('user', ['fetchAllUsers', 'addUser', 'putUser', 'deleteUser']),
+    ...mapActions('user', ['fetchAllUsers', 'fetchUser', 'addUser', 'putUser', 'deleteUser']),
     ...mapActions('universe', ['fetchAllUniverses', 'fetchUniverse', 'addUniverse', 'putUniverse', 'deleteUniverse']),
     ...mapActions('templateCategories', ['fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchTemplateCategoryForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory']),
     ...mapActions('templateStat', ['fetchAllTemplateStats', 'fetchTemplateStat', 'fetchTemplateStatForCategory', 'addTemplateStat', 'putTemplateStat', 'deleteTemplateStat']),
