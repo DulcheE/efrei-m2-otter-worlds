@@ -93,7 +93,7 @@
                 />
               </v-avatar>
             </v-badge>
-            <span class="shrink d-none d-lg-flex">{{ name }}</span>
+            <span class="shrink d-none d-lg-flex">{{ username }}</span>
           </v-btn>
         </template>
 
@@ -204,8 +204,7 @@
 
 <script>
 import LayoutLoginDialog from '@/components/layout-login-dialog'
-import { mapGetters } from 'vuex'
-const traverson = require('traverson-promise')
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'LayoutAppBar',
@@ -216,8 +215,6 @@ export default {
 
   data () {
     return {
-      name: '',
-      // name: 'John DOE',
       isDialogActive: false,
       tab: null,
       universes: [],
@@ -249,6 +246,7 @@ export default {
   computed: {
     // Imports
     ...mapGetters('login', ['getLogged']),
+    ...mapGetters('universe', ['getUniverses']),
 
     /** Items to display when a user is NOT browsing an universe */
     itemsTabDefault () {
@@ -370,6 +368,11 @@ export default {
       return this.getLogged().logged
     },
 
+    /** Returns whether the user's username */
+    username () {
+      return this.getLogged().username
+    },
+
     /** Returns whether a universe is selected or not */
     isUniverseSelected () {
       return false
@@ -439,26 +442,17 @@ export default {
     }
   },
 
-  mounted () {
-    traverson.from('http://localhost:3000/api/v1')
-      .follow('$._links.universes')
-      .getResource().result
-      .then((document) => {
-        this.universes = document.list
-        return Promise.all(this.universes.map((universe) => {
-          traverson.from(universe._links.user.href)
-            .getResource().result
-            .then((document) => {
-              this.$set(universe, 'user', document)
-            })
-        }))
-      })
-      .catch((err) => {
-        throw err.message
-      })
+  async mounted () {
+    // We fetch all the Universes from the database
+    await this.fetchAllUniverses()
+
+    // We get these universes
+    this.universes = await this.getUniverses()
   },
 
   methods: {
+    ...mapActions('universe', ['fetchAllUniverses']),
+
     /** Opens the dialog */
     openDialog () {
       this.isDialogActive = true
@@ -467,8 +461,11 @@ export default {
     /** Close the dialog */
     closeDialog () {
       this.isDialogActive = false
+<<<<<<< Updated upstream
       // eslint-disable-next-line no-console
       console.log('logged : ', this.isUserLogged)
+=======
+>>>>>>> Stashed changes
     }
   }
 }
