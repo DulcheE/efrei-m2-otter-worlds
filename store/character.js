@@ -175,6 +175,25 @@ const actions = {
         throw err
       })
   },
+  putStatForCharacter (context, { stats, id }) {
+    traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/stats')
+      .withTemplateParameters({ idcharacter: id })
+      .json()
+      .put(stats).result
+      .then((response) => {
+        const result = JSON.parse(response.body)
+        context.commit('changeCharacter', result)
+      })
+      .catch((err) => {
+        throw err
+      })
+  },
+  putCharacterInGroup (context, { idgroup, idCharacter }) {
+    return traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/groups')
+      .withTemplateParameters({ idcharacter: idCharacter })
+      .json()
+      .post({ idGroup: idgroup }).result
+  },
   deleteCharacter (context, id) {
     return traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}')
       .withTemplateParameters({ idcharacter: id })
