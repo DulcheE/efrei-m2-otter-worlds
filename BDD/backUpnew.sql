@@ -11,8 +11,59 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
+-- Listage des données de la table otter_worlds.user : ~4 rows (environ)
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` (`idUser`, `username`, `password`) VALUES
+	(1, 'Eddy', 'edypaswor'),
+	(2, 'Hugues', 'hugespaword'),
+	(3, 'François', 'françoispwd'),
+	(4, 'Paul', 'paulsword');
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+
+
+-- Listage des données de la table otter_worlds.universe : ~5 rows (environ)
+/*!40000 ALTER TABLE `universe` DISABLE KEYS */;
+INSERT INTO `universe` (`idUniverse`, `name`, `description`, `bIsPublic`, `user_idUser`) VALUES
+	(1, 'My little Poney', 'Wonderful world with a lot of magical poney', 1, 4),
+	(2, 'The Witcher', 'Dark world with beasts and magic', 0, 1),
+	(3, 'Warhammer', 'Chaotic world with wars and heretics', 1, 2),
+	(4, 'Dungeons and dragons', 'Medieval fantasy world with epic quests', 1, 3),
+	(5, 'Unity', 'a mix of fantasy post apocaliptic and weird scify', 1, 3);
+/*!40000 ALTER TABLE `universe` ENABLE KEYS */;
+
+-- Listage des données de la table otter_worlds.templatecategory : ~4 rows (environ)
+/*!40000 ALTER TABLE `templatecategory` DISABLE KEYS */;
+INSERT INTO `templatecategory` (`idTemplateCategory`, `name`, `order`, `universe_idUniverse`) VALUES
+	(1, 'Characteristics', 2, 4),
+	(2, 'Description', 1, 4),
+	(3, 'Skills', 3, 4),
+	(5, 'test', 4, 4);
+/*!40000 ALTER TABLE `templatecategory` ENABLE KEYS */;
+
+
+
+-- Listage des données de la table otter_worlds.templatestat : ~14 rows (environ)
+/*!40000 ALTER TABLE `templatestat` DISABLE KEYS */;
+INSERT INTO `templatestat` (`idTemplateStat`, `name`, `bIsNumber`, `bIsRequired`, `templateCategory_idTemplateCategory`) VALUES
+	(1, 'Run', 1, 0, 3),
+	(2, 'Jump', 1, 0, 3),
+	(3, 'Name', 0, 1, 2),
+	(4, 'Race', 0, 1, 2),
+	(5, 'Sex', 0, 1, 2),
+	(6, 'Age', 1, 1, 2),
+	(7, 'INT', 1, 1, 1),
+	(8, 'DEX', 1, 1, 1),
+	(9, 'Sword (1-h)', 1, 0, 3),
+	(10, 'STR', 1, 1, 1),
+	(11, 'Kingdom', 0, 0, 2),
+	(12, 'CHA', 1, 1, 1),
+	(13, 'Sword (2-h)', 1, 0, 3),
+	(14, 'prout qui pue', 1, 1, 1);
+/*!40000 ALTER TABLE `templatestat` ENABLE KEYS */;
+
 -- Listage des données de la table otter_worlds.article : ~14 rows (environ)
 /*!40000 ALTER TABLE `article` DISABLE KEYS */;
+
 INSERT INTO `article` (`idArticle`, `title`, `content`, `thumbnail`, `subTopic_idSubTopic`) VALUES
 	(1, 'Les Cité', 'les cite de la cote de l\'epee sont tres impressionannte', 'hdjfg.jsp', 4),
 	(2, 'never winter', 'never winter est la capital du monde connues', 'neverwinter.png', 4),
@@ -29,6 +80,34 @@ INSERT INTO `article` (`idArticle`, `title`, `content`, `thumbnail`, `subTopic_i
 	(13, 'house', 'it\'s a house, for poney', 'poney', 1),
 	(14, 'warior', 'it\'s a poney with an armor that shout lazer with his eyes ', NULL, 3);
 /*!40000 ALTER TABLE `article` ENABLE KEYS */;
+
+-- Listage des données de la table otter_worlds.topic : ~8 rows (environ)
+/*!40000 ALTER TABLE `topic` DISABLE KEYS */;
+INSERT INTO `topic` (`idTopic`, `name`, `order`, `universe_idUniverse`, `article_idArticle`) VALUES
+	(3, 'poney Land', 1, 1, NULL),
+	(6, 'Religions', 2, 4, NULL),
+	(7, 'les royaumes oublier', 1, 4, NULL),
+	(15, 'the human', 1, 2, NULL),
+	(16, 'the wild hunt', 2, 2, 3),
+	(17, 'faction and power', 3, 2, NULL),
+	(18, 'war', 1, 3, NULL),
+	(19, 'hammer', 2, 3, NULL);
+/*!40000 ALTER TABLE `topic` ENABLE KEYS */;
+
+
+-- Listage des données de la table otter_worlds.subtopic : ~9 rows (environ)
+/*!40000 ALTER TABLE `subtopic` DISABLE KEYS */;
+INSERT INTO `subtopic` (`idSubTopic`, `name`, `order`, `topic_idTopic`, `article_idArticle`) VALUES
+	(1, 'poney house', 1, 3, NULL),
+	(3, 'poney warior', 2, 3, NULL),
+	(4, 'la cote de l\'epee', 1, 7, NULL),
+	(6, 'Barovia', 2, 7, 6),
+	(7, 'Le culte de zafriel', 1, 6, 4),
+	(8, 'the eternal fire', 1, 17, NULL),
+	(9, 'nilfgaar', 2, 17, NULL),
+	(10, 'jaskie the bard', 1, 15, NULL),
+	(11, 'the ice knights', 1, 16, 3);
+/*!40000 ALTER TABLE `subtopic` ENABLE KEYS */;
 
 -- Listage des données de la table otter_worlds.character : ~6 rows (environ)
 /*!40000 ALTER TABLE `character` DISABLE KEYS */;
@@ -97,25 +176,17 @@ INSERT INTO `inventory` (`idInventory`, `name`, `number`, `description`, `weight
 
 -- Listage des données de la table otter_worlds.keyword : ~7 rows (environ)
 /*!40000 ALTER TABLE `keyword` DISABLE KEYS */;
-INSERT INTO `keyword` (`idKeyword`, `name`, `universe_idUniverse`) VALUES
-	(4, 'donjon', 4),
-	(1, 'dragon', 4),
-	(2, 'lore', 4),
-	(6, 'poney', 1),
-	(5, 'sun sword', 4),
-	(3, 'war', 3),
-	(7, 'witcher', 2);
+INSERT INTO `keyword` ( `name`, article_idArticle ) VALUES
+	('donjon', 4),
+	('dragon', 4),
+	('lore', 4),
+	('poney', 1),
+	('sun sword', 4),
+	('war', 3),
+	('witcher', 2);
 /*!40000 ALTER TABLE `keyword` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.keywordarticle : ~5 rows (environ)
-/*!40000 ALTER TABLE `keywordarticle` DISABLE KEYS */;
-INSERT INTO `keywordarticle` (`keyword_idKeyword`, `article_idArticle`) VALUES
-	(1, 1),
-	(5, 5),
-	(5, 6),
-	(6, 13),
-	(7, 10);
-/*!40000 ALTER TABLE `keywordarticle` ENABLE KEYS */;
+
 
 -- Listage des données de la table otter_worlds.map : ~4 rows (environ)
 /*!40000 ALTER TABLE `map` DISABLE KEYS */;
@@ -152,47 +223,10 @@ INSERT INTO `stat` (`value`, `character_idCharacter`, `templateStat_idTemplateSt
 	('2', 1, 13);
 /*!40000 ALTER TABLE `stat` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.subtopic : ~9 rows (environ)
-/*!40000 ALTER TABLE `subtopic` DISABLE KEYS */;
-INSERT INTO `subtopic` (`idSubTopic`, `name`, `order`, `topic_idTopic`, `article_idArticle`) VALUES
-	(1, 'poney house', 1, 3, NULL),
-	(3, 'poney warior', 2, 3, NULL),
-	(4, 'la cote de l\'epee', 1, 7, NULL),
-	(6, 'Barovia', 2, 7, 6),
-	(7, 'Le culte de zafriel', 1, 6, 4),
-	(8, 'the eternal fire', 1, 17, NULL),
-	(9, 'nilfgaar', 2, 17, NULL),
-	(10, 'jaskie the bard', 1, 15, NULL),
-	(11, 'the ice knights', 1, 16, 3);
-/*!40000 ALTER TABLE `subtopic` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.templatecategory : ~4 rows (environ)
-/*!40000 ALTER TABLE `templatecategory` DISABLE KEYS */;
-INSERT INTO `templatecategory` (`idTemplateCategory`, `name`, `order`, `universe_idUniverse`) VALUES
-	(1, 'Characteristics', 2, 4),
-	(2, 'Description', 1, 4),
-	(3, 'Skills', 3, 4),
-	(5, 'test', 4, 4);
-/*!40000 ALTER TABLE `templatecategory` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.templatestat : ~14 rows (environ)
-/*!40000 ALTER TABLE `templatestat` DISABLE KEYS */;
-INSERT INTO `templatestat` (`idTemplateStat`, `name`, `bIsNumber`, `bIsRequired`, `templateCategory_idTemplateCategory`) VALUES
-	(1, 'Run', 1, 0, 3),
-	(2, 'Jump', 1, 0, 3),
-	(3, 'Name', 0, 1, 2),
-	(4, 'Race', 0, 1, 2),
-	(5, 'Sex', 0, 1, 2),
-	(6, 'Age', 1, 1, 2),
-	(7, 'INT', 1, 1, 1),
-	(8, 'DEX', 1, 1, 1),
-	(9, 'Sword (1-h)', 1, 0, 3),
-	(10, 'STR', 1, 1, 1),
-	(11, 'Kingdom', 0, 0, 2),
-	(12, 'CHA', 1, 1, 1),
-	(13, 'Sword (2-h)', 1, 0, 3),
-	(14, 'prout qui pue', 1, 1, 1);
-/*!40000 ALTER TABLE `templatestat` ENABLE KEYS */;
+
+
 
 -- Listage des données de la table otter_worlds.timeline : ~2 rows (environ)
 /*!40000 ALTER TABLE `timeline` DISABLE KEYS */;
@@ -201,37 +235,8 @@ INSERT INTO `timeline` (`idTimeline`, `name`, `description`, `bIsPublic`, `unive
 	(2, 'the age of the horses', 'the event that happened in the legendary ages of the horses', 1, 1);
 /*!40000 ALTER TABLE `timeline` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.topic : ~8 rows (environ)
-/*!40000 ALTER TABLE `topic` DISABLE KEYS */;
-INSERT INTO `topic` (`idTopic`, `name`, `order`, `universe_idUniverse`, `article_idArticle`) VALUES
-	(3, 'poney Land', 1, 1, NULL),
-	(6, 'Religions', 2, 4, NULL),
-	(7, 'les royaumes oublier', 1, 4, NULL),
-	(15, 'the human', 1, 2, NULL),
-	(16, 'the wild hunt', 2, 2, 3),
-	(17, 'faction and power', 3, 2, NULL),
-	(18, 'war', 1, 3, NULL),
-	(19, 'hammer', 2, 3, NULL);
-/*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.universe : ~5 rows (environ)
-/*!40000 ALTER TABLE `universe` DISABLE KEYS */;
-INSERT INTO `universe` (`idUniverse`, `name`, `description`, `bIsPublic`, `user_idUser`) VALUES
-	(1, 'My little Poney', 'Wonderful world with a lot of magical poney', 1, 4),
-	(2, 'The Witcher', 'Dark world with beasts and magic', 0, 1),
-	(3, 'Warhammer', 'Chaotic world with wars and heretics', 1, 2),
-	(4, 'Dungeons and dragons', 'Medieval fantasy world with epic quests', 1, 3),
-	(5, 'Unity', 'a mix of fantasy post apocaliptic and weird scify', 1, 3);
-/*!40000 ALTER TABLE `universe` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.user : ~4 rows (environ)
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` (`idUser`, `username`, `password`) VALUES
-	(1, 'Eddy', 'edypaswor'),
-	(2, 'Hugues', 'hugespaword'),
-	(3, 'François', 'françoispwd'),
-	(4, 'Paul', 'paulsword');
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
 
 -- Listage des données de la table otter_worlds.userinvitation : ~5 rows (environ)
 /*!40000 ALTER TABLE `userinvitation` DISABLE KEYS */;

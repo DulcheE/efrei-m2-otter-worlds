@@ -1,8 +1,8 @@
 <template>
   <div>
-    <v-list v-for="user in users" :key="user.id">
+    <!-- <v-list v-for="user in users" :key="user.id">
       <h1>{{ user }}</h1>
-    </v-list>
+    </v-list> -->
     <h1>{{ logged }}</h1>
     <!-- <v-list v-for="universe in universes" :key="universe.id">
       <h5>{{ universe }}</h5>
@@ -34,6 +34,21 @@
     </v-list>
     <h5>{{ subTopic }}</h5>
     <h5>{{ articleSub }}</h5> -->
+    <!-- <v-list v-for="mape in maps" :key="mape.id">
+      <h5>{{ mape }}</h5>
+    </v-list>
+    <h5>{{ map }}</h5>
+    <h5>{{ InterestPoints }}</h5> -->
+    <!-- <v-list v-for="point in InterestPoints" :key="point.id">
+      <h5>{{ point }}</h5>
+    </v-list> -->
+    <!-- <v-list v-for="timelin in timelines" :key="timelin.id">
+      <h5>{{ timelin }}</h5>
+    </v-list>
+    <h5>{{ timeline }}</h5> -->
+    <v-list v-for="event in events" :key="event.id">
+      <h5>{{ event }}</h5>
+    </v-list>
   </div>
 </template>
 
@@ -51,6 +66,19 @@ export default {
     ...mapGetters('group', ['getGroups', 'getGroup']),
     ...mapGetters('topic', ['getTopics', 'getTopic', 'getTopicByid', 'getTopicArticle']),
     ...mapGetters('subTopic', ['getSubTopics', 'getSubTopicByid', 'getSubTopic', 'getSubTopicArticle']),
+    ...mapGetters('map', ['getMaps', 'getMapByid', 'getMap']),
+    ...mapGetters('interestPoint', ['getInterestPoints', 'getInterestPoint']),
+    ...mapGetters('timeline', ['getTimelines', 'getTimeline', '']),
+    ...mapGetters('event', ['getEvents']),
+    timelines () {
+      return this.getTimelines()
+    },
+    timeline () {
+      return this.getTimelines()
+    },
+    events () {
+      return this.getEvents()
+    },
     logged () {
       return this.getLogged()
     },
@@ -98,11 +126,30 @@ export default {
     },
     universes () {
       return this.getUniverses()
+    },
+    maps () {
+      return this.getMaps()
+    },
+    map () {
+      return this.getMap()
+    },
+    InterestPoints () {
+      return this.getInterestPoints()
     }
   },
   async mounted () {
     await this.login({ username: 'François', password: 'françoispwd' })
-    await this.fetchUser(1)
+    await this.fetchEventForTimeline(1)
+    await this.putEvent({ event: { name: 'the conquest of the third circle', year: 10, month: 5, day: null, description: 'the demons of the abyss walk on the third circle of like it always belong to them', idArticle: null, idTimeline: 1 }, id: 6 })
+    /* await this.fetchTimelinesForUniverse(4)
+    await this.fetchTimelineWithEvent(1)
+    await this.putTimeline({ timeline: { name: 'the stradh conquest', description: 'stradh is a very cruel and powerfull vampire who rule barovia', bIsPublic: true, idUniverse: 4 }, id: 3 }) */
+    // await this.fetchAllInterestPoints()
+    // await this.putInterestPoint({ interestPoint: { name: 'temple of the forgoten god', coordinate: '(17, 12)', idMap: 5 }, id: 9 })
+    // await this.fetchMapsForUniverse(4)
+    // await this.fetchMapWithInterestPoint(1)
+    // await this.putMap({ id: 5, map: { name: 'baldur gate', idUniverse: 4, idArticle: 5 } })
+    // await this.fetchUser(1)
     // await this.fetchTemplateCategoryForUniverse(4)
     // await this.fetchAllCharacters()
     // await this.addCharacter({ name: 'Maynard Plainslayer', backstory: 'A lazy ass mother fucker', bIsDead: false, bIsSheetCompleted: true, idUser: 1, idUniverse: 2 })
@@ -152,8 +199,11 @@ export default {
     ...mapActions('inventory', ['fetchAllInventories', 'fetchInventory', 'fetchInventoryForCharacter', 'addInventory', 'putInventory', 'deleteInventory']),
     ...mapActions('group', ['fetchAllGroups', 'fetchGroup', 'fetchGroupForCharacter', 'fetchGroupForUniverse', 'addGroup', 'putGroup', 'deleteGroup']),
     ...mapActions('topic', ['fetchAllTopics', 'fetchTopic', 'fetchTopicWithArticle', 'fetchTopicForUniverse', 'addTopic', 'putTopic']),
-    ...mapActions('subTopic', ['fetchAllSubTopics', 'fetchSubTopic', 'fetchSubTopicWithArticle', 'fetchSubTopicForTopic', 'addSubTopic'])
-
+    ...mapActions('subTopic', ['fetchAllSubTopics', 'fetchSubTopic', 'fetchSubTopicWithArticle', 'fetchSubTopicForTopic', 'addSubTopic']),
+    ...mapActions('map', ['fetchAllMaps', 'fetchMap', 'fetchMapsForUniverse', 'fetchMapWithInterestPoint', 'addMap', 'putMap', 'deleteMap']),
+    ...mapActions('interestPoint', ['fetchAllInterestPoints', 'fetchInterestPoint', 'fetchInterestPointForMap', 'addInterestPoint', 'putInterestPoint', 'deleteInterestPoint']),
+    ...mapActions('timeline', ['fetchAllTimelines', 'fetchTimeline', 'fetchTimelinesForUniverse', 'fetchTimelineWithEvent', 'addTimeline', 'putTimeline']),
+    ...mapActions('event', ['fetchAllEvents', 'fetchEvent', 'fetchEventForTimeline', 'addEvent', 'putEvent', 'deleteEvent'])
   }
 
 }
