@@ -11,7 +11,7 @@ export default async function postArticle (req, res) {
     res.status(201).json(newArticle.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.log(err)
+    console.log(err.code)
     const jsonErr = { code: err.code, message: 'Error while creating the new template.\n' }
 
     if (err.code === 'ER_NO_REFERENCED_ROW_2') {
