@@ -3,6 +3,11 @@ export default {
   name: 'MixinRules',
 
   data: () => ({
+    // Input max values
+    valueMaxSmall: 50,
+    valueMaxBig: 65535,
+
+    // Rules
     rules: {
       required: value => !!value || 'Required',
       maxSmall: value => (value !== null && value !== undefined && value.length <= 50) || 'Max 50 characters',

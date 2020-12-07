@@ -1,11 +1,13 @@
 <template>
   <v-container>
-    <h1>Universe {{ $route.params.idUniverse }}</h1>
+    <h1>Universe {{ universe.name }}</h1>
   </v-container>
 </template>
 
 <script>
 // Imports
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'PageUniverse',
 
@@ -17,16 +19,27 @@ export default {
   }),
 
   computed: {
+    ...mapGetters('universe', ['getUniverse', 'getUniverses']),
+
+    idUniverse () {
+      return parseInt(this.$route.params.idUniverse)
+    }
   },
 
-  mounted () {
+  async mounted () {
+    // We fetch the Universe from the database
+    await this.fetchUniverse(this.idUniverse)
+
+    // We get the universe
+    this.universe = await this.getUniverse(this.idUniverse)
   },
 
   methods: {
+    ...mapActions('universe', ['fetchUniverse'])
   },
 
   head () {
-    return { title: this.$route.params.idUniverse }
+    return { title: this.universe.name }
   }
 }
 </script>

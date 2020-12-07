@@ -260,7 +260,7 @@ export default {
           icon: 'mdi-earth',
           title: 'Create / Discover Universes',
           to: '/most-known-universes',
-          content: this.universes.map((u) => {
+          content: this.universes.slice(0, 5).map((u) => {
             return {
               title: u.name,
               src: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
