@@ -11,7 +11,7 @@ class HalResourceDataTopic extends HalResourceData {
 class HalToOneLinksTopic extends HalToOneLinks {
   /** @type { Number } */
   universe
-  /** @type { Number } */
+  /** @type { Number? } */
   article
 }
 
@@ -37,7 +37,7 @@ export default class Topic extends HalResource {
 
     this.toOneLinks = new HalToOneLinksTopic()
     this.toOneLinks.universe = topic.universe_idUniverse || topic.toOneLinks.universe
-    this.toOneLinks.article = topic.article_idArticle || (topic.toOneLinks !== undefined) ? topic.toOneLinks.article : undefined
+    this.toOneLinks.article = (topic.article_idArticle !== undefined) ? topic.article_idArticle : topic.toOneLinks.article
   }
 
   /**

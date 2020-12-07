@@ -9,7 +9,7 @@ class HalResourceDataMap extends HalResourceData {
 class HalToOneLinksMap extends HalToOneLinks {
   /** @type { Number } */
   universe
-  /** @type { Number } */
+  /** @type { Number? } */
   article
 }
 
@@ -34,7 +34,7 @@ export default class Map extends HalResource {
 
     this.toOneLinks = new HalToOneLinksMap()
     this.toOneLinks.universe = map.universe_idUniverse || map.toOneLinks.universe
-    this.toOneLinks.article = map.article_idArticle || (map.toOneLinks !== undefined) ? map.toOneLinks.article : undefined
+    this.toOneLinks.article = (map.article_idArticle !== undefined) ? map.article_idArticle : map.toOneLinks.article
   }
 
   /**

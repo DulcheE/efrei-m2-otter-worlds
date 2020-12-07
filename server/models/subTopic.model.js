@@ -37,7 +37,7 @@ export default class SubTopic extends HalResource {
 
     this.toOneLinks = new HalToOneLinksSubTopic()
     this.toOneLinks.topic = subTopic.topic_idTopic || subTopic.toOneLinks.topic
-    this.toOneLinks.article = subTopic.article_idArticle || (subTopic.toOneLinks !== undefined) ? subTopic.toOneLinks.article : undefined
+    this.toOneLinks.article = (subTopic.article_idArticle !== undefined) ? subTopic.article_idArticle : subTopic.toOneLinks.article
   }
 
   /**

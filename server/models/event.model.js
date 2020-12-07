@@ -6,9 +6,9 @@ class HalResourceDataEvent extends HalResourceData {
   name
   /** @type { Number } */
   year
-  /** @type { Number } */
+  /** @type { Number? } */
   month
-  /** @type { Number } */
+  /** @type { Number? } */
   day
   /** @type { String } */
   description
@@ -17,7 +17,7 @@ class HalResourceDataEvent extends HalResourceData {
 class HalToOneLinksEvent extends HalToOneLinks {
   /** @type { Number } */
   timeline
-  /** @type { Number } */
+  /** @type { Number? } */
   article
 }
 
@@ -39,13 +39,13 @@ export default class Event extends HalResource {
     this.data = new HalResourceDataEvent()
     this.data.name = event.name || event.data.name
     this.data.year = event.year || event.data.year
-    this.data.month = event.month || event.data.month
-    this.data.day = event.day || event.data.day
+    this.data.month = (event.month !== undefined) ? event.month : event.data.month
+    this.data.day = (event.day !== undefined) ? event.day : event.data.day
     this.data.description = event.description || event.data.description
 
     this.toOneLinks = new HalToOneLinksEvent()
     this.toOneLinks.timeline = event.timeline_idTimeline || event.toOneLinks.timeline
-    this.toOneLinks.article = event.article_idArticle || event.toOneLinks.article
+    this.toOneLinks.article = (event.article_idArticle !== undefined) ? event.article_idArticle : event.toOneLinks.article
   }
 
   /**
