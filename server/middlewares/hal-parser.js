@@ -26,7 +26,7 @@ export class HalResource {
       if (this.data[_] !== null) { data[_] = this.data[_] }
     })
     const resource = hal.Resource({ id: this.id, ...data },
-      `${baseAPI + resourcePath}/${this.id}`)
+      encodeURI(`${baseAPI + resourcePath}/${this.id}`))
 
     // the links one to one and many to one
     const toOneLinks = Object.keys(this.toOneLinks)
@@ -38,14 +38,14 @@ export class HalResource {
         const link = rel.charAt(rel.length - 1) !== 'y' ? rel + 's' : rel.slice(0, rel.length - 1) + 'ies'
 
         resource.link(rel,
-          `${baseAPI + link}/${this.toOneLinks[key]}`)
+          encodeURI(`${baseAPI + link}/${this.toOneLinks[key]}`))
       }
     })
 
     // the links one to many
     this.constructor.toManyLinks.forEach((toManyLink) => {
       resource.link(toManyLink,
-        `${baseAPI + resourcePath}/${this.id}/${toManyLink}`)
+        encodeURI(`${baseAPI + resourcePath}/${this.id}/${toManyLink}`))
     })
 
     return resource
@@ -66,7 +66,7 @@ export class HalResource {
       resources.push(resource.asResource(baseAPI, resourcePath).toJSON())
     }
 
-    const resource = hal.Resource({ list: resources }, baseAPI + selfLink)
+    const resource = hal.Resource({ list: resources }, encodeURI(baseAPI + selfLink))
 
     return resource
   }

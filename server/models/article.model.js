@@ -85,17 +85,23 @@ export default class Article extends HalResource {
   }
 
   /**
-   * @param { Number } idKeyword id of the keyword
+   * @param { Number } idUniverse id of the universe
+   * @param { String } keyword name of the keyword
    * @returns { Promise<Article[]> }
    */
-  static async getByKeyword (idKeyword) {
-    // TODO use custom view
+  static async getByKeyword (idUniverse, keyword) {
     return await mariadbStore.client.query(`
-      SELECT * FROM article a
-      LEFT OUTER JOIN keywordarticle ka
-        ON a.idArticle = ka.article_idArticle
-      WHERE ka.keyword_idKeyword = ?
-    `, idKeyword)
+      SELECT a.* FROM article a
+      INNER JOIN subTopic st
+        ON st.idSubTopic = a.subTopic_idSubTopic
+      INNER JOIN topic t
+        ON t.idTopic = st.topic_idTopic
+      INNER JOIN universe u
+        ON u.idUniverse = t.universe_idUniverse
+      INNER JOIN keyword k
+        ON k.article_idArticle = a.idArticle
+      WHERE u.idUniverse = ? AND k.name = ?
+    `, [idUniverse, keyword])
   }
 
   /// POST

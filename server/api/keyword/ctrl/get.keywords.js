@@ -1,3 +1,4 @@
+import hal from 'hal'
 import Keyword from '../../../models/keyword.model'
 import { baseAPI } from '../../routes.js'
 
@@ -7,5 +8,13 @@ import { baseAPI } from '../../routes.js'
  */
 export default async function getKeywords (req, res) {
   const keywords = await Keyword.getAll()
-  res.status(200).json(Keyword.asResourceList(baseAPI(req), keywords))
+
+  const resources = []
+  for (const item of keywords) {
+    const keyword = new Keyword(item)
+    const resource = keyword.asResource(baseAPI(req))
+    resources.push(resource)
+  }
+
+  res.status(200).json(hal.Resource({ list: resources }, baseAPI(req) + 'keywords'))
 }

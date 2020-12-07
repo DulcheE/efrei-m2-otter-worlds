@@ -1,3 +1,4 @@
+import hal from 'hal'
 import { mariadbStore } from '../mariadb-store.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
@@ -8,7 +9,7 @@ class HalResourceDataKeyword extends HalResourceData {
 
 class HalToOneLinksKeyword extends HalToOneLinks {
   /** @type { Number } */
-  universe
+  article
 }
 
 export default class Keyword extends HalResource {
@@ -25,21 +26,21 @@ export default class Keyword extends HalResource {
   constructor (keyword) {
     super()
 
-    this.id = keyword.idKeyword || keyword.id
-
     this.data = new HalResourceDataKeyword()
     this.data.name = keyword.name || keyword.data.name
 
     this.toOneLinks = new HalToOneLinksKeyword()
-    this.toOneLinks.universe = keyword.universe_idUniverse || keyword.toOneLinks.universe
+    this.toOneLinks.article = keyword.article_idArticle || keyword.toOneLinks.article
   }
 
   /**
    * @param { String } baseAPI
    * @param { String } resourcePath
    */
-  asResource (baseAPI, resourcePath = 'keywords') {
-    return super.asResource(baseAPI, resourcePath)
+  asResource (baseAPI) {
+    const resource = hal.Resource({ name: this.data.name })
+    resource.link('article', baseAPI + 'articles/' + this.toOneLinks.article)
+    return resource
   }
 
   /**
@@ -59,14 +60,6 @@ export default class Keyword extends HalResource {
    */
   static async getAll () {
     return await mariadbStore.client.query('SELECT * FROM keyword')
-  }
-
-  /**
-   * @param { Number } id id of the keyword
-   * @returns { Promise<Keyword> }
-   */
-  static async get (id) {
-    return new Keyword((await mariadbStore.client.query('SELECT * FROM keyword WHERE idKeyword = ?', id))[0])
   }
 
   /**
