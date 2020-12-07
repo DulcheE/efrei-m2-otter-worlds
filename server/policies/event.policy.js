@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store'
+import { mariadbStore } from '../mariadb-store.js'
 
 class EventPolicy {
   /**

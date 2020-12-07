@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store.js'
+import { mariadbStore } from '../mariadb-store.js'
 
 /**
  * @param { import('express').Request } req
