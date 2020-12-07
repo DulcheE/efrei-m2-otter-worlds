@@ -82,8 +82,8 @@ INSERT INTO `subtopic` (`idSubTopic`, `name`, `order`, `topic_idTopic`, `article
 	(2, '[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, 2, NULL),
 	(3, '[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, 3, NULL),
 	(4, '[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, 4, NULL),
-	(5, 'The shire', 3, 3, NULL),
-	(6, 'Mordor', 2, 3, NULL);
+	(5, 'The shire', 1, 5, NULL),
+	(6, 'Mordor', 2, 5, NULL);
 /*!40000 ALTER TABLE `subtopic` ENABLE KEYS */;
 
 -- Listage des données de la table otter_worlds.templatecategory : ~3 rows (environ)
