@@ -84,14 +84,6 @@ export default class Event extends HalResource {
   }
 
   /**
-   * @param { Number } id id of the article
-   * @returns { Promise<Event[]> }
-   */
-  static async getByArticle (id) {
-    return await mariadbStore.client.query('SELECT * FROM Event WHERE article_idArticle = ? ORDER BY year, month, day', id)
-  }
-
-  /**
    * @param { Number } id if of the timeline
    * @returns { Promise<Event[]> }
    */

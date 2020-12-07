@@ -23,7 +23,7 @@ export default class Universe extends HalResource {
   /** @type { HalToOneLinksUniverse } */
   toOneLinks
   /** @type { String[] } */
-  static toManyLinks = ['groups', 'characters', 'maps', 'template-categories', 'timelines', 'topics', 'users-playing', 'keywords']
+  static toManyLinks = ['groups', 'characters', 'keywords', 'maps', 'template-categories', 'timelines', 'topics', 'users-playing']
 
   /**
    * @param { Universe } universe

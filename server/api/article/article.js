@@ -35,7 +35,6 @@ router.post('/', isConnected, canAdd, tryTo(postArticle, emptyError))
 
 // Put
 router.put('/:id', isConnected, canEdit, tryTo(putArticle, emptyError))
-// router.put('/:id/keywords', isConnected, canEdit, tryTo(putArticleKeyword, emptyError))
 
 // Delete
 router.delete('/:id', isConnected, canEdit, passwordConfirmation, tryTo(deleteArticle, emptyError))

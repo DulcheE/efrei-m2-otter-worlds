@@ -6,6 +6,6 @@ import { baseAPI } from '../../routes.js'
  * @param { import('express').Response } res
  */
 export default async function getArticleKeywords (req, res) {
-  const keywords = await Keyword.getAllForArticle(parseInt(req.params.id))
+  const keywords = await Keyword.getByArticle(parseInt(req.params.id))
   res.status(200).json(Keyword.asResourceList(baseAPI(req), keywords, 'articles' + req.url))
 }

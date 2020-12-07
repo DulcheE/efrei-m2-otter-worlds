@@ -70,6 +70,23 @@ export default class Keyword extends HalResource {
     return await mariadbStore.client.query('SELECT * FROM keyword WHERE article_idArticle = ?', id)
   }
 
+  /**
+   * @param { Number } id id of the universe
+   * @returns { Promise<Keyword[]> }
+   */
+  static async getByUniverse (id) {
+    return await mariadbStore.client.query(`
+      SELECT k.* FROM keyword k
+      INNER JOIN article a
+        ON a.idArticle = k.article_idArticle
+      INNER JOIN subtopic st
+        ON st.idSubTopic = a.subTopic_idSubTopic
+      INNER JOIN topic t
+        ON t.idTopic = st.topic_idTopic
+      WHERE t.universe_idUniverse = ?
+      `, id)
+  }
+
   /// POST
 
   /**

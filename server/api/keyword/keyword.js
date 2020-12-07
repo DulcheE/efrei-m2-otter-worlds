@@ -3,7 +3,6 @@ import { Router } from 'express'
 import isConnected from '../../middlewares/is-connected.js'
 import passwordConfirmation from '../../middlewares/password-confirmation.js'
 import { tryTo, emptyError } from '../../middlewares/errors.js'
-import KeywordPolicy from '../../policies/keyword.policy.js'
 import ArticlePolicy from '../../policies/article.policy.js'
 
 import getKeywords from './ctrl/get.keywords.js'
@@ -16,8 +15,7 @@ const {
   canEditUniverseIndirect
 } = require('../../middlewares/access-rights.js')
 
-const canAdd = canEditUniverseIndirect(ArticlePolicy.getUniverseId, 'idArticle', 'body')
-const canEdit = canEditUniverseIndirect(KeywordPolicy.getUniverseId, 'id', 'params')
+const canEdit = canEditUniverseIndirect(ArticlePolicy.getUniverseId, 'idArticle', 'body')
 
 const router = Router()
 
@@ -26,9 +24,9 @@ router.get('/', tryTo(getKeywords, emptyError))
 router.get('/query', canGetUniverse('universe', 'query'), tryTo(getKeywordArticles, emptyError))
 
 // Post
-router.post('/', isConnected, canAdd, tryTo(postKeyword, emptyError))
+router.post('/', isConnected, canEdit, tryTo(postKeyword, emptyError))
 
 // Delete
-router.delete('/:id', isConnected, canEdit, passwordConfirmation, tryTo(deleteKeyword, emptyError))
+router.delete('/', isConnected, canEdit, passwordConfirmation, tryTo(deleteKeyword, emptyError))
 
 export default router
