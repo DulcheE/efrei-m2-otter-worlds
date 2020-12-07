@@ -32,17 +32,20 @@ const mutations = {
 }
 
 const actions = {
-  async login (context, credentials) {
-    await traverson.from('http://localhost:3000/api/v1/auth/login')
+  login (context, credentials) {
+    traverson.from('http://localhost:3000/api/v1/auth/login')
       .json()
       .post(credentials).result
       .then((document) => {
+        // eslint-disable-next-line no-console
+        console.log(document)
         const result = JSON.parse(document.text)
-        context.commit('setLogin', { logged: true, id: result.id, username: result.username })
+        context.commit('setLogin', { logged: document.ok, id: result.id, username: result.username })
       })
       .catch((err) => {
         // eslint-disable-next-line
         console.log(err)
+        throw err
       })
   },
   async fetchUniverseOwn (context) {
