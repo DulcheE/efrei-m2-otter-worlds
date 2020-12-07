@@ -80,7 +80,7 @@ export default class Topic extends HalResource {
    * @returns { Promise<Topic[]> }
    */
   static async getByUniverse (id) {
-    return await mariadbStore.client.query('SELECT * FROM topic WHERE universe_idUniverse = ?', id)
+    return await mariadbStore.client.query('SELECT * FROM topic WHERE universe_idUniverse = ? AND name != "[OTTERWORLDS-TOPIC-SYSTEM]"', id)
   }
 
   /// POST
