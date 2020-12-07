@@ -1,3 +1,6 @@
+import CharacterPolicy from '../policies/character.policy.js'
+import SubTopicPolicy from '../policies/subTopic.policy.js'
+import TopicPolicy from '../policies/topic.policy.js'
 import UniversePolicy from '../policies/universe.policy.js'
 import UserPolicy from '../policies/user.policy'
 
@@ -61,6 +64,14 @@ function withIndirectId (policy) {
     , unauthorized)
 }
 
+/**
+ * @param { function(Number, Number): Promise<Boolean> } policy
+ * @return { function(String, String) : ExpressMiddleware }
+ */
+function withBody (policy) {
+  return gate(req => policy(req.session.idUser, req.body), unauthorized)
+}
+
 // /**
 //  * @param { function(Number, Number): Promise<Boolean> } policy
 //  * @return { function(String, String) : ExpressMiddleware }
@@ -71,13 +82,18 @@ function withIndirectId (policy) {
 // }
 
 module.exports = {
+  canGetSubTopic: withId(SubTopicPolicy.canGet),
+  verifySubTopic: withBody(SubTopicPolicy.verify),
+  canGetTopic: withId(TopicPolicy.canGet),
+  verifyTopic: withBody(TopicPolicy.verify),
   canGetUniverse: withId(UniversePolicy.canGet),
   canEditUniverse: withId(UniversePolicy.canEdit),
   canGetUniverseIndirect: withIndirectId(UniversePolicy.canGet),
   canEditUniverseIndirect: withIndirectId(UniversePolicy.canEdit),
   isUniverseOwner: withId(UniversePolicy.isOwner),
   isUser: withId(UserPolicy.isUser),
-  isUserIndirect: withIndirectId(UserPolicy.isUser)
+  isUserIndirect: withIndirectId(UserPolicy.isUser),
+  verifyStat: withBody(CharacterPolicy.verifyStat)
 }
 
 // canEditSessionAttempt: withIdSkip(SessionAttemptPolicy.canEdit),

@@ -18,10 +18,12 @@ import deleteCharacter from './ctrl/delete.character.js'
 import deleteCharacterGroup from './ctrl/delete.character.group.js'
 
 const {
+  canGetUniverse,
   canGetUniverseIndirect,
   canEditUniverseIndirect,
   isUser,
-  isUserIndirect
+  isUserIndirect,
+  verifyStat
 } = require('../../middlewares/access-rights.js')
 
 const canGet = canGetUniverseIndirect(CharacterPolicy.getUniverseId, 'id', 'params')
@@ -38,12 +40,12 @@ router.get('/:id/inventories', canGet, tryTo(getCharacterInventories, emptyError
 router.get('/:id/stats', canGet, tryTo(getCharacterStats, emptyError))
 
 // Post
-router.post('/', isConnected, canGet, isUser('idUser', 'body'), tryTo(postCharacter, emptyError))
+router.post('/', isConnected, canGetUniverse('idUniverse', 'body'), isUser('idUser', 'body'), tryTo(postCharacter, emptyError))
 router.post('/:id/groups', isConnected, canEditUniverse, tryTo(postCharacterGroup, emptyError))
 
 // Put
 router.put('/:id', isConnected, canEditCharacter, tryTo(putCharacter, emptyError))
-router.put('/:id/stats', isConnected, canEditCharacter, tryTo(putCharacterStats, emptyError))
+router.put('/:id/stats', isConnected, canEditCharacter, verifyStat, tryTo(putCharacterStats, emptyError))
 
 // Delete
 router.delete('/:id', isConnected, canEditCharacter, passwordConfirmation, tryTo(deleteCharacter, emptyError))

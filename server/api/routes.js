@@ -34,6 +34,7 @@ apiRouter.get('/', (req, res) => {
       characters: `${baseAPI(req)}characters`,
       events: `${baseAPI(req)}events`,
       groups: `${baseAPI(req)}groups`,
+      keywords: `${baseAPI(req)}keywords`,
       'interest-points': `${baseAPI(req)}interest-points`,
       inventories: `${baseAPI(req)}inventories`,
       maps: `${baseAPI(req)}maps`,

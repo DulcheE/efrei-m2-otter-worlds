@@ -54,10 +54,6 @@ INSERT INTO `inventory` (`idInventory`, `name`, `number`, `description`, `weight
 /*!40000 ALTER TABLE `keyword` DISABLE KEYS */;
 /*!40000 ALTER TABLE `keyword` ENABLE KEYS */;
 
--- Listage des données de la table otter_worlds.keywordarticle : ~0 rows (environ)
-/*!40000 ALTER TABLE `keywordarticle` DISABLE KEYS */;
-/*!40000 ALTER TABLE `keywordarticle` ENABLE KEYS */;
-
 -- Listage des données de la table otter_worlds.map : ~0 rows (environ)
 /*!40000 ALTER TABLE `map` DISABLE KEYS */;
 /*!40000 ALTER TABLE `map` ENABLE KEYS */;
@@ -82,8 +78,12 @@ INSERT INTO `stat` (`value`, `character_idCharacter`, `templateStat_idTemplateSt
 -- Listage des données de la table otter_worlds.subtopic : ~2 rows (environ)
 /*!40000 ALTER TABLE `subtopic` DISABLE KEYS */;
 INSERT INTO `subtopic` (`idSubTopic`, `name`, `order`, `topic_idTopic`, `article_idArticle`) VALUES
-	(1, 'The shire', 3, 3, NULL),
-	(3, 'Mordor', 2, 3, NULL);
+	(1, '[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, 1, NULL),
+	(2, '[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, 2, NULL),
+	(3, '[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, 3, NULL),
+	(4, '[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, 4, NULL),
+	(5, 'The shire', 1, 5, NULL),
+	(6, 'Mordor', 2, 5, NULL);
 /*!40000 ALTER TABLE `subtopic` ENABLE KEYS */;
 
 -- Listage des données de la table otter_worlds.templatecategory : ~3 rows (environ)
@@ -119,7 +119,11 @@ INSERT INTO `templatestat` (`idTemplateStat`, `name`, `bIsNumber`, `bIsRequired`
 -- Listage des données de la table otter_worlds.topic : ~2 rows (environ)
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
 INSERT INTO `topic` (`idTopic`, `name`, `order`, `universe_idUniverse`, `article_idArticle`) VALUES
-	(3, 'Royaumes', 1, 1, NULL),
+	(1, '[OTTERWORLDS-TOPIC-SYSTEM]', 0, 1, NULL),
+	(2, '[OTTERWORLDS-TOPIC-SYSTEM]', 0, 2, NULL),
+	(3, '[OTTERWORLDS-TOPIC-SYSTEM]', 0, 3, NULL),
+	(4, '[OTTERWORLDS-TOPIC-SYSTEM]', 0, 4, NULL),
+	(5, 'Royaumes', 1, 1, NULL),
 	(6, 'Religions', 2, 1, NULL);
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 

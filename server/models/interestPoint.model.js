@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store'
+import { mariadbStore } from '../mariadb-store.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
 class HalResourceDataInterestPoint extends HalResourceData {
@@ -11,7 +11,7 @@ class HalResourceDataInterestPoint extends HalResourceData {
 class HalToOneLinksInterestPoint extends HalToOneLinks {
   /** @type { Number } */
   map
-  /** @type { Number } */
+  /** @type { Number? } */
   article
 }
 
@@ -37,7 +37,7 @@ export default class InterestPoint extends HalResource {
 
     this.toOneLinks = new HalToOneLinksInterestPoint()
     this.toOneLinks.map = interestPoint.map_idMap || interestPoint.toOneLinks.map
-    this.toOneLinks.article = interestPoint.article_idArticle || (interestPoint.toOneLinks !== undefined) ? interestPoint.toOneLinks.article : undefined
+    this.toOneLinks.article = (interestPoint.article_idArticle !== undefined) ? interestPoint.article_idArticle : interestPoint.toOneLinks.article
   }
 
   /**

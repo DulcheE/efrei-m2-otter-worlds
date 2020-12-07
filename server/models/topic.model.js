@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store'
+import { mariadbStore } from '../mariadb-store.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
 class HalResourceDataTopic extends HalResourceData {
@@ -11,7 +11,7 @@ class HalResourceDataTopic extends HalResourceData {
 class HalToOneLinksTopic extends HalToOneLinks {
   /** @type { Number } */
   universe
-  /** @type { Number } */
+  /** @type { Number? } */
   article
 }
 
@@ -33,11 +33,11 @@ export default class Topic extends HalResource {
 
     this.data = new HalResourceDataTopic()
     this.data.name = topic.name || topic.data.name
-    this.data.order = topic.order || topic.data.order
+    this.data.order = (topic.order !== undefined) ? topic.order : topic.data.order
 
     this.toOneLinks = new HalToOneLinksTopic()
     this.toOneLinks.universe = topic.universe_idUniverse || topic.toOneLinks.universe
-    this.toOneLinks.article = topic.article_idArticle || (topic.toOneLinks !== undefined) ? topic.toOneLinks.article : undefined
+    this.toOneLinks.article = (topic.article_idArticle !== undefined) ? topic.article_idArticle : topic.toOneLinks.article
   }
 
   /**
@@ -80,7 +80,7 @@ export default class Topic extends HalResource {
    * @returns { Promise<Topic[]> }
    */
   static async getByUniverse (id) {
-    return await mariadbStore.client.query('SELECT * FROM topic WHERE universe_idUniverse = ?', id)
+    return await mariadbStore.client.query('SELECT * FROM topic WHERE universe_idUniverse = ? AND name != "[OTTERWORLDS-TOPIC-SYSTEM]"', id)
   }
 
   /// POST

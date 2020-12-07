@@ -14,6 +14,8 @@ import putSubTopic from './ctrl/put.subTopic.js'
 import deleteSubTopic from './ctrl/delete.subTopic.js'
 
 const {
+  canGetSubTopic,
+  verifySubTopic,
   canGetUniverseIndirect,
   canEditUniverseIndirect
 } = require('../../middlewares/access-rights.js')
@@ -26,16 +28,16 @@ const router = Router()
 
 // Get
 router.get('/', tryTo(getSubTopics, emptyError))
-router.get('/:id', canGet, tryTo(getSubTopic, emptyError))
-router.get('/:id/articles', canGet, tryTo(getSubTopicArticles, emptyError))
+router.get('/:id', canGetSubTopic('id', 'params'), canGet, tryTo(getSubTopic, emptyError))
+router.get('/:id/articles', canGetSubTopic('id', 'params'), canGet, tryTo(getSubTopicArticles, emptyError))
 
 // Post
-router.post('/', isConnected, canAdd, tryTo(postSubTopic, emptyError))
+router.post('/', isConnected, verifySubTopic, canAdd, tryTo(postSubTopic, emptyError))
 
 // Put
-router.put('/:id', isConnected, canEdit, tryTo(putSubTopic, emptyError))
+router.put('/:id', isConnected, verifySubTopic, canGetSubTopic('id', 'params'), canEdit, tryTo(putSubTopic, emptyError))
 
 // Delete
-router.delete('/:id', isConnected, canEdit, passwordConfirmation, tryTo(deleteSubTopic, emptyError))
+router.delete('/:id', isConnected, canGetSubTopic('id', 'params'), canEdit, passwordConfirmation, tryTo(deleteSubTopic, emptyError))
 
 export default router

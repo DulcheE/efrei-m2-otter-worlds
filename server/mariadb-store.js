@@ -28,4 +28,4 @@ class Mariadb {
   } */
 }
 
-export default new Mariadb()
+exports.mariadbStore = new Mariadb()

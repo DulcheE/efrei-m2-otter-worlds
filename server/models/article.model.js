@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store'
+import { mariadbStore } from '../mariadb-store.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
 class HalResourceDataArticle extends HalResourceData {
@@ -6,7 +6,7 @@ class HalResourceDataArticle extends HalResourceData {
   title
   /** @type { String } */
   content
-  /** @type { string } */
+  /** @type { String? } */
   thumbnail
 }
 
@@ -34,10 +34,10 @@ export default class Article extends HalResource {
     this.data = new HalResourceDataArticle()
     this.data.title = article.title || article.data.title
     this.data.content = article.content || article.data.content
-    this.data.thumbnail = article.thumbnail || article.data.thumbnail
+    this.data.thumbnail = (article.thumbnail !== undefined) ? article.thumbnail : article.data.thumbnail
 
     this.toOneLinks = new HalToOneLinksArticle()
-    this.toOneLinks.subTopic = article.subtopic_idSubTopic || article.toOneLinks.subTopic
+    this.toOneLinks.subTopic = article.subTopic_idSubTopic || article.toOneLinks.subTopic
   }
 
   /**
@@ -101,7 +101,7 @@ export default class Article extends HalResource {
   /// POST
 
   /**
-   * @param { { title: String, content: String, thumbnail: String, idSubTopic: Number } } article
+   * @param { { title: String, content: String, thumbnail: String?, idSubTopic: Number? } } article
    * @returns { Promise<Article> } the id of the new inserted article
    */
   static async add (article) {
@@ -111,7 +111,7 @@ export default class Article extends HalResource {
         VALUES(?, ?, ?, ?)
       RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [article.title, article.content, article.thumbnail, article.idSubTopic]
+    const params = [article.title, article.content, article.thumbnail || null, article.idSubTopic || null]
 
     return new Article((await mariadbStore.client.query(sql, params))[0])
   }
