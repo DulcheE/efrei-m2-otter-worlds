@@ -20,7 +20,13 @@ const {
 } = require('../../middlewares/access-rights.js')
 
 const canGet = canGetUniverseIndirect(ArticlePolicy.getUniverseId, 'id', 'params')
-const canAdd = canEditUniverseIndirect(SubTopicPolicy.getUniverseId, 'idSubTopic', 'body')
+const canAdd = (req, res, next) => {
+  if (req.body.idSubTopic) {
+    canEditUniverseIndirect(SubTopicPolicy.getUniverseId, 'idSubTopic', 'body')(req, res, next)
+  } else {
+    next()
+  }
+}
 const canEdit = canEditUniverseIndirect(ArticlePolicy.getUniverseId, 'id', 'params')
 
 const router = Router()

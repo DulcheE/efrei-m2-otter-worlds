@@ -1,4 +1,5 @@
 import Article from '../../../models/article.model'
+import { baseAPI } from '../../routes'
 
 /**
  * @param { import('express').Request } req
@@ -6,11 +7,11 @@ import Article from '../../../models/article.model'
  */
 export default async function postArticle (req, res) {
   try {
-    const insertedId = await Article.add(req.body)
-    res.status(201).json(insertedId)
+    const newArticle = await Article.add(req.body)
+    res.status(201).json(newArticle.asResource(baseAPI(req)))
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.log(err.code)
+    console.log(err)
     const jsonErr = { code: err.code, message: 'Error while creating the new template.\n' }
 
     if (err.code === 'ER_NO_REFERENCED_ROW_2') {

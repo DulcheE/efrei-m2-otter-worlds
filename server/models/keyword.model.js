@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store'
+import { mariadbStore } from '../mariadb-store.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
 class HalResourceDataKeyword extends HalResourceData {
@@ -70,40 +70,27 @@ export default class Keyword extends HalResource {
   }
 
   /**
-   * @param { Number } id id of the universe
-   * @returns { Promise<Keyword[]> }
-   */
-  static async getByUniverse (id) {
-    return await mariadbStore.client.query('SELECT * FROM keyword WHERE universe_idUniverse = ?', id)
-  }
-
-  /**
    * @param { Number } id id of the article
    * @returns { Promise<Keyword[]> }
    */
   static async getByArticle (id) {
-    return await mariadbStore.client.query(`
-      SELECT * FROM keyword k
-      LEFT OUTER JOIN keywordarticle ka
-        ON k.idKeyword = ka.keywords_idKeyword
-      WHERE ka.article_idArticle = ?
-    `, id)
+    return await mariadbStore.client.query('SELECT * FROM keyword WHERE article_idArticle = ?', id)
   }
 
   /// POST
 
   /**
-   * @param { {name: String, idUniverse: Number} } keyword
+   * @param { { name: String, idArticle: Number } } keyword
    * @returns { Promise<Keyword> } the id of the new inserted keyword
    */
   static async add (keyword) {
     const sql = `
       INSERT INTO
-        keyword(name, universe_idUniverse)
-        VALUES(?)
+        keyword(name, article_idArticle)
+        VALUES(?, ?)
       RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [keyword.name, keyword.idUniverse]
+    const params = [keyword.name, keyword.idArticle]
 
     return new Keyword((await mariadbStore.client.query(sql, params))[0])
   }
@@ -111,14 +98,14 @@ export default class Keyword extends HalResource {
   /// DELETE
 
   /**
-   * @param { Number } id id of the article
+   * @param { { name: String, idArticle: Number } } keyword
    * @returns { Promise<Boolean> } if the keyword could have been removed
    */
-  static async remove (id) {
+  static async remove (keyword) {
     const sql = `
       DELETE FROM keyword
-        WHERE idKeyword = ?`
-    const params = [id]
+        WHERE name = ? AND article_idArticle = ?`
+    const params = [keyword.name, keyword.idArticle]
 
     const rows = await mariadbStore.client.query(sql, params)
 
