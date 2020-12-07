@@ -13,6 +13,8 @@ import putTopic from './ctrl/put.topic.js'
 import deleteTopic from './ctrl/delete.topic.js'
 
 const {
+  canGetTopic,
+  verifyTopic,
   canEditUniverse,
   canGetUniverseIndirect,
   canEditUniverseIndirect
@@ -25,16 +27,16 @@ const router = Router()
 
 // Get
 router.get('/', tryTo(getTopics, emptyError))
-router.get('/:id', isConnected, canGet, tryTo(getTopic, emptyError))
-router.get('/:id/sub-topics', isConnected, canGet, tryTo(getTopicSubTopics, emptyError))
+router.get('/:id', canGetTopic('id', 'params'), canGet, tryTo(getTopic, emptyError))
+router.get('/:id/sub-topics', canGetTopic('id', 'params'), canGet, tryTo(getTopicSubTopics, emptyError))
 
 // Post
-router.post('/', isConnected, canEditUniverse('idUniverse', 'body'), tryTo(postTopic, emptyError))
+router.post('/', isConnected, verifyTopic, canEditUniverse('idUniverse', 'body'), tryTo(postTopic, emptyError))
 
 // Put
-router.put('/:id', isConnected, canEdit, tryTo(putTopic, emptyError))
+router.put('/:id', isConnected, verifyTopic, canGetTopic('id', 'params'), canEdit, tryTo(putTopic, emptyError))
 
 // Delete
-router.delete('/:id', isConnected, canEdit, passwordConfirmation, tryTo(deleteTopic, emptyError))
+router.delete('/:id', isConnected, canGetTopic('id', 'params'), canEdit, passwordConfirmation, tryTo(deleteTopic, emptyError))
 
 export default router

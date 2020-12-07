@@ -24,7 +24,8 @@ import deleteUniverseUser from './ctrl/delete.universe.kickUser.js'
 const {
   canGetUniverse,
   canEditUniverse,
-  isUniverseOwner
+  isUniverseOwner,
+  isUser
 } = require('../../middlewares/access-rights.js')
 
 const canGet = canGetUniverse('id')
@@ -45,7 +46,7 @@ router.get('/:id/topics', canGet, tryTo(getUniverseTopics, emptyError))
 router.get('/:id/users-playing', canGet, tryTo(getUniverseUsersPlaying, emptyError))
 
 // Post
-router.post('/', isConnected, tryTo(postUniverse, emptyError))
+router.post('/', isConnected, isUser('idUser', 'body'), tryTo(postUniverse, emptyError))
 router.post('/:id/users-playing', isConnected, canEdit, tryTo(postUniverseInvitation, emptyError))
 
 // Put

@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store'
+import { mariadbStore } from '../mariadb-store.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
 class HalResourceDataSubTopic extends HalResourceData {
@@ -33,7 +33,7 @@ export default class SubTopic extends HalResource {
 
     this.data = new HalResourceDataSubTopic()
     this.data.name = subTopic.name || subTopic.data.name
-    this.data.order = subTopic.order || subTopic.data.ordre
+    this.data.order = (subTopic.order !== undefined) ? subTopic.order : subTopic.data.ordre
 
     this.toOneLinks = new HalToOneLinksSubTopic()
     this.toOneLinks.topic = subTopic.topic_idTopic || subTopic.toOneLinks.topic

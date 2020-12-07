@@ -1,4 +1,4 @@
-import mariadbStore from '../mariadb-store'
+import { mariadbStore } from '../mariadb-store.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
 class HalResourceDataTopic extends HalResourceData {
@@ -33,7 +33,7 @@ export default class Topic extends HalResource {
 
     this.data = new HalResourceDataTopic()
     this.data.name = topic.name || topic.data.name
-    this.data.order = topic.order || topic.data.order
+    this.data.order = (topic.order !== undefined) ? topic.order : topic.data.order
 
     this.toOneLinks = new HalToOneLinksTopic()
     this.toOneLinks.universe = topic.universe_idUniverse || topic.toOneLinks.universe

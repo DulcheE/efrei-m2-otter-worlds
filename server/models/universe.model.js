@@ -1,10 +1,12 @@
-import mariadbStore from '../mariadb-store'
+import mariadb from 'mariadb'
+import { mariadbStore } from '../mariadb-store.js'
+import config from '../server.config.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
 
 class HalResourceDataUniverse extends HalResourceData {
   /** @type { String } */
   name
-  /** @type { String } */
+  /** @type { String? } */
   description
   /** @type { Boolean } */
   bIsPublic
@@ -33,7 +35,7 @@ export default class Universe extends HalResource {
 
     this.data = new HalResourceDataUniverse()
     this.data.name = universe.name || universe.data.name
-    this.data.description = universe.description || universe.data.description
+    this.data.description = (universe.description !== undefined) ? universe.description : universe.data.description
     this.data.bIsPublic = (universe.bIsPublic !== universe) ? !!universe.bIsPublic : universe.data.bIsPublic
 
     this.toOneLinks = new HalToOneLinksUniverse()
@@ -99,18 +101,37 @@ export default class Universe extends HalResource {
   /// POST
 
   /**
-   * @param { { name: String, description: String, bIsPublic: Boolean?, idUser: Number } } universe
+   * @param { { name: String, description: String?, bIsPublic: Boolean?, idUser: Number } } universe
    * @returns { Promise<Universe> } the id of the new inserted universe
    */
   static async add (universe) {
-    const sql = `
-      INSERT INTO 
-        universe(name, description, bIsPublic, user_idUser) 
-        VALUES(?, ?, ?, ?)
-      RETURNING *`
-    const params = [universe.name, universe.description, universe.bIsPublic, universe.idUser]
+    const conn = await mariadb.createConnection(config.MARIADB)
+    await conn.beginTransaction()
 
-    return new Universe((await mariadbStore.client.query(sql, params))[0])
+    try {
+      const sql = `
+        INSERT INTO 
+          universe(name, description, bIsPublic, user_idUser) 
+          VALUES(?, ?, ` + (universe.bIsPublic !== undefined ? '?' : 'DEFAULT(bIsPublic)') + `, ?)
+        RETURNING *`
+      const params = [universe.name, universe.description || null]
+      if (universe.bIsPublic !== undefined) { params.push(universe.bIsPublic) }
+      params.push(universe.idUser)
+
+      const newUniverse = new Universe((await conn.query(sql, params))[0])
+
+      const idTopic = (await conn.query('INSERT INTO topic(name, `order`, universe_idUniverse) VALUES(?, ?, ?)',
+        ['[OTTERWORLDS-TOPIC-SYSTEM]', 0, newUniverse.id])).insertId
+      await conn.query('INSERT INTO subTopic(name, `order`, topic_idTopic) VALUES (?, ?, ?)',
+        ['[OTTERWORLDS-SUBTOPIC-SYSTEM]', 0, idTopic])
+
+      await conn.commit().then(() => conn.close())
+
+      return newUniverse
+    } catch (err) {
+      conn.rollback().then(() => conn.close())
+      throw err
+    }
   }
 
   /**
