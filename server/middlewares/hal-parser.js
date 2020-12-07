@@ -21,13 +21,17 @@ export class HalResource {
    */
   asResource (baseAPI, resourcePath) {
     // The data from the object
-    const resource = hal.Resource({ id: this.id, ...this.data },
+    const data = { }
+    Object.keys(this.data).forEach((_) => {
+      if (this.data[_] !== null) { data[_] = this.data[_] }
+    })
+    const resource = hal.Resource({ id: this.id, ...data },
       `${baseAPI + resourcePath}/${this.id}`)
 
     // the links one to one and many to one
     const toOneLinks = Object.keys(this.toOneLinks)
     toOneLinks.forEach((key) => {
-      if (this.toOneLinks[key]) {
+      if (this.toOneLinks[key] != null) {
         // transform templateCategory to template-category
         const rel = ([...key].map(c => c === c.toLowerCase() ? c : '-' + c.toLowerCase())).join('')
         // transforme user to users OR template-category to template-categories
@@ -57,9 +61,9 @@ export class HalResource {
    */
   static asResourceList (baseAPI, list, selfLink, resourcePath, Classe) {
     const resources = []
-    for (const resource of list) {
-      const _resource = new Classe(resource)
-      resources.push(_resource.asResource(baseAPI, resourcePath).toJSON())
+    for (const item of list) {
+      const resource = new Classe(item)
+      resources.push(resource.asResource(baseAPI, resourcePath).toJSON())
     }
 
     const resource = hal.Resource({ list: resources }, baseAPI + selfLink)
