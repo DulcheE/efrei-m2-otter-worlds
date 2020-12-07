@@ -50,7 +50,7 @@
                       <v-text-field
                         v-model="newUniverse.name"
                         label="Name"
-                        :rules="[rules.required]"
+                        :rules="[rules.required, rules.maxSmall]"
                       />
                     </v-col>
 
@@ -60,7 +60,7 @@
                         <v-textarea
                           v-model="newUniverse.description"
                           label="Description"
-                          :rules="[rules.required]"
+                          :rules="[rules.required, rules.maxBig]"
                           :placeholder="newUniverse.description || 'Please write the description of your universe !'"
                           outlined
                           auto-grow
