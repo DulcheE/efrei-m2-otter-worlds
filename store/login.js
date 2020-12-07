@@ -33,14 +33,13 @@ const mutations = {
 
 const actions = {
   login (context, credentials) {
-    traverson.from('http://localhost:3000/api/v1/auth/login')
+    return traverson.from('http://localhost:3000/api/v1/auth/login')
       .json()
       .post(credentials).result
       .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
         const result = JSON.parse(document.text)
         context.commit('setLogin', { logged: document.ok, id: result.id, username: result.username })
+        return result
       })
       .catch((err) => {
         // eslint-disable-next-line
@@ -48,6 +47,7 @@ const actions = {
         throw err
       })
   },
+
   async fetchUniverseOwn (context) {
     // eslint-disable-next-line
     console.log(context.state)

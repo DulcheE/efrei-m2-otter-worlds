@@ -31,7 +31,7 @@
 
           <!-- text -->
           <div class="shrink mt-1 d-none d-lg-flex">
-            Sign in
+            New account
           </div>
         </v-tab>
       </v-tabs>
@@ -45,7 +45,7 @@
               <v-form ref="formLogin" v-model="formLogin">
                 <!-- Text -->
                 <h3 class="pa-4" align="center">
-                  Have you tried "user1" and "test" ?
+                  Have you tried "Paul" and "paulsword" ?
                 </h3>
 
                 <v-spacer />
@@ -54,7 +54,7 @@
                 <v-text-field
                   v-model="loginUsername"
                   class="pa-4"
-                  counter="15"
+                  counter="50"
                   clearable
                   prepend-icon="mdi-face"
                   label="Username"
@@ -78,15 +78,15 @@
 
               <!-- ALERT - displayed if the credentials are incorrect -->
               <v-alert
-                :value="loginFailed"
+                v-model="loginFailed"
                 dense
                 outlined
-                dismissible
                 prominent
+                dismissible
                 type="error"
                 transition="scale-transition"
               >
-                Please fill the form accordingly
+                {{ loginErrorMessage }}
               </v-alert>
             </v-container>
           </v-card-text>
@@ -96,7 +96,7 @@
         <v-tab-item>
           <v-card-text>
             <v-container>
-              <v-form ref="formSignIn" v-model="formSignIn">
+              <v-form ref="formSignup" v-model="formSignup">
                 <!-- Text -->
                 <h3 class="pa-4" align="center">
                   Having an account allows you to keep track of your scores
@@ -143,7 +143,7 @@
 
               <!-- ALERT - displayed if the credentials are incorrect -->
               <v-alert
-                :value="signUpFailed"
+                v-model="signUpFailed"
                 dense
                 outlined
                 dismissible
@@ -151,7 +151,7 @@
                 type="error"
                 transition="scale-transition"
               >
-                Please fill the form accordingly
+                {{ signUpErrorMessage }}
               </v-alert>
             </v-container>
           </v-card-text>
@@ -204,17 +204,20 @@ export default {
 
       // Form holder
       formLogin: false,
-      formSignIn: false,
+      formSignup: false,
 
       // Whether a form failed or not
       loginFailed: false,
-      signUpFailed: false
+      loginErrorMessage: '',
+      signUpFailed: false,
+      signUpErrorMessage: ''
     }
   },
 
   methods: {
     // Imports
     ...mapActions('login', ['login']),
+    ...mapActions('user', ['addUser']),
 
     /** Close dialog */
     closeDialog () {
@@ -231,26 +234,71 @@ export default {
           password: this.loginPassword
         }
 
-        // We call the login method
-        await this.login(credentials)
+        // We try to login
+        const response = await this.login(credentials)
 
-        // We reset the inputs
-        this.$refs.formLogin.reset()
+        // If the response has an ID : success !
+        // Otherwise : failed login
+        if (response.id !== undefined) {
+          // We reset the inputs
+          this.$refs.formLogin.reset()
 
-        // We close the dialog
-        this.closeDialog()
+          // We close the dialog
+          this.closeDialog()
+        } else {
+          this.loginFailed = true
+          this.loginErrorMessage = response.message
+        }
       }
     },
 
-    /** Method to Sign in (create new account) */
-    signUp () {
+    /** Method to Sign up (create new account) */
+    async signUp () {
       // If the form is valid
-      if (this.$refs.formSignIn.validate()) {
-        alert('SIGNIN !')
+      if (this.$refs.formSignup.validate()) {
+        if (this.signUpPassword === this.signUpPasswordVerif) {
+          // We create a credentials instance
+          const credentials = {
+            username: this.signUpUsername,
+            password: this.signUpPassword
+          }
 
-        // We reset the input OF BOTH FORM
-        this.$refs.formLogin.reset()
-        this.$refs.formSignIn.reset()
+          // We try to login
+          const response = await this.addUser(credentials)
+          console.log(response)
+
+          // If the sign-up is successful : log into the new account
+          // Otherwise : error
+          if (response.ok) {
+            // We try to login
+            const response2 = await this.login(credentials)
+
+            // If the response has an ID : success !
+            // Otherwise : failed login
+            if (response2.id !== undefined) {
+              // We reset the inputs
+              this.$refs.formSignup.reset()
+
+              // We close the dialog
+              this.closeDialog()
+            } else {
+              this.signUpFailed = true
+              this.signUpE = response2.message
+            }
+          } else {
+            this.signUpFailed = true
+            this.signUpE = 'Error at the sign Up, please try again'
+          }
+
+          // We reset the input OF BOTH FORM
+          /*
+          this.$refs.formLogin.reset()
+          this.$refs.formSignup.reset()
+          */
+        } else {
+          this.signUpFailed = true
+          this.signUpErrorMessage = 'The passwords do not match !'
+        }
       }
     }
   }
