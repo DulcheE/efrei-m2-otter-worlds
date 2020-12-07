@@ -1,7 +1,7 @@
-import mariadbStore from '../mariadb-store'
+import mariadb from 'mariadb'
+import { mariadbStore } from '../mariadb-store.js'
 import config from '../server.config.js'
 import { HalResource, HalResourceData, HalToOneLinks } from '../middlewares/hal-parser.js'
-const mariadb = require('mariadb')
 
 class HalResourceDataCharacter extends HalResourceData {
   /** @type { String } */
@@ -208,8 +208,8 @@ export default class Character extends HalResource {
 
   /**
    * @param { Number } id id of the character
-   * @param { { stats: { id: Number, value: String|Number }[] }[] } stats
-   * @returns { Promise<Boolean> } if the character could have been updated
+   * @param { { id: Number, value: String|Number }[] } stats
+   * @returns { Promise<{ value: String, character_idCharacter: Number, templateStat_idTemplateStat: Number }[]> } if the character could have been updated
    */
   static async updateStats (id, stats) {
     const conn = await mariadb.createConnection(config.MARIADB)
@@ -219,19 +219,18 @@ export default class Character extends HalResource {
 
     const paramsArray = []
 
-    for (const category of stats) {
-      for (const stat of category.stats) {
-        paramsArray.push([stat.value, id, stat.id])
-      }
+    for (const stat of stats) {
+      paramsArray.push([stat.value, id, stat.id])
     }
 
     const sql = `
-    INSERT INTO stat(value, character_idCharacter, templateStat_idTemplateStat)
-      VALUES(?, ?, ?)
+      INSERT INTO stat(value, character_idCharacter, templateStat_idTemplateStat)
+        VALUES(?, ?, ?)
       ON DUPLICATE KEY
-        UPDATE value = VALUE(value)`
+        UPDATE value = VALUE(value)
+      RETURNING *`
 
-    await Promise.all(paramsArray.map((params, index) => {
+    const results = await Promise.all(paramsArray.map((params, index) => {
       return conn.query(sql, params)
         .catch(() => {
           conn.rollback().then(() => conn.end())
@@ -242,7 +241,7 @@ export default class Character extends HalResource {
 
     conn.commit().then(() => conn.end())
 
-    return true
+    return await results.map(_ => _[0])
   }
 
   // DELETE
