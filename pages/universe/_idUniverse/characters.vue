@@ -25,7 +25,7 @@
       <v-divider class="ma-4" />
     </v-container>
 
-    <!-- All Characterq -->
+    <!-- All Characters -->
     <v-row align="center" justify="center">
       <!-- Iterate through the characters -->
       <v-col
@@ -38,12 +38,12 @@
         xl="3"
       >
         <!-- Card for the current character -->
-        <NuxtLink class="text-decoration-none" :to="'/universe/character/' + character.name">
+        <NuxtLink class="text-decoration-none" :to="'/universe/' + idUniverse + '/character/' + character.id">
           <v-card class="zoom-sm">
             <v-row>
               <!-- Image on the left -->
               <v-col class="ma-0 pa-0" cols="4">
-                <v-img min-height="200" max-height="200" lazy-src="/logo.png" :src="character.src" />
+                <v-img min-height="200" max-height="200" lazy-src="/logo.png" :src="(character.src !== undefined) ? character.src : 'https://tse4.mm.bing.net/th?id=OIP.P36GNbnyP3PBzBiGfOOZnQHaE8&pid=Api'" />
               </v-col>
 
               <!-- Text on the right -->
@@ -56,6 +56,7 @@
                 <br>
 
                 <!-- Character's creator -->
+                <!--
                 <h3>
                   by
                   <router-link class="text-decoration-none white--text" :to="'/user/' + character.user.username">
@@ -70,10 +71,13 @@
                       <span>{{ character.user.username }}'s user page</span>
                     </v-tooltip>
                   </router-link>
+                </h3>
+                -->
 
-                  <br>
-
+                <br>
+                <h3>
                   <!-- Character's race... -->
+                  <!--
                   <router-link class="text-decoration-none white--text" :to="'/universe/wiki/' + character.work">
                     <v-tooltip bottom :open-delay="250">
                       <template v-slot:activator="{ on, attrs }">
@@ -85,8 +89,10 @@
                       <span>{{ character.race }}'s wiki page</span>
                     </v-tooltip>
                   </router-link>
+                -->
 
                   <!-- ...and work -->
+                  <!--
                   <router-link class="text-decoration-none white--text" :to="'/universe/wiki/' + character.work">
                     <v-tooltip bottom :open-delay="250">
                       <template v-slot:activator="{ on, attrs }">
@@ -98,6 +104,7 @@
                       <span>{{ character.job }}'s wiki page</span>
                     </v-tooltip>
                   </router-link>
+                -->
                 </h3>
               </v-col>
             </v-row>
@@ -110,6 +117,8 @@
 
 <script>
 // Imports
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'PageCharacters',
 
@@ -121,38 +130,28 @@ export default {
       id: 0,
       name: 'who cares ?'
     },
-    arrayRaces: ['Human', 'Ork', 'Argonian', 'Titan', 'Witcher', 'ELf', 'Dwarf'],
-    arrayJobs: ['Soldier', 'Priest', 'Commoner', 'Brigand', 'Thief', 'Merchant']
+    characters: []
   }),
 
   computed: {
-    characters () {
-      const array = []
-      const max = 17
+    ...mapGetters('character', ['getCharacters']),
 
-      for (let i = 0; i < max; i++) {
-        const char = {
-          id: i,
-          user: {
-            username: 'J3@n C@st3x'
-          },
-          name: 'John DOE',
-          job: this.arrayJobs[Math.floor(Math.random() * this.arrayJobs.length)],
-          race: this.arrayRaces[Math.floor(Math.random() * this.arrayRaces.length)],
-          src: `https://picsum.photos/500/300?image=${i * 5 + 10}`
-        }
-
-        array.push(char)
-      }
-
-      return array
+    /** Return the id of the Universe, if he has one */
+    idUniverse () {
+      return parseInt(this.$route.params.idUniverse) || undefined
     }
   },
 
-  mounted () {
+  async mounted () {
+    // We fetch all the Characters from this universe
+    await this.fetchCharactersForUniverse(this.idUniverse)
+
+    // We get these characters
+    this.characters = await this.getCharacters()
   },
 
   methods: {
+    ...mapActions('character', ['fetchCharactersForUniverse'])
   },
 
   head () {

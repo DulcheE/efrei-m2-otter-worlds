@@ -2,10 +2,11 @@
   <v-container>
     <!-- For each stat category, we add a card -->
     <CharacterCardStatisticCategory
-      v-for="category in stats"
+      v-for="category in categories"
       :key="category.id"
       :is-modifying="isModifying"
       :category="category"
+      :is-highlighted="true"
     />
   </v-container>
 </template>
@@ -26,7 +27,7 @@ export default {
       type: Boolean,
       required: true
     },
-    stats: {
+    categories: {
       type: Array,
       required: true
     }

@@ -35,8 +35,6 @@ const actions = {
       .json()
       .getResource().result
       .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
         context.commit('setTemplateStats', document.list)
       })
       .catch((err) => {
