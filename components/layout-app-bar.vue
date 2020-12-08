@@ -216,6 +216,8 @@ export default {
 
   data () {
     return {
+      // name: '',
+      name: 'John DOE',
       isDialogActive: false,
       tab: null,
       characters: [],

@@ -17,6 +17,7 @@
         <v-list-item
           v-for="subtopic in topic.subtopics"
           :key="subtopic.nom"
+          :to="subtopic.to"
         >
           <v-list-item-content>
             <v-list-item-title v-text="subtopic.nom" />
@@ -121,28 +122,64 @@ export default {
       {
         name: 'Religion',
         subtopics: [
-          { nom: 'detail' },
-          { nom: 'boudiste' },
-          { nom: 'catholique' },
-          { nom: 'protestant' }
+          {
+            nom: 'detail',
+            to: '/wiki_article'
+          },
+          {
+            nom: 'boudiste',
+            to: '/wiki_subtopics'
+          },
+          {
+            nom: 'catholique',
+            to: '/wiki_subtopics'
+          },
+          {
+            nom: 'protestant',
+            to: '/wiki_subtopics'
+          }
         ]
       },
       {
         name: 'ville',
         subtopics: [
-          { nom: 'detail' },
-          { nom: 'paris' },
-          { nom: 'nantes' },
-          { nom: 'marseille' }
+          {
+            nom: 'detail',
+            to: '/wiki_article'
+          },
+          {
+            nom: 'paris',
+            to: '/wiki_subtopics'
+          },
+          {
+            nom: 'nantes',
+            to: '/wiki_subtopics'
+          },
+          {
+            nom: 'marseille',
+            to: '/wiki_subtopics'
+          }
         ]
       },
       {
         name: 'nouriture',
         subtopics: [
-          { nom: 'detail' },
-          { nom: 'patate' },
-          { nom: 'viande de struff' },
-          { nom: 'couille de struff' }
+          {
+            nom: 'detail',
+            to: '/wiki_article'
+          },
+          {
+            nom: 'patate',
+            to: '/wiki_subtopics'
+          },
+          {
+            nom: 'viande de struff',
+            to: '/wiki_subtopics'
+          },
+          {
+            nom: 'couille de struff',
+            to: '/wiki_subtopics'
+          }
         ]
       }
     ],
