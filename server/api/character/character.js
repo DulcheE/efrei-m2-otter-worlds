@@ -14,6 +14,8 @@ import postCharacter from './ctrl/post.character.js'
 import postCharacterGroup from './ctrl/post.character.group.js'
 import putCharacter from './ctrl/put.character.js'
 import putCharacterStats from './ctrl/put.character.stats.js'
+import putCharacterStatus from './ctrl/put.character.status.js'
+import putCharacterStatusGM from './ctrl/put.character.status.gameMaster.js'
 import deleteCharacter from './ctrl/delete.character.js'
 import deleteCharacterGroup from './ctrl/delete.character.group.js'
 
@@ -21,6 +23,7 @@ const {
   canGetUniverse,
   canGetUniverseIndirect,
   canEditUniverseIndirect,
+  canEditUniverseIndirectSkip,
   isUser,
   isUserIndirect,
   verifyStat
@@ -28,6 +31,7 @@ const {
 
 const canGet = canGetUniverseIndirect(CharacterPolicy.getUniverseId, 'id', 'params')
 const canEditUniverse = canEditUniverseIndirect(CharacterPolicy.getUniverseId, 'id', 'params')
+const canEditUniverseSkip = canEditUniverseIndirectSkip(CharacterPolicy.getUniverseId, 'id', 'params')
 const canEditCharacter = isUserIndirect(CharacterPolicy.getUserId, 'id', 'params')
 
 const router = Router()
@@ -45,7 +49,9 @@ router.post('/:id/groups', isConnected, canEditUniverse, tryTo(postCharacterGrou
 
 // Put
 router.put('/:id', isConnected, canEditCharacter, tryTo(putCharacter, emptyError))
-router.put('/:id/stats', isConnected, canEditCharacter, verifyStat, tryTo(putCharacterStats, emptyError))
+router.put('/:id/status', isConnected, canEditUniverseSkip, tryTo(putCharacterStatusGM, emptyError))
+router.put('/:id/status', isConnected, canEditCharacter, tryTo(putCharacterStatus, emptyError))
+router.put('/:id/stats', isConnected, canEditCharacter, verifyStat('id', 'params'), tryTo(putCharacterStats, emptyError))
 
 // Delete
 router.delete('/:id', isConnected, canEditCharacter, passwordConfirmation, tryTo(deleteCharacter, emptyError))

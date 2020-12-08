@@ -18,15 +18,16 @@ class CharacterPolicy {
   }
 
   /**
+   * @param { Number } idUser
    * @param { Number } idCharacter
    * @param { { id: Number, value: String|Number }[] } stats
    * @returns { Promise<Boolean> }
    */
-  static async verifyStat (idCharacter, stats) {
+  static async verifyStat (idUser, idCharacter, stats) {
     // We verify that all the categories of the inputs are from the same universe of the character
     /** @type [] */
     const templateStats = await mariadbStore.client.query(`
-    SELECT ts.idTemplateStat FROM templateStat ts
+      SELECT ts.idTemplateStat FROM templateStat ts
       INNER JOIN templateCategory tc
         ON tc.idTemplateCategory = ts.templateCategory_idTemplateCategory
       INNER JOIN universe u

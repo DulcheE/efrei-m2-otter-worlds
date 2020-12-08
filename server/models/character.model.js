@@ -9,9 +9,9 @@ class HalResourceDataCharacter extends HalResourceData {
   /** @type { String } */
   backstory
   /** @type { Boolean } */
-  bIsDead
+  bIsAlive
   /** @type { Boolean } */
-  bIsSheetCompleted
+  sheetStatus
 }
 
 class HalToOneLinksCharacter extends HalToOneLinks {
@@ -40,8 +40,8 @@ export default class Character extends HalResource {
     this.data = new HalResourceDataCharacter()
     this.data.name = character.name || character.data.name
     this.data.backstory = character.backstory || character.data.backstory
-    this.data.bIsDead = (character.bIsDead !== undefined) ? !!character.bIsDead : character.data.bIsDead
-    this.data.bIsSheetCompleted = (character.bIsSheetCompleted !== undefined) ? !!character.bIsSheetCompleted : character.data.bIsSheetCompleted
+    this.data.bIsAlive = (character.bIsAlive !== undefined) ? !!character.bIsAlive : character.data.bIsAlive
+    this.data.sheetStatus = character.sheetStatus || character.data.sheetStatus
 
     this.toOneLinks = new HalToOneLinksCharacter()
     this.toOneLinks.universe = character.universe_idUniverse || character.toOneLinks.universe
@@ -154,17 +154,20 @@ export default class Character extends HalResource {
   /// POST
 
   /**
-   * @param { { name: String, backstory: String, idUser: Number, idUniverse: Number } } character
+   * @param { { name: String, backstory: String?, sheetStatus: String, idUser: Number, idUniverse: Number } } character
    * @returns { Promise<Character> } the id of the new inserted character
    */
   static async add (character) {
+    const bHaveSheetStatus = character.sheetStatus === 'Work In Progress' || character.sheetStatus === 'To validate'
     const sql = `
       INSERT INTO 
-        \`character\`(name, backstory, user_idUser, universe_idUniverse) 
-        VALUES(?, ?, ?, ?)
+        \`character\`(name, backstory, sheetStatus, user_idUser, universe_idUniverse) 
+        VALUES(?, ?, ?, ` + (bHaveSheetStatus ? '?' : 'DEFAULT(sheetStatus)') + `, ?)
       RETURNING *`
     // All the params we have to put to insert a new row in the table
-    const params = [character.name, character.backstory, character.idUser, character.idUniverse]
+    const params = [character.name, character.backstory || null]
+    if (bHaveSheetStatus) { params.push(character.sheetStatus) }
+    params.push(character.idUser, character.idUniverse)
 
     return new Character((await mariadbStore.client.query(sql, params))[0])
   }
@@ -191,7 +194,7 @@ export default class Character extends HalResource {
 
   /**
    * @param { Number } id id of the character
-   * @param { { name: String, backstory: String } } character
+   * @param { { name: String, backstory: String, bIsAlive: Boolean } } character
    * @returns { Promise<Character> } if the character could have been updated
    */
   static async update (id, character) {
@@ -199,11 +202,25 @@ export default class Character extends HalResource {
       INSERT INTO
         \`character\`(idCharacter) VALUES(?)
       ON DUPLICATE KEY UPDATE
-        name = ?, backstory = ?
+        name = ?, backstory = ?, bIsAlive = ?
       RETURNING *`
-    const params = [id, character.name, character.backstory]
+    const params = [id, character.name, character.backstory, character.bIsAlive]
 
     return new Character((await mariadbStore.client.query(sql, params))[0])
+  }
+
+  /**
+   * @param { Number } id id of the character
+   * @param { String } sheetStatus
+   */
+  static async updateSheetStatus (id, sheetStatus) {
+    const sql = `
+      UPDATE \`character\`
+        SET sheetStatus = ?
+      WHERE idCharacter = ?`
+    const params = [sheetStatus, id]
+
+    await mariadbStore.client.query(sql, params)
   }
 
   /**

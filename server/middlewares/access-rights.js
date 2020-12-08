@@ -11,10 +11,10 @@ import UserPolicy from '../policies/user.policy'
 /** @typedef { function(ExpressRequest) : Promise<Boolean> } Validator */
 /** @typedef { function(ExpressRequest, ExpressResponse?, NextFunction?) : void } Behaviour */
 
-/** @type { ExpressMiddleware } */
+/** @type { Behaviour } */
 const unauthorized = (req, res) => { res.sendStatus(401) }
-// /** @type { ExpressMiddleware } */
-// const skip = (req, res, next) => { next('route') }
+/** @type { Behaviour } */
+const skip = (req, res, next) => { next('route') }
 
 /**
  * @param { Validator } validate
@@ -45,53 +45,58 @@ const id = (req, param, where) => parseInt(req[where][param])
 
 /**
  * @param { function(Number, Number): Promise<Boolean> } policy
+ * @param { Behaviour } behaviour
  * @return { function(String, String) : ExpressMiddleware }
  */
-function withId (policy) {
+function withId (policy, behaviour) {
   return (param, where = 'params') =>
-    gate(req => policy(req.session.idUser, id(req, param, where)), unauthorized)
+    gate(req => policy(req.session.idUser, id(req, param, where)), behaviour)
 }
 
 /**
  * @param { function(Number, Number): Promise<Boolean> } policy
+ * @param { Behaviour } behaviour
  * @return { function(String, String) : ExpressMiddleware }
  */
-function withIndirectId (policy) {
+function withIndirectId (policy, behaviour) {
   return (method, param, where = 'params') =>
     gate(req =>
       method(id(req, param, where))
         .then(idUniverse => policy(req.session.idUser, idUniverse))
-    , unauthorized)
+    , behaviour)
 }
 
 /**
  * @param { function(Number, Number): Promise<Boolean> } policy
+ * @param { Behaviour } behaviour
  * @return { function(String, String) : ExpressMiddleware }
  */
-function withBody (policy) {
-  return gate(req => policy(req.session.idUser, req.body), unauthorized)
+function withBody (policy, behaviour) {
+  return gate(req => policy(req.session.idUser, req.body), behaviour)
 }
 
-// /**
-//  * @param { function(Number, Number): Promise<Boolean> } policy
-//  * @return { function(String, String) : ExpressMiddleware }
-//  */
-// function withIdSkip (policy) {
-//   return (param, where = 'params') =>
-//     gate(req => policy(req.session.idUser, id(req, param, where)), skip)
-// }
+/**
+ * @param { function(Number, Number): Promise<Boolean> } policy
+ * @param { Behaviour } behaviour
+ * @return { function(String, String) : ExpressMiddleware }
+ */
+function withIdBody (policy, behaviour) {
+  return (param, where = 'params') =>
+    gate(req => policy(req.session.idUser, id(req, param, where), req.body), behaviour)
+}
 
 module.exports = {
-  canGetSubTopic: withId(SubTopicPolicy.canGet),
-  verifySubTopic: withBody(SubTopicPolicy.verify),
-  canGetTopic: withId(TopicPolicy.canGet),
-  verifyTopic: withBody(TopicPolicy.verify),
-  canGetUniverse: withId(UniversePolicy.canGet),
-  canEditUniverse: withId(UniversePolicy.canEdit),
-  canGetUniverseIndirect: withIndirectId(UniversePolicy.canGet),
-  canEditUniverseIndirect: withIndirectId(UniversePolicy.canEdit),
-  isUniverseOwner: withId(UniversePolicy.isOwner),
-  isUser: withId(UserPolicy.isUser),
-  isUserIndirect: withIndirectId(UserPolicy.isUser),
-  verifyStat: withBody(CharacterPolicy.verifyStat)
+  canGetSubTopic: withId(SubTopicPolicy.canGet, unauthorized),
+  verifySubTopic: withBody(SubTopicPolicy.verify, unauthorized),
+  canGetTopic: withId(TopicPolicy.canGet, unauthorized),
+  verifyTopic: withBody(TopicPolicy.verify, unauthorized),
+  canGetUniverse: withId(UniversePolicy.canGet, unauthorized),
+  canEditUniverse: withId(UniversePolicy.canEdit, unauthorized),
+  canGetUniverseIndirect: withIndirectId(UniversePolicy.canGet, unauthorized),
+  canEditUniverseIndirect: withIndirectId(UniversePolicy.canEdit, unauthorized),
+  canEditUniverseIndirectSkip: withIndirectId(UniversePolicy.canEdit, skip),
+  isUniverseOwner: withId(UniversePolicy.isOwner, unauthorized),
+  isUser: withId(UserPolicy.isUser, unauthorized),
+  isUserIndirect: withIndirectId(UserPolicy.isUser, unauthorized),
+  verifyStat: withIdBody(CharacterPolicy.verifyStat, unauthorized)
 }
