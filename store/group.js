@@ -73,10 +73,7 @@ const actions = {
       .withTemplateParameters({ idcharacter: id })
       .json()
       .getResource().result
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
     context.commit('setGroups', document.list)
   },
   async fetchGroupForUniverse (context, id) {
@@ -84,37 +81,29 @@ const actions = {
       .withTemplateParameters({ iduniverse: id })
       .json()
       .getResource().result
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
     context.commit('setGroups', document.list)
   },
-  addGroup (context, template) {
-    traverson.from('http://localhost:3000/api/v1/groups/')
+  async addGroup (context, template) {
+    const response = await traverson.from('http://localhost:3000/api/v1/groups/')
       .json()
       .post(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putGroup', result)
-        return result
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('putGroup', result)
+    return result
   },
-  putGroup (context, { group, id }) {
-    traverson.from('http://localhost:3000/api/v1/groups/{idgroup}')
+  async putGroup (context, { group, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/groups/{idgroup}')
       .withTemplateParameters({ idgroup: id })
       .json()
       .put(group).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeGroup', result)
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('changeGroup', result)
+    return result
   },
   async deleteGroup (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/groups/{idtemplate}')

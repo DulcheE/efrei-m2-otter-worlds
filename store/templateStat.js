@@ -72,45 +72,31 @@ const actions = {
       })
   },
   async fetchTemplateStatForCategory (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/template-categories/{idcategory}/template-stats')
+    const document = await traverson.from('http://localhost:3000/api/v1/template-categories/{idcategory}/template-stats')
       .withTemplateParameters({ idcategory: id })
       .json()
       .getResource().result
-      .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setTemplateStats', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('setTemplateStats', document.list)
   },
-  addTemplateStat (context, template) {
-    return traverson.from('http://localhost:3000/api/v1/template-stats/')
+  async addTemplateStat (context, template) {
+    const response = await traverson.from('http://localhost:3000/api/v1/template-stats/')
       .json()
       .post(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putTemplateStat', result)
-        return result
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('putTemplateStat', result)
+    return result
   },
   async putTemplateStat (context, { template, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/template-stats/{idtemplate}')
+    const response = await traverson.from('http://localhost:3000/api/v1/template-stats/{idtemplate}')
       .withTemplateParameters({ idtemplate: id })
       .json()
       .put(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeTemplateStat', result)
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('changeTemplateStat', result)
+    return result
   },
   async deleteTemplateStat (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/template-stats/{idtemplate}')

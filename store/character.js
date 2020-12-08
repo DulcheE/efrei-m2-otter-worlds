@@ -90,44 +90,27 @@ const actions = {
       })
   },
   async fetchCharactersForUniverse (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/characters')
+    const document = await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/characters')
       .withTemplateParameters({ iduniver: id })
       .json()
       .getResource().result
-      .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setCharacters', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw err })
+    context.commit('setCharacters', document.list)
   },
   async fetchCharactersForUser (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/users/{iduser}/characters')
+    const document = await traverson.from('http://localhost:3000/api/v1/users/{iduser}/characters')
       .withTemplateParameters({ iduser: id })
       .json()
       .getResource().result
-      .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setCharacters', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw err })
+    context.commit('setCharacters', document.list)
   },
   async fetchCharactersForGroup (context, id) {
     const document = await traverson.from('http://localhost:3000/api/v1/groups/{idgroup}/characters')
       .withTemplateParameters({ idgroup: id })
       .json()
       .getResource().result
-      .catch((err) => {
-        // eslint-disable-next-line no-console
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
     context.commit('setCharacters', document.list)
   },
   async fetchCharacterWithStat (context, id) {
@@ -142,54 +125,47 @@ const actions = {
         .json()
         .getResource().result
     ])
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
     context.commit('setCharacter', values[0])
     context.commit('setStat', values[1])
   },
-  addCharacter (context, character) {
-    traverson.from('http://localhost:3000/api/v1/characters/')
+  async addCharacter (context, character) {
+    const response = await traverson.from('http://localhost:3000/api/v1/characters/')
       .json()
       .post(character).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putCharacter', result)
-        return result
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('putCharacter', result)
+    return result
   },
-  putCharacter (context, { character, id }) {
-    traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}')
+  async putCharacter (context, { character, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}')
       .withTemplateParameters({ idcharacter: id })
       .json()
       .put(character).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeCharacter', result)
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('changeCharacter', result)
+    return result
   },
-  putStatForCharacter (context, { stats, id }) {
-    traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/stats')
+  async putStatForCharacter (context, { stats, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/stats')
       .withTemplateParameters({ idcharacter: id })
       .json()
       .put(stats).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeCharacter', result)
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('setStat', result)
+    return result
   },
-  putCharacterInGroup (context, { idgroup, idCharacter }) {
-    return traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/groups')
+  async putCharacterInGroup (context, { idgroup, idCharacter }) {
+    return await traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/groups')
       .withTemplateParameters({ idcharacter: idCharacter })
       .json()
       .post({ idGroup: idgroup }).result

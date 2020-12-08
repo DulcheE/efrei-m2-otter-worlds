@@ -7,9 +7,9 @@
     <!-- <v-list v-for="universe in universes" :key="universe.id">
       <h5>{{ universe }}</h5>
     </v-list> -->
-    <!-- <v-list v-for="template in templateCategories" :key="template.id">
+    <v-list v-for="template in templateCategories" :key="template.id">
       <h5>{{ template }}</h5>
-    </v-list> -->
+    </v-list>
     <!-- <v-list v-for="template in templateStats" :key="template.id">
       <h5>{{ template }}</h5>
     </v-list> -->
@@ -46,9 +46,9 @@
       <h5>{{ timelin }}</h5>
     </v-list>
     <h5>{{ timeline }}</h5> -->
-    <v-list v-for="event in events" :key="event.id">
+    <!-- <v-list v-for="event in events" :key="event.id">
       <h5>{{ event }}</h5>
-    </v-list>
+    </v-list> -->
   </div>
 </template>
 
@@ -139,8 +139,11 @@ export default {
   },
   async mounted () {
     await this.login({ username: 'François', password: 'françoispwd' })
-    await this.fetchEventForTimeline(1)
-    await this.putEvent({ event: { name: 'the conquest of the third circle', year: 10, month: 5, day: null, description: 'the demons of the abyss walk on the third circle of like it always belong to them', idArticle: null, idTimeline: 1 }, id: 6 })
+    /* await this.fetchEventForTimeline(1)
+    const newevent = await this.addEvent({ name: 'the rise of zafriel', year: 682, month: null, day: null, description: 'the angel zafriel shined again like in the first day it was born', idArticle: null, idTimeline: 1 })
+    // eslint-disable-next-line no-console
+    console.log(newevent) */
+    await this.fetchTemplateCategorywithTemplateStat(4)
     /* await this.fetchTimelinesForUniverse(4)
     await this.fetchTimelineWithEvent(1)
     await this.putTimeline({ timeline: { name: 'the stradh conquest', description: 'stradh is a very cruel and powerfull vampire who rule barovia', bIsPublic: true, idUniverse: 4 }, id: 3 }) */
@@ -193,7 +196,7 @@ export default {
     ...mapActions('login', ['login', 'fetchUniverseOwn', 'fetchUniversePlay']),
     ...mapActions('user', ['fetchAllUsers', 'fetchUser', 'addUser', 'putUser', 'deleteUser']),
     ...mapActions('universe', ['fetchAllUniverses', 'fetchUniverse', 'addUniverse', 'putUniverse', 'deleteUniverse']),
-    ...mapActions('templateCategories', ['fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchTemplateCategoryForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory']),
+    ...mapActions('templateCategories', ['fetchTemplateCategorywithTemplateStat', 'fetchAllTemplateCategories', 'fetchTemplateCategory', 'fetchTemplateCategoryForUniverse', 'addTemplateCategory', 'putTemplateCategory', 'deleteTemplateCategory']),
     ...mapActions('templateStat', ['fetchAllTemplateStats', 'fetchTemplateStat', 'fetchTemplateStatForCategory', 'addTemplateStat', 'putTemplateStat', 'deleteTemplateStat']),
     ...mapActions('character', ['fetchAllCharacters', 'fetchCharacter', 'fetchCharactersForGroup', 'fetchCharactersForUniverse', 'fetchCharactersForUser', 'fetchCharacterWithStat', 'addCharacter', 'putCharacter', 'deleteCharacter']),
     ...mapActions('inventory', ['fetchAllInventories', 'fetchInventory', 'fetchInventoryForCharacter', 'addInventory', 'putInventory', 'deleteInventory']),

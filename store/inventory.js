@@ -67,43 +67,35 @@ const actions = {
       })
   },
   async fetchInventoryForCharacter (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/inventories')
+    const document = await traverson.from('http://localhost:3000/api/v1/characters/{idcharacter}/inventories')
       .withTemplateParameters({ idcharacter: id })
       .json()
       .getResource().result
-      .then((document) => {
-        context.commit('setInventories', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('setInventories', document.list)
   },
-  addInventory (context, template) {
-    traverson.from('http://localhost:3000/api/v1/inventories/')
+  async addInventory (context, template) {
+    const response = await traverson.from('http://localhost:3000/api/v1/inventories/')
       .json()
       .post(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putInventory', result)
-        return result
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('putInventory', result)
+    return result
   },
-  putInventory (context, { inventory, id }) {
-    traverson.from('http://localhost:3000/api/v1/inventories/{idIventory}')
+  async putInventory (context, { inventory, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/inventories/{idIventory}')
       .withTemplateParameters({ idIventory: id })
       .json()
       .put(inventory).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeInventory', result)
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('changeInventory', result)
+    return result
   },
   async deleteInventory (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/inventories/{idtemplate}')

@@ -68,30 +68,21 @@ const actions = {
       })
   },
   async fetchEventForTimeline (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/timelines/{idtimeline}/events')
+    const document = await traverson.from('http://localhost:3000/api/v1/timelines/{idtimeline}/events')
       .withTemplateParameters({ idtimeline: id })
       .json()
       .getResource().result
-      .then((document) => {
-        context.commit('setEvents', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw err })
+    context.commit('setEvents', document.list)
   },
-  addEvent (context, template) {
-    traverson.from('http://localhost:3000/api/v1/events/')
+  async addEvent (context, template) {
+    const response = await traverson.from('http://localhost:3000/api/v1/events/')
       .json()
       .post(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putEvent', result)
-        return result
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('putEvent', result)
+    return result
   },
   putEvent (context, { event, id }) {
     traverson.from('http://localhost:3000/api/v1/events/{idEvent}')

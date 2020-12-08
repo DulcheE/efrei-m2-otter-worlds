@@ -38,13 +38,8 @@ const mutations = {
     const id = state.maps.findIndex((element) => {
       return element.id === map.id
     })
-    // eslint-disable-next-line no-console
-    console.log(state.maps[id])
     state.maps[id] = map
-    // eslint-disable-next-line no-console
-    console.log(state.maps[id])
     state.map = map
-
     state.maps = { ...state.maps }
   }
 }
@@ -92,19 +87,12 @@ const actions = {
       })
   },
   async fetchMapsForUniverse (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/maps')
+    const document = await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/maps')
       .withTemplateParameters({ iduniver: id })
       .json()
       .getResource().result
-      .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setMaps', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('setMaps', document.list)
   },
   async fetchMapWithInterestPoint (context, id) {
     const values = await Promise.all([
@@ -118,38 +106,27 @@ const actions = {
         .json()
         .getResource().result
     ])
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
     context.commit('setMap', values[0])
     context.commit('setInterestPoints', values[1].list)
   },
   async addMap (context, map) {
-    return await traverson.from('http://localhost:3000/api/v1/maps/')
+    const response = await traverson.from('http://localhost:3000/api/v1/maps/')
       .json()
       .post(map).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putMap', result)
-        return result
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('putMap', result)
+    return result
   },
-  putMap (context, { map, id }) {
-    traverson.from('http://localhost:3000/api/v1/maps/{idmap}')
+  async putMap (context, { map, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/maps/{idmap}')
       .withTemplateParameters({ idmap: id })
       .json()
       .put(map).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeMap', result)
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('changeMap', result)
   },
   deleteMap (context, id) {
     return traverson.from('http://localhost:3000/api/v1/maps/{idmap}')

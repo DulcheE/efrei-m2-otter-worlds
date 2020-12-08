@@ -70,17 +70,28 @@ const actions = {
       })
   },
   async fetchTemplateCategoryForUniverse (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/template-categories')
+    const document = await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/template-categories')
       .withTemplateParameters({ iduniver: id })
       .json()
       .getResource().result
-      .then((document) => {
-        context.commit('setTemplateCategories', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('setTemplateCategories', document.list)
+  },
+  async fetchTemplateCategorywithTemplateStat (context, id) {
+    const document = await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/template-categories')
+      .withTemplateParameters({ iduniver: id })
+      .json()
+      .getResource().result
+      .catch((err) => { throw (err) })
+    const result = await Promise.all(document.list.map((item) => {
+      return traverson.from(item._links['template-stats'].href).json().getResource().result
+    }))
+    let iterator = 0
+    context.commit('setTemplateCategories', document.list.map((item) => {
+      item.stats = result[iterator]
+      iterator++
+      return item
+    }))
   },
   addTemplateCategory (context, template) {
     traverson.from('http://localhost:3000/api/v1/template-categories/')

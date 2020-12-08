@@ -68,43 +68,31 @@ const actions = {
       })
   },
   async fetchInterestPointForMap (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/maps/{idmap}/interest-points')
+    const document = await traverson.from('http://localhost:3000/api/v1/maps/{idmap}/interest-points')
       .withTemplateParameters({ idmap: id })
       .json()
       .getResource().result
-      .then((document) => {
-        context.commit('setInterestPoints', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('setInterestPoints', document.list)
   },
-  addInterestPoint (context, template) {
-    traverson.from('http://localhost:3000/api/v1/interest-points/')
+  async addInterestPoint (context, template) {
+    const response = await traverson.from('http://localhost:3000/api/v1/interest-points/')
       .json()
       .post(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putInterestPoint', result)
-        return result
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('putInterestPoint', result)
+    return result
   },
-  putInterestPoint (context, { interestPoint, id }) {
-    traverson.from('http://localhost:3000/api/v1/interest-points/{idInterestPoint}')
+  async putInterestPoint (context, { interestPoint, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/interest-points/{idInterestPoint}')
       .withTemplateParameters({ idInterestPoint: id })
       .json()
       .put(interestPoint).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeInterestPoint', result)
-      })
-      .catch((err) => {
-        throw err
-      })
+      .catch((err) => { throw err })
+    const result = JSON.parse(response.body)
+    context.commit('changeInterestPoint', result)
+    return result
   },
   async deleteInterestPoint (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/interest-points/{idtemplate}')

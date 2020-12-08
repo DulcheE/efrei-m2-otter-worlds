@@ -92,19 +92,12 @@ const actions = {
       })
   },
   async fetchTimelinesForUniverse (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/timelines')
+    const document = await traverson.from('http://localhost:3000/api/v1/universes/{iduniver}/timelines')
       .withTemplateParameters({ iduniver: id })
       .json()
       .getResource().result
-      .then((document) => {
-        // eslint-disable-next-line no-console
-        console.log(document)
-        context.commit('setTimelines', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('setTimelines', document.list)
   },
   async fetchTimelineWithEvent (context, id) {
     const values = await Promise.all([
@@ -118,38 +111,32 @@ const actions = {
         .json()
         .getResource().result
     ])
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw err })
     context.commit('setTimeline', values[0])
     context.commit('setEvents', values[1].list)
   },
   async addTimeline (context, timeline) {
-    return await traverson.from('http://localhost:3000/api/v1/timelines/')
+    const response = await traverson.from('http://localhost:3000/api/v1/timelines/')
       .json()
-      .post(timeline).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putTimeline', result)
-        return result
-      })
+      .post(timeline).resul
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('putTimeline', result)
+    return result
   },
-  putTimeline (context, { timeline, id }) {
-    traverson.from('http://localhost:3000/api/v1/timelines/{idtimeline}')
+  async putTimeline (context, { timeline, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/timelines/{idtimeline}')
       .withTemplateParameters({ idtimeline: id })
       .json()
       .put(timeline).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeTimeline', result)
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('changeTimeline', result)
+    return result
   },
   deleteTimeline (context, id) {
     return traverson.from('http://localhost:3000/api/v1/timelines/{idtimeline}')

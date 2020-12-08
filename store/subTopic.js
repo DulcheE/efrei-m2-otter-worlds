@@ -102,37 +102,31 @@ const actions = {
       .withTemplateParameters({ idtopic: id })
       .json()
       .getResource().result
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
     context.commit('setSubTopics', document.list)
   },
-  addSubTopic (context, template) {
-    traverson.from('http://localhost:3000/api/v1/sub-topics/')
+  async addSubTopic (context, template) {
+    const response = await traverson.from('http://localhost:3000/api/v1/sub-topics/')
       .json()
       .post(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('putSubTopic', result)
-        return result
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('putSubTopic', result)
+    return result
   },
-  putSubTopic (context, { template, id }) {
-    traverson.from('http://localhost:3000/api/v1/sub-topics/{idtemplate}')
+  async putSubTopic (context, { template, id }) {
+    const response = await traverson.from('http://localhost:3000/api/v1/sub-topics/{idtemplate}')
       .withTemplateParameters({ idtemplate: id })
       .json()
       .put(template).result
-      .then((response) => {
-        const result = JSON.parse(response.body)
-        context.commit('changeSubTopic', result)
-      })
       .catch((err) => {
         throw err
       })
+    const result = JSON.parse(response.body)
+    context.commit('changeSubTopic', result)
+    return result
   },
   async deleteSubTopic (context, id) {
     return await traverson.from('http://localhost:3000/api/v1/sub-topics/{idtemplate}')

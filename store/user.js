@@ -19,49 +19,46 @@ const mutations = {
   },
   putUser (state, user) {
     state.users.push(user)
+  },
+  changeUser (state, user) {
+    const id = state.users.findIndex((element) => {
+      return element.id === user.id
+    })
+    state.users[id] = user
+    state.users = { ...state.users }
   }
 }
 
 const actions = {
   async fetchAllUsers (context) {
-    await traverson.from('http://localhost:3000/api/v1/users/')
+    const document = await traverson.from('http://localhost:3000/api/v1/users/')
       .json()
       .getResource().result
-      .then((document) => {
-        context.commit('setUsers', document.list)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('setUsers', document.list)
   },
   async fetchUser (context, id) {
-    await traverson.from('http://localhost:3000/api/v1/users/{idUser}')
+    const document = await traverson.from('http://localhost:3000/api/v1/users/{idUser}')
       .withTemplateParameters({ idUser: id })
       .json()
       .getResource().result
-      .then((document) => {
-        context.commit('putUser', document)
-      })
-      .catch((err) => {
-        // eslint-disable-next-line
-        console.log(err)
-      })
+      .catch((err) => { throw (err) })
+    context.commit('putUser', document)
   },
   async addUser (context, user) {
-    return await traverson.from('http://localhost:3000/api/v1/users/')
+    const response = await traverson.from('http://localhost:3000/api/v1/users/')
       .json()
       .post(user).result
+    context.commit('putUser', response)
   },
   async putUser (context, { user, id }) {
-    return await traverson.from('http://localhost:3000/api/v1/users/{userid}')
+    const response = await traverson.from('http://localhost:3000/api/v1/users/{userid}')
       .withTemplateParameters({ userid: id })
       .json()
       .put(user).result
+    context.commit('changeUser', response)
   },
   async deleteUser (context, user) {
-    // eslint-disable-next-line no-console
-    console.log(user)
     return await traverson.from('http://localhost:3000/api/v1/users/')
       .json()
       .delete(user).result
