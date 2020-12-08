@@ -17,13 +17,13 @@
 
 -- Listage des données de la table otter_worlds.character : ~6 rows (environ)
 /*!40000 ALTER TABLE `character` DISABLE KEYS */;
-INSERT INTO `character` (`idCharacter`, `name`, `backstory`, `bIsDead`, `bIsSheetCompleted`, `user_idUser`, `universe_idUniverse`) VALUES
-	(1, 'Eozen Thelir Daragon', 'A strange warrior who lost his memory', 0, 0, 1, 4),
-	(2, 'Le faurain', 'He come from a demon and patate his enemies', 0, 0, 4, 4),
-	(3, 'ConnArgonien', 'A very friendly reptile', 0, 0, 2, 4),
-	(4, 'François', 'Just François in is own universe', 0, 0, 3, 4),
-	(5, 'Jeskia', 'A original bard', 0, 0, 3, 2),
-	(6, 'Smith', 'A very very respectable priest', 0, 0, 2, 2);
+INSERT INTO `character` (`idCharacter`, `name`, `backstory`, `bIsAlive`, `sheetStatus`, `user_idUser`, `universe_idUniverse`) VALUES
+	(1, 'Eozen Thelir Daragon', 'A strange warrior who lost his memory', 1, 1, 1, 4),
+	(2, 'Le faurain', 'He come from a demon and patate his enemies', 1, 1, 4, 4),
+	(3, 'ConnArgonien', 'A very friendly reptile', 1, 1, 2, 4),
+	(4, 'François', 'Just François in is own universe', 1, 1, 3, 4),
+	(5, 'Jeskia', 'A original bard', 1, 1, 3, 2),
+	(6, 'Smith', 'A very very respectable priest', 1, 1, 2, 2);
 /*!40000 ALTER TABLE `character` ENABLE KEYS */;
 
 -- Listage des données de la table otter_worlds.characteringroup : ~0 rows (environ)
