@@ -1,20 +1,20 @@
 <template>
   <v-container>
     <v-form ref="form" v-model="validForm">
-      <!-- Status of the character's card -->
+      <!-- Status of the character's sheet -->
       <v-row align="center" justify="center">
         <v-col class="pa-4" cols="12" sm="6" md="4">
           <v-select
             v-model="status"
             label="Status of the character's card"
-            :items="statusItems.map(item => item.title)"
+            :items="itemsStatus.map(item => item.title)"
             :disabled="!isModifying"
             required
             prepend-icon="mdi-wrench"
-            :color="statusItems.find(item => item.title === status).color"
-            :item-color="statusItems.find(item => item.title === status).color"
-            :class="'ma-4 ' + statusItems.find(item => item.title === status).color + '--text'"
             solo
+            :color="itemsStatus.find(item => item.title === status).color"
+            :item-color="itemsStatus.find(item => item.title === status).color"
+            :class="'ma-4 ' + itemsStatus.find(item => item.title === status).color + '--text'"
           />
         </v-col>
       </v-row>
@@ -23,6 +23,19 @@
       <v-card shaped>
         <!-- Title for all the essential data about the character -->
         <v-container class="pa-4">
+          <!-- Character's name -->
+          <v-row align="center" justify="center">
+            <v-col class="pa-4" cols="8" sm="6" md="4">
+              <v-text-field
+                v-model="characterPlaceholder.character.name"
+                label="Character's name"
+                prepend-icon="mdi-face"
+                :rules="[rules.required, rules.maxSmall]"
+                :disabled="!isModifying"
+              />
+            </v-col>
+          </v-row>
+
           <v-row>
             <!-- Image on the left -->
             <v-col class="pa-4" cols="12" lg="4">
@@ -119,111 +132,13 @@
 
             <!-- Inputs on the right -->
             <v-col cols="12" lg="8">
-              <!-- Container with fill-height to vertically center the content -->
-              <v-container class="pa-4" fill-height>
-                <v-row align="center" justify="center">
-                  <!-- Character's name -->
-                  <v-col cols="12" sm="6" md="3">
-                    <v-text-field
-                      v-model="characterPlaceholder.name"
-                      label="Name"
-                      :disabled="!isModifying"
-                      :clearable="isModifying"
-                      :rules="[rules.required, rules.maxSmall]"
-                      class="ma-4"
-                      type="text"
-                      required
-                    />
-                  </v-col>
-
-                  <!-- Character's race -->
-                  <v-col cols="12" sm="6" md="3">
-                    <v-text-field
-                      v-model="characterPlaceholder.race"
-                      label="Race"
-                      :disabled="!isModifying"
-                      :clearable="isModifying"
-                      :rules="[rules.required, rules.maxSmall]"
-                      required
-                      class="ma-4"
-                      type="text"
-                    />
-                  </v-col>
-
-                  <!-- Character's job -->
-                  <v-col cols="12" sm="6" md="3">
-                    <v-text-field
-                      v-model="characterPlaceholder.job"
-                      label="Job"
-                      :disabled="!isModifying"
-                      :clearable="isModifying"
-                      :rules="[rules.required, rules.maxSmall]"
-                      required
-                      class="ma-4"
-                    />
-                  </v-col>
-
-                  <!-- Character's age -->
-                  <v-col cols="12" sm="6" md="3">
-                    <v-text-field
-                      v-model="characterPlaceholder.age"
-                      label="Age"
-                      :disabled="!isModifying"
-                      :clearable="isModifying"
-                      :rules="[rules.required]"
-                      class="ma-4"
-                      type="number"
-                    />
-                  </v-col>
-                </v-row>
-
-                <!-- A separator to divide both parts -->
-                <v-container>
-                  <v-divider v-if="statsEssential.content.length !== 0" class="ma-6" />
-                </v-container>
-
-                <!-- For each Essential stat, we add an input -->
-                <!-- First, the number inputs -->
-                <v-row align="center" justify="center">
-                  <v-col
-                    v-for="item in orderByName(statsEssential.content.filter(s => s.isNumber))"
-                    :key="item.id"
-                    cols="12"
-                    sm="6"
-                    md="3"
-                  >
-                    <v-text-field
-                      v-model="item.value"
-                      :label="item.name"
-                      :disabled="!isModifying"
-                      :clearable="isModifying"
-                      :rules="[rules.required]"
-                      class="ma-4"
-                      type="number"
-                    />
-                  </v-col>
-                </v-row>
-
-                <!-- Second, the text inputs -->
-                <v-row align="center" justify="center">
-                  <v-col
-                    v-for="item in orderByName(statsEssential.content.filter(s => !s.isNumber))"
-                    :key="item.id"
-                    cols="12"
-                    sm="6"
-                    md="3"
-                  >
-                    <v-text-field
-                      v-model="item.value"
-                      :label="item.name"
-                      :disabled="!isModifying"
-                      :clearable="isModifying"
-                      :rules="[rules.required, rules.maxSmall]"
-                      class="ma-4"
-                      type="text"
-                    />
-                  </v-col>
-                </v-row>
+              <v-container>
+                <!-- For each stat category, we add a card -->
+                <CharacterCardStatisticCategory
+                  :is-modifying="isModifying"
+                  :category="statsEssential"
+                  :is-highlighted="false"
+                />
               </v-container>
             </v-col>
           </v-row>
@@ -256,22 +171,22 @@
         <v-tabs-items v-model="tab">
           <!-- Tab n° 1 - Statistics -->
           <v-tab-item>
-            <CharacterCardStatistics :is-modifying="isModifying" :stats="statsRegular" />
+            <CharacterCardStatistics :is-modifying="isModifying" :categories="statsRegular" />
           </v-tab-item>
 
           <!-- Tab n° 2 - Inventory -->
           <v-tab-item>
-            <CharacterCardInventory :is-modifying="isModifying" :inventory="inventory" />
+            <CharacterCardInventory :is-modifying="isModifying" :inventory="characterPlaceholder.inventory" />
           </v-tab-item>
 
           <!-- Tab n° 3 - Magic (may be passed) -->
           <v-tab-item v-if="hasMagic">
-            <CharacterCardMagic :is-modifying="isModifying" :stats="statsMagic" />
+            <CharacterCardMagic :is-modifying="isModifying" :categories="statsMagic" />
           </v-tab-item>
 
           <!-- Tab n° 4 - BackStory -->
           <v-tab-item>
-            <CharacterCardBackstory :is-modifying="isModifying" :backstory="backstory" />
+            <CharacterCardBackstory :is-modifying="isModifying" :backstory="characterPlaceholder.character.backstory" />
           </v-tab-item>
         </v-tabs-items>
       </v-card>
@@ -340,6 +255,7 @@
 
 <script>
 // Imports
+import { mapActions, mapGetters } from 'vuex'
 import MixinRules from '@/mixins/mixin-rules'
 import MixinOrderByName from '@/mixins/mixin-order-by-name'
 import CharacterCardStatistics from '@/components/character-card-statistics'
@@ -370,48 +286,84 @@ export default {
     // Whether the form is valid or not
     validForm: false,
 
-    // TEMPORARY - Data about the character to be displayed
+    // Data about the character to be STORED
     character: {
-      id: -1,
-      user: {
-        username: ''
-      },
       name: '',
-      race: '',
-      job: '',
-      age: 20,
-      src: 'https://picsum.photos/500/300?image=1',
-      stats: [
-        {
-          name: 'Essential',
-          id: -1,
-          isMagic: false,
-          content: []
-        }
-      ]
+      bIsDead: 0,
+      bIsSheetCompleted: 0,
+      backstory: '',
+      src: 'https://picsum.photos/500/300?image=1'
     },
+    statCategories: [
+      {
+        id: -1,
+        name: 'essential',
+        order: -1,
+        stats: [
+          {
+            id: -1,
+            name: 'default',
+            value: 0,
+            bIsNumber: true,
+            bIsRequired: true
+          }
+        ]
+      }
+    ],
+    inventory: {},
+
+    // Data about the character to be DISPLAYED
     characterPlaceholder: {
-      id: -1,
-      user: {
-        username: ''
+      character: {
+        name: '',
+        bIsDead: 0,
+        bIsSheetCompleted: 0,
+        backstory: '',
+        src: 'https://picsum.photos/500/300?image=1'
       },
-      name: '',
-      race: '',
-      job: '',
-      age: 20,
-      src: 'https://picsum.photos/500/300?image=1',
-      stats: [
+      statCategories: [
         {
-          name: 'Essential',
           id: -1,
-          isMagic: false,
-          content: []
+          name: 'essential',
+          order: -1,
+          stats: [
+            {
+              id: -1,
+              name: 'default',
+              value: 0,
+              bIsNumber: true,
+              bIsRequired: true
+            }
+          ]
         }
-      ]
+      ],
+      inventory: []
     },
 
     // Status of the character's card
     status: 'Work in progress',
+    itemsAllStatus: [
+      {
+        title: 'Work in progress',
+        color: 'primary',
+        isForAdmin: false
+      },
+      {
+        title: 'Waiting validation',
+        color: 'warning',
+        isForAdmin: false
+      },
+      {
+        title: 'Refused by MJ',
+        color: 'error',
+        isForAdmin: true
+      },
+      {
+        title: 'Validated by MJ',
+        color: 'success',
+        isForAdmin: true
+      }
+    ],
 
     // Whether the picture dialog is open or not
     dialogPicture: false,
@@ -427,34 +379,15 @@ export default {
   }),
 
   computed: {
-    /** Items contained in the status widget */
-    statusItems () {
-      // We initialize a list
-      const allItems = [
-        {
-          title: 'Work in progress',
-          color: 'primary',
-          isForAdmin: false
-        },
-        {
-          title: 'Waiting validation',
-          color: 'warning',
-          isForAdmin: false
-        },
-        {
-          title: 'Refused by MJ',
-          color: 'error',
-          isForAdmin: true
-        },
-        {
-          title: 'Validated by MJ',
-          color: 'success',
-          isForAdmin: true
-        }
-      ]
+    ...mapGetters('character', ['getCharacter', 'getStat']),
+    ...mapGetters('inventory', ['getInventories']),
+    ...mapGetters('templateCategory', ['getTemplateCategories']),
+    ...mapGetters('templateStat', ['getTemplateStats']),
 
+    /** Items contained in the status widget */
+    itemsStatus () {
       // We return the correct / reduced list
-      return allItems.filter(item => item.isForAdmin === this.isAdmin || item.title === this.status)
+      return this.itemsAllStatus.filter(item => item.isForAdmin === this.isAdmin || item.title === this.status.title)
     },
 
     /** Items contained in the tab */
@@ -485,213 +418,130 @@ export default {
       return items
     },
 
-    /** Category (the first in order) containing all Essential stats */
+    /** Category (the first in order) containing all Essential statCategories */
     statsEssential () {
-      return this.characterPlaceholder.stats[0]
+      return this.characterPlaceholder.statCategories[0] || []
     },
 
-    /** Categories of stats that are neither Magic nor Essential */
+    /** Category containing non-Essential statCategories (all but the first) */
+    statsNonEssential () {
+      return this.characterPlaceholder.statCategories.slice(1, this.characterPlaceholder.statCategories.length) || []
+    },
+
+    /** Categories of statCategories that are neither Magic nor Essential */
     statsRegular () {
-      return this.characterPlaceholder.stats.filter(category => !category.isMagic && category.id !== 0)
+      return this.statsNonEssential.filter(category => !category.isMagic) || []
     },
 
-    /** Categories of stats that are Magic */
+    /** Return the id of the Universe, if he has one */
+    idUniverse () {
+      return parseInt(this.$route.params.idUniverse) || undefined
+    },
+
+    /** Categories of statCategories that are Magic (but not Essential) */
     statsMagic () {
-      return this.characterPlaceholder.stats.filter(category => category.isMagic)
+      return this.statsNonEssential.filter(category => category.isMagic) || []
+    },
+
+    /** Return whether this page is for a new Character or not */
+    isNewCharacter () {
+      return this.$route.params.idCharacter === undefined
+    },
+
+    /** Return the id of the Character, if he has one */
+    idCharacter () {
+      return (this.isNewCharacter) ? undefined : parseInt(this.$route.params.idCharacter)
     }
   },
 
-  mounted () {
+  async mounted () {
+    // GOING FORWARD, we consider that this is a valid character in a valid universe
     // We initialize the value of the picture selected by the user
-    // this.pictureSelected = this.characterPlaceholder.src
+    this.pictureSelected = this.characterPlaceholder.character.src
 
-    // If accessing the page to CREATE a character's sheet for the 1st time, the user can directly modify his data
-    const idCharacter = this.$route.params.idCharacter
-    if (idCharacter === undefined) {
+    // First, we fetch the Template categories for this Universe
+    await this.fetchTemplateCategoryForUniverse(this.idUniverse)
+    this.statCategories = this.getTemplateCategories()
+
+    // Second, for each category, we fetch the Template stat, and put it inside the category
+    await Promise.all(this.statCategories.map((category) => {
+      return this.fetchTemplateStatForCategory(category.id)
+        .then(() => {
+          category.stats = this.getTemplateStats()
+        })
+    }))
+
+    // we define an array to host the character's existing statCategories
+    let statsFromCharacter = []
+
+    // If it is a new character :
+    // we get the default template
+    // the user can directly modify his data
+    // Otherwise :
+    // We get the character's data
+    if (this.isNewCharacter) {
       this.isModifying = true
+    } else {
+      // We fetch the character's own data
+      await this.fetchCharacterWithStat(this.idCharacter)
+      await this.fetchInventoryForCharacter(this.idCharacter)
+
+      // We get the data
+      this.character = this.getCharacter()
+      statsFromCharacter = this.getStat().categories
+      this.inventory = this.getInventories()
     }
 
-    // TO BE REPLACED - We fill the character object
-    this.character = {
-      id: 1234,
-      user: {
-        username: 'J3@n C@st3x'
-      },
-      name: 'John Doe',
-      race: 'Human',
-      job: 'Soldier',
-      age: 22,
-      src: 'https://picsum.photos/500/300?image=1',
-      stats: [
-        {
-          name: 'Essential',
-          id: 0,
-          isMagic: false,
-          content: [
-            {
-              name: 'Reputation',
-              value: 'Well-known',
-              isNumber: false
-            },
-            {
-              name: 'Strength',
-              value: '8',
-              isNumber: true
-            },
-            {
-              name: 'Spirit',
-              value: '3',
-              isNumber: true
-            },
-            {
-              name: 'Intelligence',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Karma',
-              value: 'Non-existent',
-              isNumber: false
-            }
-          ]
-        },
-        {
-          name: 'General',
-          id: 1,
-          isMagic: false,
-          content: [
-            {
-              name: 'Intelligence',
-              value: 'Dumb fuck',
-              isNumber: false
-            },
-            {
-              name: 'Blablabla',
-              value: 'bla bla ?',
-              isNumber: false
-            },
-            {
-              name: 'Blabla.',
-              value: 'bla !',
-              isNumber: false
-            },
-            {
-              name: 'Deduction',
-              value: '8',
-              isNumber: true
-            },
-            {
-              name: 'Education',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Language - elder',
-              value: '3',
-              isNumber: true
-            },
-            {
-              name: 'Language - dwarf',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Opposition',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Contradiction',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Premonition',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Compromise',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Agitation',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Violation',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Mutilation',
-              value: '5',
-              isNumber: true
-            },
-            {
-              name: 'Planet dies',
-              value: '5',
-              isNumber: true
-            }
-          ]
-        },
-        {
-          name: 'Craft',
-          id: 2,
-          isMagic: false,
-          content: [
-            {
-              name: 'Alchemy',
-              value: 7,
-              isNumber: true
-            },
-            {
-              name: 'Cooking',
-              value: 5,
-              isNumber: true
-            },
-            {
-              name: 'Forgery',
-              value: 2,
-              isNumber: true
-            }
-          ]
-        },
-        {
-          name: 'Witchery',
-          id: 3,
-          isMagic: true,
-          content: [
-            {
-              name: 'Mana',
-              value: 7,
-              isNumber: true
-            },
-            {
-              name: 'Witchcraft',
-              value: 'novice',
-              isNumber: false
-            }
-          ]
+    // We fill the template with the data from the database
+    this.statCategories.forEach((category) => {
+      // We get the matching category
+      const categoryPlayer = statsFromCharacter.find(c => c.id === category.id)
+
+      // we iterate through the stat of the category
+      category.stats.forEach((stat) => {
+        // If the player has no such category, we put a default value
+        // Otherwise : we try to get the stat's value, or give it a default value if none is found
+        if (categoryPlayer === undefined) {
+          stat.value = (stat.bIsNumber) ? 0 : ''
+        } else {
+          // We get the stat (from the player)
+          const statPlayer = categoryPlayer.stats.find(s => s.id === stat.id)
+
+          // We set the stat
+          stat.value = (statPlayer !== undefined) ? statPlayer.value : (stat.bIsNumber) ? 0 : ''
         }
-      ],
-      inventory: [],
-      backstory: ''
-    }
+      })
+    })
 
-    // We fill the placeholder with the character's data
-    this.characterPlaceholder = lodash.cloneDeep(this.character)
+    // We fill the placeholder
+    this.initPlaceholder()
   },
 
   methods: {
+    ...mapActions('character', ['fetchCharacterWithStat']),
+    ...mapActions('inventory', ['fetchInventoryForCharacter']),
+    ...mapActions('templateCategory', ['fetchTemplateCategoryForUniverse']),
+    ...mapActions('templateStat', ['fetchTemplateStatForCategory']),
+
+    initPlaceholder () {
+      // We fill the placeholder with the character's data
+      this.characterPlaceholder = {
+        character: lodash.cloneDeep(this.character),
+        statCategories: lodash.cloneDeep(this.statCategories),
+        inventory: lodash.cloneDeep(this.inventory)
+      }
+
+      // We set the status according to the placeholder
+      const index = this.characterPlaceholder.character.bIsSheetCompleted ? 1 : 0
+      this.status = this.itemsAllStatus[index].title
+    },
+
     /**
      * Discard the changes brought to the character card
      */
     discardChanges () {
       // We reset the placeholder
-      this.characterPlaceholder = lodash.cloneDeep(this.character)
+      this.initPlaceholder()
 
       // We close the modifications
       this.isModifying = false
@@ -703,8 +553,14 @@ export default {
     saveChanges () {
       // If the form is valid
       if (this.$refs.form.validate()) {
-        // We modify the character's data
-        this.character = lodash.cloneDeep(this.characterPlaceholder)
+        // Before we continue, we morph some data
+        this.characterPlaceholder.character.bIsSheetCompleted = true // this.itemsAllStatus.findIndex(item => item.title === this.status)
+
+        // We modify the ACTUAL character's data
+        this.character = lodash.cloneDeep(this.characterPlaceholder.character)
+        this.statCategories = lodash.cloneDeep(this.characterPlaceholder.statCategories)
+
+        // stuff ?
 
         // We close the modifications
         this.isModifying = false
@@ -713,7 +569,7 @@ export default {
   },
 
   head () {
-    return { title: (this.$route.params.idCharacter === undefined) ? 'new character' : 'not new' } // this.character.name }
+    return { title: (this.isNewCharacter) ? 'new character' : this.character.name }
   }
 }
 </script>

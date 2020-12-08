@@ -265,7 +265,6 @@ export default {
 
           // We try to login
           const response = await this.addUser(credentials)
-          console.log(response)
 
           // If the sign-up is successful : log into the new account
           // Otherwise : error

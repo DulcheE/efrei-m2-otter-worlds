@@ -203,6 +203,7 @@
 </template>
 
 <script>
+// Imports
 import LayoutLoginDialog from '@/components/layout-login-dialog'
 import { mapActions, mapGetters } from 'vuex'
 
@@ -217,6 +218,7 @@ export default {
     return {
       isDialogActive: false,
       tab: null,
+      characters: [],
       universes: [],
       itemsProfile: [
         {
@@ -245,6 +247,7 @@ export default {
 
   computed: {
     // Imports
+    ...mapGetters('character', ['getCharacters']),
     ...mapGetters('login', ['getLogged']),
     ...mapGetters('universe', ['getUniverses']),
 
@@ -260,13 +263,12 @@ export default {
           icon: 'mdi-earth',
           title: 'Create / Discover Universes',
           to: '/most-known-universes',
-          content: this.universes.slice(0, 5).map((u) => {
-            return {
+          content: this.universes.slice(0, 5).map(u => (
+            {
               title: u.name,
               src: 'https://i.pinimg.com/originals/48/cb/53/48cb5349f515f6e59edc2a4de294f439.png',
               to: '/universe/' + u.id
-            }
-          })
+            }))
         },
         {
           icon: 'mdi-account-group',
@@ -277,59 +279,30 @@ export default {
     },
 
     /** Items to display when a user is browsing an universe */
-    itemsTabAdvanced () {
+    itemsTabInUniverse () {
       // We declare some items
       const items = [
         {
           icon: 'mdi-human-handsup',
           title: 'Characters',
-          to: '/characters',
-          content: [
+          to: '/universe/' + this.idUniverse + '/characters',
+          content: this.characters.slice(0, 5).map(c => (
             {
-              title: 'Eddy',
+              title: c.name,
               src: 'http://pngimg.com/uploads/witcher/witcher_PNG56.png',
-              to: '/characters/eddy'
-            },
-            {
-              title: 'François',
-              src: 'https://risibank.fr/cache/stickers/d910/91038-full.png',
-              to: '/characters/francois'
-            },
-            {
-              title: 'Hugues',
-              src: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/c225ee22-742c-4b8c-bf24-046ecca04e42/d7gluxa-95a2d14f-619b-42c4-8591-5b7cf38eb672.png/v1/fill/w_800,h_800,q_75,strp/more_argonian_by_pa1nful-d7gluxa.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwic3ViIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl0sIm9iaiI6W1t7InBhdGgiOiIvZi9jMjI1ZWUyMi03NDJjLTRiOGMtYmYyNC0wNDZlY2NhMDRlNDIvZDdnbHV4YS05NWEyZDE0Zi02MTliLTQyYzQtODU5MS01YjdjZjM4ZWI2NzIucG5nIiwid2lkdGgiOiI8PTgwMCIsImhlaWdodCI6Ijw9ODAwIn1dXX0.ZyMft0maq8-AKhPfI6dHblFmznry3Suvvh-8JelRyGA',
-              to: '/characters/hugues'
-            },
-            {
-              title: 'Paul',
-              src: 'https://image.noelshack.com/fichiers/2017/37/6/1505512943-jdg-11.png',
-              to: '/characters/paul'
-            }
-          ]
+              to: '/universe/' + this.idUniverse + '/character/' + c.id
+            }))
         },
         {
           icon: 'mdi-feather',
           title: 'Wiki',
-          to: '/wiki',
-          content: [
-            {
-              title: 'Alpha',
-              to: '/wiki/alpha'
-            },
-            {
-              title: 'Beta',
-              to: '/wiki/beta'
-            },
-            {
-              title: 'Omega',
-              to: '/wiki/omega'
-            }
-          ]
+          to: '/universe/' + this.idUniverse + '/wiki',
+          content: []
         },
         {
           icon: 'mdi-map-legend',
           title: 'Maps',
-          to: '/map',
+          to: '/universe/' + this.idUniverse + '/map',
           content: [
             {
               title: 'The Shire',
@@ -346,7 +319,7 @@ export default {
         {
           icon: 'mdi-help',
           title: 'Forums',
-          to: '/forum'
+          to: '/universe/' + this.idUniverse + '/forum'
         }
       ]
 
@@ -357,7 +330,7 @@ export default {
     /** Returns the items to display in the App bar Tabs depending on the situation */
     itemsTab () {
       if (this.isUniverseSelected) {
-        return this.itemsTabAdvanced
+        return this.itemsTabInUniverse
       } else {
         return this.itemsTabDefault
       }
@@ -375,7 +348,12 @@ export default {
 
     /** Returns whether a universe is selected or not */
     isUniverseSelected () {
-      return false
+      return this.$router.currentRoute.name.startsWith('universe')
+    },
+
+    /** Return the id of the Universe, if he has one */
+    idUniverse () {
+      return this.isUniverseSelected ? parseInt(this.$route.params.idUniverse) : undefined
     },
 
     /** Items to put in the search bar */
@@ -443,14 +421,23 @@ export default {
   },
 
   async mounted () {
-    // We fetch all the Universes from the database
-    await this.fetchAllUniverses()
+    if (this.isUniverseSelected) {
+      // We fetch all the Characters from this universe
+      await this.fetchCharactersForUniverse(this.idUniverse)
 
-    // We get these universes
-    this.universes = await this.getUniverses()
+      // We get these characters
+      this.characters = await this.getCharacters()
+    } else {
+      // We fetch all the Universes
+      await this.fetchAllUniverses()
+
+      // We get these universes
+      this.universes = await this.getUniverses()
+    }
   },
 
   methods: {
+    ...mapActions('character', ['fetchCharactersForUniverse']),
     ...mapActions('universe', ['fetchAllUniverses']),
 
     /** Opens the dialog */

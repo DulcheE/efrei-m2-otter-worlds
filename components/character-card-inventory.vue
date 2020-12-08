@@ -229,37 +229,6 @@ export default {
     }
   }),
 
-  computed: {
-  },
-
-  created () {
-    this.inventory = [
-      {
-        name: 'Apple',
-        number: 5,
-        description: '1 doctor a day keeps the apple away',
-        weight: 0.1,
-        weightTotal: 0.1
-      },
-      {
-        name: 'Dagger',
-        number: 1,
-        description: 'That\'s not a knife...',
-        weight: 0.5,
-        weightTotal: 0.5
-      },
-      {
-        name: 'Claymore',
-        number: 1,
-        description: 'That\'s a knife !',
-        weight: 15,
-        weightTotal: 15
-      }
-    ]
-  },
-
-  mounted () {},
-
   methods: {
     /**
      * Headers for the data table

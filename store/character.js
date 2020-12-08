@@ -96,7 +96,6 @@ const actions = {
       .getResource().result
       .then((document) => {
         // eslint-disable-next-line no-console
-        console.log(document)
         context.commit('setCharacters', document.list)
       })
       .catch((err) => {
