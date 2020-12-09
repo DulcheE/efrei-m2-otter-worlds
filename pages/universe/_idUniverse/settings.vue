@@ -345,6 +345,7 @@ import MixinRules from '@/mixins/mixin-rules'
 
 export default {
   name: 'PageUniverseSettings',
+  layout: 'default-universe',
 
   mixins: [MixinRoles, MixinRules],
 

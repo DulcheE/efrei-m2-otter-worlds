@@ -214,10 +214,15 @@ export default {
     LayoutLoginDialog
   },
 
+  props: {
+    isUniverseSelected: {
+      type: Boolean,
+      required: true
+    }
+  },
+
   data () {
     return {
-      // name: '',
-      name: 'John DOE',
       isDialogActive: false,
       tab: null,
       characters: [],
@@ -346,11 +351,6 @@ export default {
     /** Returns whether the user's username */
     username () {
       return this.getLogged().username
-    },
-
-    /** Returns whether a universe is selected or not */
-    isUniverseSelected () {
-      return this.$router.currentRoute.name.startsWith('universe')
     },
 
     /** Return the id of the Universe, if he has one */

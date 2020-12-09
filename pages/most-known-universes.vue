@@ -186,7 +186,7 @@
             <!-- Title of the universe -->
             <v-card-title>
               <v-container class="pa-0">
-                <v-row align="center" justify="center">
+                <v-row class="ma-0 pa-0" align="center" justify="center">
                   <!-- Logo (flexible according to the screen size) -->
                   <v-col sm="4" md="4" align="right">
                     <v-img class="shrink d-flex d-md-none" src="/logo.png" max-height="50" max-width="50" contain />

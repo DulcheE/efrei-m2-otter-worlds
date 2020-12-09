@@ -266,6 +266,7 @@ const lodash = require('lodash')
 
 export default {
   name: 'PageCharacter',
+  layout: 'default-universe',
 
   components: {
     CharacterCardStatistics,

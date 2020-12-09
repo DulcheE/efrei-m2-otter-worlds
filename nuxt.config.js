@@ -86,4 +86,8 @@ export default {
   serverMiddleware: [
     '~/server/server.js'
   ],
+
+  router: {
+    middleware: ['myMiddleware']
+  }
 }

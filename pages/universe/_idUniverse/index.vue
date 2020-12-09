@@ -10,6 +10,7 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'PageUniverse',
+  layout: 'default-universe',
 
   components: {
   },

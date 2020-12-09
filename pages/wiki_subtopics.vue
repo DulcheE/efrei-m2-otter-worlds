@@ -30,9 +30,9 @@
 
           <!-- Dialog -->
           <v-card>
-              <v-card-title>
-                <span class="headline">New Topic</span>
-              </v-card-title>
+            <v-card-title>
+              <span class="headline">New Topic</span>
+            </v-card-title>
 
             <v-card-text>
               <v-container>
@@ -68,7 +68,7 @@
 
                     <!-- New Add : description -->
                     <v-col cols="12">
-                      <div class = "d-flex justify-center">
+                      <div class="d-flex justify-center">
                         <v-textarea
                           v-model="newAdd.description"
                           label="Description"

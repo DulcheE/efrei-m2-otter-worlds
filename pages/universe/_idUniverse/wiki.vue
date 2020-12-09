@@ -114,6 +114,7 @@
 
 export default {
   name: 'Pagewiki',
+  layout: 'default-universe',
 
   data: () => ({
     formNewTopic: false,

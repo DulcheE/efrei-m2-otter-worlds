@@ -1,7 +1,7 @@
 <template>
   <v-app dark>
     <!-- App bar (navbar) -->
-    <LayoutAppBar :is-universe-selected="false" />
+    <LayoutAppBar :is-universe-selected="true" />
 
     <!-- Appbar (wiki) -->
     <!-- <LayoutAppBarWiki v-if="inWiki" /> -->

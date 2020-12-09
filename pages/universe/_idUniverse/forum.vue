@@ -10,6 +10,7 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'PageForum',
+  layout: 'default-universe',
 
   components: {
   },

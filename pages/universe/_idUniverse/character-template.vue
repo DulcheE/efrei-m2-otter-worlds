@@ -280,6 +280,7 @@ import CharacterTemplateNewCategory from '@/components/character-template-new-ca
 
 export default {
   name: 'PageCharacterTemplate',
+  layout: 'default-universe',
 
   components: {
     CharacterTemplateNewCategory

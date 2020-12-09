@@ -186,7 +186,10 @@ export default {
   mixins: [MixinRules],
 
   props: {
-    isDialogActive: Boolean
+    isDialogActive: {
+      type: Boolean,
+      required: true
+    }
   },
 
   data () {

@@ -26,7 +26,7 @@
     </v-container>
 
     <!-- All Characters -->
-    <v-row align="center" justify="center">
+    <v-row v-if="characters.length !== 0" align="center" justify="center">
       <!-- Iterate through the characters -->
       <v-col
         v-for="character in characters"
@@ -40,7 +40,7 @@
         <!-- Card for the current character -->
         <NuxtLink class="text-decoration-none" :to="'/universe/' + idUniverse + '/character/' + character.id">
           <v-card class="zoom-sm">
-            <v-row>
+            <v-row class="ma-0 pa-0">
               <!-- Image on the left -->
               <v-col class="ma-0 pa-0" cols="4">
                 <v-img min-height="200" max-height="200" lazy-src="/logo.png" :src="(character.src !== undefined) ? character.src : 'https://tse4.mm.bing.net/th?id=OIP.P36GNbnyP3PBzBiGfOOZnQHaE8&pid=Api'" />
@@ -112,6 +112,9 @@
         </NuxtLink>
       </v-col>
     </v-row>
+    <h1 v-else>
+      Sorry, it seems that this universe does not have any character yet...
+    </h1>
   </v-container>
 </template>
 
@@ -121,6 +124,7 @@ import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'PageCharacters',
+  layout: 'default-universe',
 
   components: {
   },
