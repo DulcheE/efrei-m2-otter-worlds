@@ -298,17 +298,9 @@ export default {
     statCategories: [
       {
         id: -1,
-        name: 'essential',
-        order: -1,
-        stats: [
-          {
-            id: -1,
-            name: 'default',
-            value: 0,
-            bIsNumber: true,
-            bIsRequired: true
-          }
-        ]
+        name: '',
+        order: 0,
+        stats: []
       }
     ],
     inventory: {},
