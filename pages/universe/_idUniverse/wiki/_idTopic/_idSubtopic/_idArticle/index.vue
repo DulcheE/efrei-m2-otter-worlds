@@ -34,7 +34,6 @@
           readonly
         />
       </v-row>
-
     </div>
     <!-- All article -->
     <v-list>

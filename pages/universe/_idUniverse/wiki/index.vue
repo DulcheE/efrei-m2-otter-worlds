@@ -204,16 +204,6 @@ export default {
 
   }),
 
-  methods: {
-    createTopic () {
-      if (this.$refs.formNewTopic.validate()) {
-        this.topics.push(this.newTopic)
-        this.newTopic = this.newTopicPlaceholder
-        this.dialogNewTopic = false
-      }
-    }
-  },
-
   computed: {
 
     /** Returns whether a universe is selected or not */
@@ -224,6 +214,16 @@ export default {
     /** Return the id of the Universe, if he has one */
     idUniverse () {
       return this.isUniverseSelected ? parseInt(this.$route.params.idUniverse) : undefined
+    }
+  },
+
+  methods: {
+    createTopic () {
+      if (this.$refs.formNewTopic.validate()) {
+        this.topics.push(this.newTopic)
+        this.newTopic = this.newTopicPlaceholder
+        this.dialogNewTopic = false
+      }
     }
   },
 

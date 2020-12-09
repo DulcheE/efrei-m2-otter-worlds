@@ -35,9 +35,8 @@
             :key="index"
             :to="content.to"
           >
-
             <!-- text -->
-            <v-list-item-title>{{ content.title}}</v-list-item-title>
+            <v-list-item-title>{{ content.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>

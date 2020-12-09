@@ -4,7 +4,7 @@
       <!-- Inputs for Add -->
       <v-row>
         <!-- Nom -->
-         <v-text-field
+        <v-text-field
           v-model="article.name"
           label="Name"
           :rules="[rules.required]"
@@ -35,11 +35,10 @@
             mdi-cancel
           </v-icon>
         </v-btn>
-
       </v-row>
       <v-row>
         <v-textarea
-        class="mt-10"
+          class="mt-10"
           labal="Description"
           :rules="[rules.required]"
           outlined

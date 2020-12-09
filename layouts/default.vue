@@ -11,6 +11,7 @@
 
     <!-- Container for Nuxt's page -->
     <v-main class="background">
+      <LayoutAppBarWiki v-if="inWiki" />
       <v-container>
         <nuxt />
       </v-container>
@@ -29,14 +30,14 @@
 <script>
 import LayoutAppBar from '@/components/layout-app-bar'
 import LayoutGmDashboard from '@/components/layout-gm-dashboard'
-// import LayoutAppBarWiki from '@/components/layout-app-bar-wiki'
+import LayoutAppBarWiki from '@/components/layout-app-bar-wiki'
 import MixinCss from '@/mixins/mixin-css'
 
 export default {
   components: {
     LayoutAppBar,
-    LayoutGmDashboard
-    // LayoutAppBarWiki
+    LayoutGmDashboard,
+    LayoutAppBarWiki
   },
 
   mixins: [MixinCss],
@@ -45,6 +46,14 @@ export default {
     return {
       isMJ: true,
       inWiki: true
+    }
+  },
+
+  computed: {
+
+    /** Retuns whether a wiki is seleced or not  */
+    isWikiSelected () {
+      return this.$router.currentRoute.name.includes('wiki')
     }
   },
 
