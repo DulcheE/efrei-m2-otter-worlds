@@ -55,10 +55,14 @@ Don't worry ! We've got you covered.
 
 ```
 Download the project.
-To fully end the download, open a console tab where the project is located, and enter :
+To fully end the set-up :
+  create a ccopy of the file 'server/local.server.config.example.js'
+  rename it 'server/local.server.config.js'
+
+  To download the dependencies, open a console tab and enter :
   $npm install
   
-To make the server operational, please enter :
+  To make the server operational, please enter :
   $npm run dev
 ```
 
